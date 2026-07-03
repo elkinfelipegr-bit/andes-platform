@@ -16,19 +16,19 @@ This document defines two things: (1) the product vision for AI within the platf
 
 Planned capabilities, to be built out module by module (see the AI module's position in [PRODUCT_STRATEGY.md](PRODUCT_STRATEGY.md), deliberately last in the sprint sequence):
 
-* NSR-10 assistant
-* ACI assistant
-* Structural design guidance
-* Geotechnical recommendations
-* Inspection report generation
-* Proposal generation
-* RFI assistance
-* Document summarization
-* BIM assistance
-* ETABS result explanation
-* SAFE assistance
-* Specification search
-* Technical knowledge retrieval
+- NSR-10 assistant
+- ACI assistant
+- Structural design guidance
+- Geotechnical recommendations
+- Inspection report generation
+- Proposal generation
+- RFI assistance
+- Document summarization
+- BIM assistance
+- ETABS result explanation
+- SAFE assistance
+- Specification search
+- Technical knowledge retrieval
 
 **Human engineers always make the final decision.** The Copilot accelerates and informs; it does not sign off on structural or geotechnical judgment. This mirrors [engineering-philosophy.md](engineering-philosophy.md) principle 6, "AI as Copilot."
 
@@ -58,6 +58,6 @@ Every development session should begin by reading, in order:
 
 ## Related Documents
 
-* [engineering-philosophy.md](engineering-philosophy.md) — principle 6, "AI as Copilot."
-* [project-principles.md](project-principles.md) — the governance rule this document operationalizes.
-* [architecture-principles.md](architecture-principles.md) — "AI assists but does not replace engineering judgment."
+- [engineering-philosophy.md](engineering-philosophy.md) — principle 6, "AI as Copilot."
+- [project-principles.md](project-principles.md) — the governance rule this document operationalizes.
+- [architecture-principles.md](architecture-principles.md) — "AI assists but does not replace engineering judgment."

@@ -36,7 +36,9 @@ export default function LoginPage() {
       <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="text-xl font-semibold">Andes Core</h1>
         <p className="mt-1 text-sm text-slate-500">
-          {mode === "sign-in" ? "Sign in to your account" : "Create your account"}
+          {mode === "sign-in"
+            ? "Sign in to your account"
+            : "Create your account"}
         </p>
 
         <form onSubmit={submit} className="mt-6 space-y-4">

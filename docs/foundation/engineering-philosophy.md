@@ -54,4 +54,4 @@ User experience is not a layer of polish applied after the "real" engineering wo
 
 ## How This Document Is Used
 
-New engineers and every AI assistant session should read this document to understand *why* the platform is built the way it is, before reading the more operational [engineering-principles.md](engineering-principles.md) and [architecture-principles.md](architecture-principles.md).
+New engineers and every AI assistant session should read this document to understand _why_ the platform is built the way it is, before reading the more operational [engineering-principles.md](engineering-principles.md) and [architecture-principles.md](architecture-principles.md).

@@ -89,7 +89,10 @@ describe("tenantProcedure", () => {
   });
 
   it("rejects authenticated users without a tenant membership with FORBIDDEN", async () => {
-    const noMembership: SessionInfo = { ...engineerSession, activeMembership: null };
+    const noMembership: SessionInfo = {
+      ...engineerSession,
+      activeMembership: null,
+    };
     await expect(callerWith(noMembership).tenantEcho()).rejects.toMatchObject({
       code: "FORBIDDEN",
     });
@@ -106,12 +109,16 @@ describe("tenantProcedure", () => {
 
 describe("roleProcedure", () => {
   it("rejects roles outside the allowed set with FORBIDDEN", async () => {
-    await expect(callerWith(engineerSession).adminOnly()).rejects.toMatchObject({
-      code: "FORBIDDEN",
-    });
+    await expect(callerWith(engineerSession).adminOnly()).rejects.toMatchObject(
+      {
+        code: "FORBIDDEN",
+      },
+    );
   });
 
   it("allows listed roles through", async () => {
-    await expect(callerWith(ownerSession).adminOnly()).resolves.toBe("OWNER_ADMIN");
+    await expect(callerWith(ownerSession).adminOnly()).resolves.toBe(
+      "OWNER_ADMIN",
+    );
   });
 });

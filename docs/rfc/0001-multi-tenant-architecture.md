@@ -27,9 +27,9 @@ This distinguishes two separate concepts that must not be conflated in the domai
 
 ## Alternatives
 
-* **Schema-per-tenant** — stronger isolation, but migrations and any cross-tenant admin/analytics query become significantly more complex to run and to keep in sync across potentially hundreds of tenants.
-* **Database-per-tenant** — maximum isolation and the easiest story for regulatory compliance, but the most expensive to operate and the hardest to scale to hundreds of small-to-mid-size engineering firms, which is the expected customer profile.
-* **Mono-tenant now, multi-tenant later** — rejected. Retrofitting `tenantId` and RLS onto an already-built single-tenant schema, plus migrating Andes Engineering's own live data into the new model, was judged more expensive than building tenant-aware from Sprint 0.
+- **Schema-per-tenant** — stronger isolation, but migrations and any cross-tenant admin/analytics query become significantly more complex to run and to keep in sync across potentially hundreds of tenants.
+- **Database-per-tenant** — maximum isolation and the easiest story for regulatory compliance, but the most expensive to operate and the hardest to scale to hundreds of small-to-mid-size engineering firms, which is the expected customer profile.
+- **Mono-tenant now, multi-tenant later** — rejected. Retrofitting `tenantId` and RLS onto an already-built single-tenant schema, plus migrating Andes Engineering's own live data into the new model, was judged more expensive than building tenant-aware from Sprint 0.
 
 ## Trade-offs
 
@@ -37,10 +37,10 @@ Shared DB with row-level isolation is the standard, cost-effective approach for 
 
 ## Consequences
 
-* Every table in the Sprint 0 domain model (`docs/architecture/sprint-0-domain-model.md`) that is not itself the Tenant table carries a `tenantId` foreign key.
-* Tenant-scoping middleware for tRPC is Sprint 0, Andes Core work — it is a hard prerequisite for every other product's data layer.
-* Seed/dev data must include at least one seed tenant record representing Andes Engineering itself.
-* Tenant-isolation logic (middleware + RLS policies) is security-critical and must be covered by tests per `PROJECT_RULES.md`, not left to the "pragmatic" default coverage level.
+- Every table in the Sprint 0 domain model (`docs/architecture/sprint-0-domain-model.md`) that is not itself the Tenant table carries a `tenantId` foreign key.
+- Tenant-scoping middleware for tRPC is Sprint 0, Andes Core work — it is a hard prerequisite for every other product's data layer.
+- Seed/dev data must include at least one seed tenant record representing Andes Engineering itself.
+- Tenant-isolation logic (middleware + RLS policies) is security-critical and must be covered by tests per `PROJECT_RULES.md`, not left to the "pragmatic" default coverage level.
 
 ## Rollout
 
@@ -48,11 +48,11 @@ Implemented as part of Sprint 0 (Andes Core), alongside authentication ([ADR-002
 
 ## Open Questions
 
-* **Billing/subscription model per tenant** — not decided. Needed before the platform can actually onboard a second, paying tenant firm. Should become its own future ADR ("Billing & Subscription Model") once commercialization is closer.
-* **Can a user belong to more than one tenant** (e.g. an independent consultant working across firms)? Sprint 0's domain model assumes one active tenant membership per user for simplicity — see the open question noted in `docs/architecture/sprint-0-domain-model.md`. Revisit if this becomes a real requirement.
+- **Billing/subscription model per tenant** — not decided. Needed before the platform can actually onboard a second, paying tenant firm. Should become its own future ADR ("Billing & Subscription Model") once commercialization is closer.
+- **Can a user belong to more than one tenant** (e.g. an independent consultant working across firms)? Sprint 0's domain model assumes one active tenant membership per user for simplicity — see the open question noted in `docs/architecture/sprint-0-domain-model.md`. Revisit if this becomes a real requirement.
 
 ## References
 
-* [VISION.md](../foundation/VISION.md)
-* [ADR-001](../adr/0001-technology-stack.md), [ADR-002](../adr/0002-authentication-provider.md), [ADR-003](../adr/0003-api-layer.md)
-* `docs/architecture/sprint-0-domain-model.md`
+- [VISION.md](../foundation/VISION.md)
+- [ADR-001](../adr/0001-technology-stack.md), [ADR-002](../adr/0002-authentication-provider.md), [ADR-003](../adr/0003-api-layer.md)
+- `docs/architecture/sprint-0-domain-model.md`

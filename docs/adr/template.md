@@ -44,4 +44,4 @@ Sources, prior art, related decisions.
 
 ---
 
-*This template follows the Decision Documentation Standard defined in [engineering-principles.md](../foundation/engineering-principles.md).*
+_This template follows the Decision Documentation Standard defined in [engineering-principles.md](../foundation/engineering-principles.md)._

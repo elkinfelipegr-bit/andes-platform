@@ -44,4 +44,4 @@ Sources, prior art, related ADRs/RFCs.
 
 ---
 
-*RFCs document larger, cross-cutting changes, per [engineering-principles.md](../foundation/engineering-principles.md). Individually scoped decisions are ADRs (`docs/adr/`), not RFCs.*
+_RFCs document larger, cross-cutting changes, per [engineering-principles.md](../foundation/engineering-principles.md). Individually scoped decisions are ADRs (`docs/adr/`), not RFCs._

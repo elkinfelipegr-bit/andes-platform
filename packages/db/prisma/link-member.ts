@@ -18,10 +18,14 @@ async function main() {
     );
   }
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) throw new Error(`No user with email ${email} — sign up in the app first.`);
+  if (!user)
+    throw new Error(`No user with email ${email} — sign up in the app first.`);
 
-  const tenant = await prisma.tenant.findUnique({ where: { slug: tenantSlug } });
-  if (!tenant) throw new Error(`No tenant with slug ${tenantSlug} — run the seed.`);
+  const tenant = await prisma.tenant.findUnique({
+    where: { slug: tenantSlug },
+  });
+  if (!tenant)
+    throw new Error(`No tenant with slug ${tenantSlug} — run the seed.`);
 
   const role = await prisma.role.findUnique({
     where: { tenantId_key: { tenantId: tenant.id, key: roleKey } },
@@ -34,7 +38,9 @@ async function main() {
     create: { tenantId: tenant.id, userId: user.id, roleId: role.id },
   });
 
-  console.log(`${email} → ${tenant.slug} as ${roleKey} (membership ${membership.id})`);
+  console.log(
+    `${email} → ${tenant.slug} as ${roleKey} (membership ${membership.id})`,
+  );
 }
 
 main()

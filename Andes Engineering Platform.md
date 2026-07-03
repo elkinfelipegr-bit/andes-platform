@@ -28,13 +28,13 @@ It should eventually become the operating system for engineering consulting comp
 
 The project must prioritize:
 
-* Scalability
-* Maintainability
-* Modularity
-* Clean Architecture
-* Excellent User Experience
-* Artificial Intelligence integration
-* Engineering-first workflows
+- Scalability
+- Maintainability
+- Modularity
+- Clean Architecture
+- Excellent User Experience
+- Artificial Intelligence integration
+- Engineering-first workflows
 
 ---
 
@@ -46,8 +46,8 @@ Long-term vision:
 
 Transform Andes Engineering into both:
 
-* an engineering consulting company
-* a software company specialized in civil engineering
+- an engineering consulting company
+- a software company specialized in civil engineering
 
 The software should eventually become a commercial SaaS product.
 
@@ -61,14 +61,14 @@ Instead, it is a platform composed of multiple products.
 
 Proposed product structure:
 
-* Andes Core
-* Andes Projects
-* Andes CRM
-* Andes Structures
-* Andes Geo
-* Andes BIM
-* Andes AI
-* Andes Analytics
+- Andes Core
+- Andes Projects
+- Andes CRM
+- Andes Structures
+- Andes Geo
+- Andes BIM
+- Andes AI
+- Andes Analytics
 
 Each module should eventually be able to evolve independently.
 
@@ -142,19 +142,19 @@ adr/
 
 Current documents:
 
-* README.md
-* VISION.md
-* MISSION.md
-* PRODUCT_STRATEGY.md
+- README.md
+- VISION.md
+- MISSION.md
+- PRODUCT_STRATEGY.md
 
 Next planned documents:
 
-* engineering-philosophy.md
-* project-principles.md
-* engineering-principles.md
-* architecture-principles.md
-* ai-principles.md
-* glossary.md
+- engineering-philosophy.md
+- project-principles.md
+- engineering-principles.md
+- architecture-principles.md
+- ai-principles.md
+- glossary.md
 
 ---
 
@@ -162,15 +162,15 @@ Next planned documents:
 
 Planned:
 
-* Target Market
-* Business Model
-* Competitor Analysis
-* User Personas
-* User Journeys
-* User Stories
-* Features
-* Non-functional Requirements
-* Product Roadmap
+- Target Market
+- Business Model
+- Competitor Analysis
+- User Personas
+- User Journeys
+- User Stories
+- Features
+- Non-functional Requirements
+- Product Roadmap
 
 ---
 
@@ -178,15 +178,15 @@ Planned:
 
 Planned:
 
-* Architecture Overview
-* Domain-Driven Design
-* Module Definitions
-* Database Design
-* API Design
-* Authentication
-* Authorization
-* Security
-* Infrastructure
+- Architecture Overview
+- Domain-Driven Design
+- Module Definitions
+- Database Design
+- API Design
+- Authentication
+- Authorization
+- Security
+- Infrastructure
 
 ---
 
@@ -194,11 +194,11 @@ Planned:
 
 Planned:
 
-* Design System
-* Component Library
-* UX Guidelines
-* Navigation
-* Design Tokens
+- Design System
+- Component Library
+- UX Guidelines
+- Navigation
+- Design Tokens
 
 ---
 
@@ -246,19 +246,19 @@ It should become an Engineering Copilot.
 
 Future capabilities include:
 
-* NSR-10 assistant
-* ACI assistant
-* Structural design guidance
-* Geotechnical recommendations
-* Inspection report generation
-* Proposal generation
-* RFI assistance
-* Document summarization
-* BIM assistance
-* ETABS result explanation
-* SAFE assistance
-* Specification search
-* Technical knowledge retrieval
+- NSR-10 assistant
+- ACI assistant
+- Structural design guidance
+- Geotechnical recommendations
+- Inspection report generation
+- Proposal generation
+- RFI assistance
+- Document summarization
+- BIM assistance
+- ETABS result explanation
+- SAFE assistance
+- Specification search
+- Technical knowledge retrieval
 
 Human engineers always make the final decision.
 
@@ -268,16 +268,16 @@ Human engineers always make the final decision.
 
 Important principles discussed:
 
-* Engineering before implementation.
-* Domain before UI.
-* Documentation before coding.
-* Reuse before creation.
-* Modularity over monolithic design.
-* Simplicity over cleverness.
-* Architecture over speed.
-* Long-term maintainability.
-* Single Source of Truth.
-* AI assists but does not replace engineering judgment.
+- Engineering before implementation.
+- Domain before UI.
+- Documentation before coding.
+- Reuse before creation.
+- Modularity over monolithic design.
+- Simplicity over cleverness.
+- Architecture over speed.
+- Long-term maintainability.
+- Single Source of Truth.
+- AI assists but does not replace engineering judgment.
 
 ---
 
@@ -481,61 +481,61 @@ Tentative stack (subject to future ADRs):
 
 Frontend
 
-* React
-* Next.js
-* TypeScript
+- React
+- Next.js
+- TypeScript
 
 UI
 
-* Tailwind CSS
-* shadcn/ui
+- Tailwind CSS
+- shadcn/ui
 
 Database
 
-* PostgreSQL
+- PostgreSQL
 
 ORM
 
-* Prisma
+- Prisma
 
 Authentication
 
-* Better Auth or Auth.js
+- Better Auth or Auth.js
 
 State
 
-* Zustand
-* TanStack Query
+- Zustand
+- TanStack Query
 
 Forms
 
-* React Hook Form
+- React Hook Form
 
 Validation
 
-* Zod
+- Zod
 
 Storage
 
-* S3-compatible storage
+- S3-compatible storage
 
 Deployment
 
-* Vercel
+- Vercel
 
 Monitoring
 
-* Sentry
+- Sentry
 
 Analytics
 
-* PostHog
+- PostHog
 
 AI
 
-* OpenAI
-* Anthropic
-* Gemini
+- OpenAI
+- Anthropic
+- Gemini
 
 ---
 
@@ -547,16 +547,16 @@ engineering-philosophy.md
 
 Key ideas:
 
-* Engineering First
-* Simplicity Over Cleverness
-* Build for Evolution
-* Documentation is Product
-* Domain Driven
-* AI as Copilot
-* Quality by Design
-* Single Source of Truth
-* Reuse Before Create
-* UX is Engineering
+- Engineering First
+- Simplicity Over Cleverness
+- Build for Evolution
+- Documentation is Product
+- Domain Driven
+- AI as Copilot
+- Quality by Design
+- Single Source of Truth
+- Reuse Before Create
+- UX is Engineering
 
 ---
 
@@ -586,9 +586,9 @@ References
 
 This documentation style should resemble:
 
-* ADRs
-* RFCs
-* Internal engineering handbooks used by mature software companies.
+- ADRs
+- RFCs
+- Internal engineering handbooks used by mature software companies.
 
 ---
 
