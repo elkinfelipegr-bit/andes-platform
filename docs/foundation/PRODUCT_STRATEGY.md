@@ -10,15 +10,15 @@
 
 This document captures the product structure and delivery sequencing that were already decided. It is **not** a replacement for the detailed product documentation planned under `docs/product/`:
 
-* Target Market
-* Business Model
-* Competitor Analysis
-* User Personas
-* User Journeys
-* User Stories
-* Features
-* Non-functional Requirements
-* Product Roadmap
+- Target Market
+- Business Model
+- Competitor Analysis
+- User Personas
+- User Journeys
+- User Stories
+- Features
+- Non-functional Requirements
+- Product Roadmap
 
 Those remain 🕓 **planned** and should be developed as their own PRDs, following the workflow in [engineering-principles.md](engineering-principles.md).
 
@@ -32,40 +32,40 @@ Andes Core · Andes Projects · Andes CRM · Andes Structures · Andes Geo · An
 
 The following functional modules are known to be in scope for the platform. Their mapping to the eight products above is indicative, not yet ratified as architecture:
 
-| Functional Module | Likely Product |
-|---|---|
-| Dashboard | Andes Core |
-| Projects | Andes Projects |
-| Clients | Andes CRM |
-| CRM | Andes CRM |
-| Proposal Generator | Andes CRM |
-| Structural Engineering | Andes Structures |
-| Geotechnical Engineering | Andes Geo |
-| Inspection Management | Andes Projects |
-| BIM | Andes BIM |
-| Reports | Andes Analytics |
-| Artificial Intelligence | Andes AI |
-| Analytics | Andes Analytics |
-| Notifications | Andes Core |
-| Authentication | Andes Core |
-| Administration | Andes Core |
+| Functional Module        | Likely Product   |
+| ------------------------ | ---------------- |
+| Dashboard                | Andes Core       |
+| Projects                 | Andes Projects   |
+| Clients                  | Andes CRM        |
+| CRM                      | Andes CRM        |
+| Proposal Generator       | Andes CRM        |
+| Structural Engineering   | Andes Structures |
+| Geotechnical Engineering | Andes Geo        |
+| Inspection Management    | Andes Projects   |
+| BIM                      | Andes BIM        |
+| Reports                  | Andes Analytics  |
+| Artificial Intelligence  | Andes AI         |
+| Analytics                | Andes Analytics  |
+| Notifications            | Andes Core       |
+| Authentication           | Andes Core       |
+| Administration           | Andes Core       |
 
 ## Delivery Strategy
 
 Every sprint focuses on **one objective**. The sequencing logic — foundation and platform mechanics before feature modules, AI last — is deliberate: AI features are only trustworthy once the domain they assist (structural, geotechnical, BIM) already exists and is well-modeled.
 
-| Phase | Focus |
-|---|---|
+| Phase    | Focus                                                               |
+| -------- | ------------------------------------------------------------------- |
 | Sprint 0 | Foundation, Architecture, Design System, Navigation, Authentication |
-| Sprint 1 | Dashboard |
-| Sprint 2 | Projects |
-| Sprint 3 | CRM |
-| Sprint 4 | Proposal Generator |
-| Sprint 5 | Inspection Module |
-| Sprint 6 | Structural Module |
-| Sprint 7 | Geotechnical Module |
-| Sprint 8 | BIM Module |
-| Sprint 9 | AI Module |
+| Sprint 1 | Dashboard                                                           |
+| Sprint 2 | Projects                                                            |
+| Sprint 3 | CRM                                                                 |
+| Sprint 4 | Proposal Generator                                                  |
+| Sprint 5 | Inspection Module                                                   |
+| Sprint 6 | Structural Module                                                   |
+| Sprint 7 | Geotechnical Module                                                 |
+| Sprint 8 | BIM Module                                                          |
+| Sprint 9 | AI Module                                                           |
 
 This order is a starting proposal, not a locked commitment — it should be revisited at the start of each sprint per [engineering-principles.md](engineering-principles.md).
 
@@ -73,23 +73,23 @@ This order is a starting proposal, not a locked commitment — it should be revi
 
 The stack below is now binding, ratified as [ADR-001](../adr/0001-technology-stack.md). Authentication, API layer, and repository structure — left open in the original tentative list — are resolved by their own ADRs.
 
-| Layer | Choice | Decision |
-|---|---|---|
-| Frontend | React, Next.js, TypeScript | ADR-001 |
-| UI | Tailwind CSS, shadcn/ui | ADR-001 |
-| Database | PostgreSQL | ADR-001 |
-| ORM | Prisma | ADR-001 |
-| Authentication | Better Auth | [ADR-002](../adr/0002-authentication-provider.md) |
-| API layer | tRPC | [ADR-003](../adr/0003-api-layer.md) |
-| Repository structure | Monorepo (pnpm + Turborepo) | [ADR-004](../adr/0004-repository-structure.md) |
-| State | Zustand, TanStack Query | ADR-001 |
-| Forms | React Hook Form | ADR-001 |
-| Validation | Zod | ADR-001 |
-| Storage | S3-compatible storage | ADR-001 |
-| Deployment | Vercel (direction confirmed; not yet a standalone ADR) | — |
-| Monitoring | Sentry | ADR-001 |
-| Analytics | PostHog | ADR-001 |
-| AI | OpenAI, Anthropic, Gemini | ADR-001 |
+| Layer                | Choice                                                 | Decision                                          |
+| -------------------- | ------------------------------------------------------ | ------------------------------------------------- |
+| Frontend             | React, Next.js, TypeScript                             | ADR-001                                           |
+| UI                   | Tailwind CSS, shadcn/ui                                | ADR-001                                           |
+| Database             | PostgreSQL                                             | ADR-001                                           |
+| ORM                  | Prisma                                                 | ADR-001                                           |
+| Authentication       | Better Auth                                            | [ADR-002](../adr/0002-authentication-provider.md) |
+| API layer            | tRPC                                                   | [ADR-003](../adr/0003-api-layer.md)               |
+| Repository structure | Monorepo (pnpm + Turborepo)                            | [ADR-004](../adr/0004-repository-structure.md)    |
+| State                | Zustand, TanStack Query                                | ADR-001                                           |
+| Forms                | React Hook Form                                        | ADR-001                                           |
+| Validation           | Zod                                                    | ADR-001                                           |
+| Storage              | S3-compatible storage                                  | ADR-001                                           |
+| Deployment           | Vercel (direction confirmed; not yet a standalone ADR) | —                                                 |
+| Monitoring           | Sentry                                                 | ADR-001                                           |
+| Analytics            | PostHog                                                | ADR-001                                           |
+| AI                   | OpenAI, Anthropic, Gemini                              | ADR-001                                           |
 
 ## Commercialization Path
 

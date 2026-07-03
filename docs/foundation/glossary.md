@@ -51,7 +51,7 @@ The product vision for AI on this platform: an assistant embedded in engineering
 ## Civil Engineering Domain Terms
 
 **NSR-10**
-*Reglamento Colombiano de Construcción Sismo Resistente* — the Colombian building code governing seismic-resistant construction. One of the planned AI Copilot assistants.
+_Reglamento Colombiano de Construcción Sismo Resistente_ — the Colombian building code governing seismic-resistant construction. One of the planned AI Copilot assistants.
 
 **ACI (American Concrete Institute)**
 A standards body whose codes govern concrete design and construction practice; also refers informally to the ACI code itself. One of the planned AI Copilot assistants.

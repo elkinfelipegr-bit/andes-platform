@@ -24,19 +24,19 @@ Andes Engineering Platform must let an engineering firm (a tenant, per [RFC-001]
 
 ## Domain Concepts
 
-* **Tenant** — an engineering firm subscribed to the platform.
-* **User** — a person with a login.
-* **Role** — a named set of permissions a user can hold within a tenant.
-* **Membership** — the fact that a specific user holds a specific role within a specific tenant. This is what makes the system multi-tenant-aware at the identity level, not just at the data level.
+- **Tenant** — an engineering firm subscribed to the platform.
+- **User** — a person with a login.
+- **Role** — a named set of permissions a user can hold within a tenant.
+- **Membership** — the fact that a specific user holds a specific role within a specific tenant. This is what makes the system multi-tenant-aware at the identity level, not just at the data level.
 
 ## Entities (draft sketch)
 
-| Entity | Key Fields | Notes |
-|---|---|---|
-| `Tenant` | `id`, `name`, `slug`, `createdAt` | Not itself tenant-scoped — it *is* the scope. |
-| `User` | `id`, `email`, `name`, `authProviderId`, `createdAt` | Global identity; a user's tenant access is via `Membership`, not a direct field on `User` — see open question below. |
-| `Role` | `id`, `tenantId`, `key`, `label` | Modeled as **data (a table), not a hardcoded enum** — recommended so that adding roles later (Reviewer, Client viewer — explicitly deferred, not rejected, per your Sprint 0 scope answer) is a data change, not a schema migration. Confirm before implementation; this is a reversible, low-risk modeling choice, not a platform-wide commitment. |
-| `Membership` | `id`, `tenantId`, `userId`, `roleId`, `createdAt` | Join entity binding a user to a tenant with a role. |
+| Entity       | Key Fields                                           | Notes                                                                                                                                                                                                                                                                                                                                               |
+| ------------ | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Tenant`     | `id`, `name`, `slug`, `createdAt`                    | Not itself tenant-scoped — it _is_ the scope.                                                                                                                                                                                                                                                                                                       |
+| `User`       | `id`, `email`, `name`, `authProviderId`, `createdAt` | Global identity; a user's tenant access is via `Membership`, not a direct field on `User` — see open question below.                                                                                                                                                                                                                                |
+| `Role`       | `id`, `tenantId`, `key`, `label`                     | Modeled as **data (a table), not a hardcoded enum** — recommended so that adding roles later (Reviewer, Client viewer — explicitly deferred, not rejected, per your Sprint 0 scope answer) is a data change, not a schema migration. Confirm before implementation; this is a reversible, low-risk modeling choice, not a platform-wide commitment. |
+| `Membership` | `id`, `tenantId`, `userId`, `roleId`, `createdAt`    | Join entity binding a user to a tenant with a role.                                                                                                                                                                                                                                                                                                 |
 
 **Sprint 0 seed roles:** `OWNER_ADMIN`, `ENGINEER` — the two roles selected for this phase. `REVIEWER` and `CLIENT_VIEWER` are anticipated (see [ai-principles.md](../foundation/ai-principles.md) product context and [RFC-001](../rfc/0001-multi-tenant-architecture.md)) but out of scope for Sprint 0; the `Role`-as-data approach above exists specifically so adding them later doesn't require a migration.
 
@@ -51,19 +51,19 @@ Tenant 1 ──── N Membership N ──── 1 User
                   Role
 ```
 
-* A `Tenant` has many `Membership` records.
-* A `User` has many `Membership` records (see open question below on whether this is capped at one active tenant for now).
-* Each `Membership` points to exactly one `Role`, which itself belongs to a `Tenant` (roles are tenant-scoped so a tenant could eventually customize its own role set, though Sprint 0 only needs the two seed roles above, identical across tenants).
+- A `Tenant` has many `Membership` records.
+- A `User` has many `Membership` records (see open question below on whether this is capped at one active tenant for now).
+- Each `Membership` points to exactly one `Role`, which itself belongs to a `Tenant` (roles are tenant-scoped so a tenant could eventually customize its own role set, though Sprint 0 only needs the two seed roles above, identical across tenants).
 
 ## Open Questions for Implementation
 
-* **Can a `User` hold `Membership`s in more than one `Tenant`?** RFC-001 assumes one active tenant membership per user for Sprint 0 simplicity (e.g. an independent consultant working across firms is out of scope). The schema above (`User` 1-to-N `Membership`) does not technically block multiple memberships — Claude Code should enforce "one active tenant per user" at the application layer for now rather than the schema layer, so this can be relaxed later without a migration.
-* **Permission granularity within a `Role`** (e.g. can `ENGINEER` create projects but not delete them?) is not modeled yet — Sprint 0 only needs role-level, not permission-level, checks. A `Permission` entity can be layered on top of `Role` later without breaking this model.
+- **Can a `User` hold `Membership`s in more than one `Tenant`?** RFC-001 assumes one active tenant membership per user for Sprint 0 simplicity (e.g. an independent consultant working across firms is out of scope). The schema above (`User` 1-to-N `Membership`) does not technically block multiple memberships — Claude Code should enforce "one active tenant per user" at the application layer for now rather than the schema layer, so this can be relaxed later without a migration.
+- **Permission granularity within a `Role`** (e.g. can `ENGINEER` create projects but not delete them?) is not modeled yet — Sprint 0 only needs role-level, not permission-level, checks. A `Permission` entity can be layered on top of `Role` later without breaking this model.
 
 ## Implementation Notes (added during Sprint 0 build)
 
-* **`User.authProviderId` was not implemented.** With Better Auth self-hosted in our own database ([ADR-002](../adr/0002-authentication-provider.md)), the `User` row *is* the auth identity; provider linkage lives in Better Auth's `Account` table (one row per credential/OAuth account), which is strictly more capable than a single id field. The sketch's intent — linking identity to the auth provider — is fulfilled by that table.
-* The "one active tenant per user" rule is enforced in `@andes/auth` (`getActiveMembership`), which fails closed if a user ever holds more than one membership — per open question 1 above, the schema does not block multiple memberships.
+- **`User.authProviderId` was not implemented.** With Better Auth self-hosted in our own database ([ADR-002](../adr/0002-authentication-provider.md)), the `User` row _is_ the auth identity; provider linkage lives in Better Auth's `Account` table (one row per credential/OAuth account), which is strictly more capable than a single id field. The sketch's intent — linking identity to the auth provider — is fulfilled by that table.
+- The "one active tenant per user" rule is enforced in `@andes/auth` (`getActiveMembership`), which fails closed if a user ever holds more than one membership — per open question 1 above, the schema does not block multiple memberships.
 
 ## What This Document Does Not Cover
 
@@ -71,6 +71,6 @@ Database schema (exact Prisma model, indexes, RLS policy syntax) and API design 
 
 ## References
 
-* [RFC-001: Multi-Tenant Architecture](../rfc/0001-multi-tenant-architecture.md)
-* [ADR-002: Authentication Provider](../adr/0002-authentication-provider.md)
-* [architecture-principles.md](../foundation/architecture-principles.md)
+- [RFC-001: Multi-Tenant Architecture](../rfc/0001-multi-tenant-architecture.md)
+- [ADR-002: Authentication Provider](../adr/0002-authentication-provider.md)
+- [architecture-principles.md](../foundation/architecture-principles.md)

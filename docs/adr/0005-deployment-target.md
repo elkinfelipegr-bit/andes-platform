@@ -20,14 +20,14 @@ Where does the platform deploy, and what does that imply for environment configu
 
 Implications made explicit by this decision:
 
-* Environment variables and secrets are managed in Vercel per project/environment (Development, Preview, Production), with `.env.example` files in the repo documenting required keys — never actual values.
-* PostgreSQL ([ADR-001](0001-technology-stack.md)) is hosted on a Vercel-compatible managed provider (e.g. Neon or Vercel Postgres); serverless function connection behavior requires connection pooling (e.g. the provider's pooler or Prisma Accelerate) — the specific provider is a follow-up operational choice within this ADR's frame, not a new ADR.
-* Better Auth ([ADR-002](0002-authentication-provider.md)) runs inside the Next.js app on Vercel — no separate auth infrastructure.
+- Environment variables and secrets are managed in Vercel per project/environment (Development, Preview, Production), with `.env.example` files in the repo documenting required keys — never actual values.
+- PostgreSQL ([ADR-001](0001-technology-stack.md)) is hosted on a Vercel-compatible managed provider (e.g. Neon or Vercel Postgres); serverless function connection behavior requires connection pooling (e.g. the provider's pooler or Prisma Accelerate) — the specific provider is a follow-up operational choice within this ADR's frame, not a new ADR.
+- Better Auth ([ADR-002](0002-authentication-provider.md)) runs inside the Next.js app on Vercel — no separate auth infrastructure.
 
 ## Alternatives
 
-* **Self-managed VPS / container platform (Railway, Fly.io, Render)** — more infrastructure control and steadier costs at scale, but adds ops burden a small AI-assisted team should not carry during foundation-phase sprints.
-* **AWS (Amplify or custom)** — maximum flexibility and enterprise credibility, at the cost of significant configuration surface that would slow every sprint now.
+- **Self-managed VPS / container platform (Railway, Fly.io, Render)** — more infrastructure control and steadier costs at scale, but adds ops burden a small AI-assisted team should not carry during foundation-phase sprints.
+- **AWS (Amplify or custom)** — maximum flexibility and enterprise credibility, at the cost of significant configuration surface that would slow every sprint now.
 
 ## Trade-offs
 
@@ -35,10 +35,10 @@ Vercel optimizes for shipping speed, per-PR preview deployments, and zero ops ov
 
 ## Consequences
 
-* Sprint 0 environment/secrets layout in the monorepo is structured around Vercel's Development/Preview/Production model from the start.
-* The database provider must be serverless-friendly; long-lived direct connections cannot be assumed anywhere in the platform.
-* Preview deployments per PR become part of the Definition of Done checks in [PROJECT_RULES.md](../foundation/PROJECT_RULES.md) as soon as a deployable app exists.
-* If a future module outgrows serverless constraints, extracting it is an architectural change requiring its own ADR (consistent with ADR-001's exception clause).
+- Sprint 0 environment/secrets layout in the monorepo is structured around Vercel's Development/Preview/Production model from the start.
+- The database provider must be serverless-friendly; long-lived direct connections cannot be assumed anywhere in the platform.
+- Preview deployments per PR become part of the Definition of Done checks in [PROJECT_RULES.md](../foundation/PROJECT_RULES.md) as soon as a deployable app exists.
+- If a future module outgrows serverless constraints, extracting it is an architectural change requiring its own ADR (consistent with ADR-001's exception clause).
 
 ## Examples
 
@@ -50,6 +50,6 @@ Specialized computation services (per ADR-001's exception) and any future self-h
 
 ## References
 
-* [ADR-001](0001-technology-stack.md), [ADR-004](0004-repository-structure.md) — both defer this decision here
-* [PROJECT_RULES.md](../foundation/PROJECT_RULES.md) — "Not Yet Decided" item this ADR resolves
-* [PRODUCT_STRATEGY.md](../foundation/PRODUCT_STRATEGY.md) — original tentative direction
+- [ADR-001](0001-technology-stack.md), [ADR-004](0004-repository-structure.md) — both defer this decision here
+- [PROJECT_RULES.md](../foundation/PROJECT_RULES.md) — "Not Yet Decided" item this ADR resolves
+- [PRODUCT_STRATEGY.md](../foundation/PRODUCT_STRATEGY.md) — original tentative direction

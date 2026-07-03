@@ -30,7 +30,10 @@ export const auth = betterAuth({
     customSession(async ({ user, session }) => ({
       user,
       session,
-      activeMembership: await getActiveMembership(forUser(prisma, user.id), user.id),
+      activeMembership: await getActiveMembership(
+        forUser(prisma, user.id),
+        user.id,
+      ),
     })),
   ],
 });

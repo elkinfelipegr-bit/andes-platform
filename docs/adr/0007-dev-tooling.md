@@ -16,15 +16,15 @@ Which linter, formatter, and test runner does the monorepo standardize on, so th
 
 ## Decision
 
-* **ESLint** (flat config) with `typescript-eslint`, plus `eslint-config-next` in Next.js apps. Shared base config lives in `packages/config`, consumed by every workspace package — this is also where the import-boundary rules required by [ADR-004](0004-repository-structure.md) ("products don't silently reach into each other's internals") will be enforced.
-* **Prettier** for formatting, one root config, no per-package overrides.
-* **Vitest** as the test runner for all packages (unit and integration). Native TypeScript/ESM support, workspace-aware, and Turborepo-cacheable via each package's `test` script.
+- **ESLint** (flat config) with `typescript-eslint`, plus `eslint-config-next` in Next.js apps. Shared base config lives in `packages/config`, consumed by every workspace package — this is also where the import-boundary rules required by [ADR-004](0004-repository-structure.md) ("products don't silently reach into each other's internals") will be enforced.
+- **Prettier** for formatting, one root config, no per-package overrides.
+- **Vitest** as the test runner for all packages (unit and integration). Native TypeScript/ESM support, workspace-aware, and Turborepo-cacheable via each package's `test` script.
 
 ## Alternatives
 
-* **Biome (lint + format in one)** — much faster and a single tool, but its rule ecosystem is still thinner than ESLint's, and the ADR-004 requirement for custom import-boundary enforcement plus Next.js's first-party ESLint integration favor ESLint. Consistent with [ADR-001](0001-technology-stack.md)'s pattern of preferring the mature ecosystem (Prisma over Drizzle) to lower risk for AI-assisted changes. Revisit if ESLint performance becomes a real monorepo bottleneck.
-* **Jest** — the incumbent test runner, but its ESM/TypeScript story requires transform configuration that Vitest makes native; Vitest is the default in the Vite/modern-TS ecosystem this stack already inhabits.
-* **Node's built-in test runner** — zero dependencies, but lacks the watch/UI/mocking ergonomics and ecosystem the team and AI assistants will lean on.
+- **Biome (lint + format in one)** — much faster and a single tool, but its rule ecosystem is still thinner than ESLint's, and the ADR-004 requirement for custom import-boundary enforcement plus Next.js's first-party ESLint integration favor ESLint. Consistent with [ADR-001](0001-technology-stack.md)'s pattern of preferring the mature ecosystem (Prisma over Drizzle) to lower risk for AI-assisted changes. Revisit if ESLint performance becomes a real monorepo bottleneck.
+- **Jest** — the incumbent test runner, but its ESM/TypeScript story requires transform configuration that Vitest makes native; Vitest is the default in the Vite/modern-TS ecosystem this stack already inhabits.
+- **Node's built-in test runner** — zero dependencies, but lacks the watch/UI/mocking ergonomics and ecosystem the team and AI assistants will lean on.
 
 ## Trade-offs
 
@@ -32,10 +32,10 @@ ESLint + Prettier is two tools (and slower) versus Biome's one — accepted for 
 
 ## Consequences
 
-* `packages/config` grows shared ESLint and Vitest configuration alongside the existing `tsconfig.base.json`; new packages inherit rather than reinvent.
-* `turbo run lint test` becomes meaningful across the workspace and is wired into CI ([ADR-006](0006-ci-provider.md)).
-* The mandatory tenant-isolation tests for Sprint 0 are written in Vitest; if this ADR is rejected in favor of another runner, those tests must be ported — they are written against standard `describe/it/expect` to keep that portable.
-* Formatting disputes are closed by definition: Prettier's output is canonical.
+- `packages/config` grows shared ESLint and Vitest configuration alongside the existing `tsconfig.base.json`; new packages inherit rather than reinvent.
+- `turbo run lint test` becomes meaningful across the workspace and is wired into CI ([ADR-006](0006-ci-provider.md)).
+- The mandatory tenant-isolation tests for Sprint 0 are written in Vitest; if this ADR is rejected in favor of another runner, those tests must be ported — they are written against standard `describe/it/expect` to keep that portable.
+- Formatting disputes are closed by definition: Prettier's output is canonical.
 
 ## Examples
 
@@ -47,7 +47,7 @@ None identified. A future non-TypeScript numerical service (ADR-001's exception)
 
 ## References
 
-* [PROJECT_RULES.md](../foundation/PROJECT_RULES.md) — "Not Yet Decided" item this ADR resolves; testing strategy
-* [ADR-001](0001-technology-stack.md) — ecosystem-maturity decision pattern
-* [ADR-004](0004-repository-structure.md) — import-boundary enforcement requirement
-* [ADR-006](0006-ci-provider.md) — CI integration of these tools
+- [PROJECT_RULES.md](../foundation/PROJECT_RULES.md) — "Not Yet Decided" item this ADR resolves; testing strategy
+- [ADR-001](0001-technology-stack.md) — ecosystem-maturity decision pattern
+- [ADR-004](0004-repository-structure.md) — import-boundary enforcement requirement
+- [ADR-006](0006-ci-provider.md) — CI integration of these tools

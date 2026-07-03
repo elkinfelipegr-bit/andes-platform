@@ -14,11 +14,11 @@ This is the operational rulebook: how code moves from idea to `main`, what "done
 
 **Trunk-based development with short-lived feature branches.**
 
-* `main` is always deployable. Nothing broken is ever merged into it.
-* Every change is made on a feature branch, named after the sprint task or ADR/RFC it implements (e.g. `sprint-0/tenant-membership-schema`).
-* Branches are short-lived — days, not weeks. If a branch is getting large, it should be split.
-* Every merge to `main` goes through a pull request with at least one review before merge. If working solo, self-review explicitly against the Definition of Done below before merging.
-* Vercel preview deployments run per pull request (per [ADR-004](../adr/0004-repository-structure.md)), and should be checked before requesting review.
+- `main` is always deployable. Nothing broken is ever merged into it.
+- Every change is made on a feature branch, named after the sprint task or ADR/RFC it implements (e.g. `sprint-0/tenant-membership-schema`).
+- Branches are short-lived — days, not weeks. If a branch is getting large, it should be split.
+- Every merge to `main` goes through a pull request with at least one review before merge. If working solo, self-review explicitly against the Definition of Done below before merging.
+- Vercel preview deployments run per pull request (per [ADR-004](../adr/0004-repository-structure.md)), and should be checked before requesting review.
 
 ## Definition of Done
 
@@ -33,10 +33,10 @@ A change is done when:
 
 **Pragmatic, risk-weighted — not blanket coverage.**
 
-* **Unit tests are required** for: domain/business logic, Zod validation schemas, permission and tenant-scoping logic, and any calculation logic (structural, geotechnical, etc. as those modules are built).
-* **Integration tests are required** for critical tRPC procedures — authentication, tenant-scoping middleware, and core CRUD paths for whatever module is being built.
-* **No mandated coverage percentage.** Coverage expectations are revisited per module as the domain stabilizes, rather than enforced uniformly from Sprint 0.
-* **Tenant-isolation logic is the one deliberate exception to "pragmatic."** Because a scoping bug is a cross-customer data leak (see [RFC-001](../rfc/0001-multi-tenant-architecture.md)), this logic must be tested more rigorously than the pragmatic default — treat it like the strict tier even though the project overall is not.
+- **Unit tests are required** for: domain/business logic, Zod validation schemas, permission and tenant-scoping logic, and any calculation logic (structural, geotechnical, etc. as those modules are built).
+- **Integration tests are required** for critical tRPC procedures — authentication, tenant-scoping middleware, and core CRUD paths for whatever module is being built.
+- **No mandated coverage percentage.** Coverage expectations are revisited per module as the domain stabilizes, rather than enforced uniformly from Sprint 0.
+- **Tenant-isolation logic is the one deliberate exception to "pragmatic."** Because a scoping bug is a cross-customer data leak (see [RFC-001](../rfc/0001-multi-tenant-architecture.md)), this logic must be tested more rigorously than the pragmatic default — treat it like the strict tier even though the project overall is not.
 
 ## Roles & Permissions (Sprint 0)
 
@@ -57,15 +57,15 @@ These apply in addition to the operating rules in [ai-principles.md](ai-principl
 
 The items originally listed here were resolved on 2026-07-03 — each is now a ratified ADR:
 
-* ~~Linting/formatting tooling~~ — resolved by [ADR-007](../adr/0007-dev-tooling.md) (ESLint + Prettier + Vitest).
-* ~~CI provider and pipeline configuration~~ — resolved by [ADR-006](../adr/0006-ci-provider.md) (GitHub Actions).
-* ~~Vercel as the formal deployment target~~ — resolved by [ADR-005](../adr/0005-deployment-target.md).
+- ~~Linting/formatting tooling~~ — resolved by [ADR-007](../adr/0007-dev-tooling.md) (ESLint + Prettier + Vitest).
+- ~~CI provider and pipeline configuration~~ — resolved by [ADR-006](../adr/0006-ci-provider.md) (GitHub Actions).
+- ~~Vercel as the formal deployment target~~ — resolved by [ADR-005](../adr/0005-deployment-target.md).
 
 Nothing is currently in this list. New open items should be added here as they are discovered, then resolved via the ADR process.
 
 ## Related Documents
 
-* [project-principles.md](project-principles.md) — the governance rules this rulebook operationalizes.
-* [engineering-principles.md](engineering-principles.md) — the workflow and decision-documentation standard.
-* [ai-principles.md](ai-principles.md) — AI assistant session protocol.
-* `docs/adr/`, `docs/rfc/` — ratified decisions this rulebook enforces.
+- [project-principles.md](project-principles.md) — the governance rules this rulebook operationalizes.
+- [engineering-principles.md](engineering-principles.md) — the workflow and decision-documentation standard.
+- [ai-principles.md](ai-principles.md) — AI assistant session protocol.
+- `docs/adr/`, `docs/rfc/` — ratified decisions this rulebook enforces.

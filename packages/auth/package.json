@@ -7,7 +7,8 @@
   "types": "./src/index.ts",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@andes/db": "workspace:*",
@@ -17,6 +18,7 @@
   "devDependencies": {
     "@andes/config": "workspace:*",
     "@types/node": "^22",
+    "eslint": "^9.0.0",
     "typescript": "^5.7.2",
     "vitest": "^3.2.0"
   }

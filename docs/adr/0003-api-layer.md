@@ -20,8 +20,8 @@ What API style connects the Next.js frontend to backend logic across eight produ
 
 ## Alternatives
 
-* **REST** — the most standard and easiest to document/expose publicly; the natural choice if external, non-TypeScript integrators need to call the platform's API. Not needed yet.
-* **GraphQL** — better suited to flexible, cross-module queries (e.g. a dashboard combining Projects + CRM + Analytics data), at the cost of significantly more operational complexity than the platform needs at this stage.
+- **REST** — the most standard and easiest to document/expose publicly; the natural choice if external, non-TypeScript integrators need to call the platform's API. Not needed yet.
+- **GraphQL** — better suited to flexible, cross-module queries (e.g. a dashboard combining Projects + CRM + Analytics data), at the cost of significantly more operational complexity than the platform needs at this stage.
 
 ## Trade-offs
 
@@ -29,9 +29,9 @@ tRPC gives end-to-end type safety between frontend and backend without hand-writ
 
 ## Consequences
 
-* All internal frontend-backend communication within the monorepo uses tRPC procedures, organized per Andes product.
-* Every tRPC procedure that touches tenant-scoped data must apply the tenant/role context established by [ADR-002](0002-authentication-provider.md) and [RFC-001](../rfc/0001-multi-tenant-architecture.md) — this should be enforced via shared middleware, not per-procedure discipline.
-* A public-facing API for external integrators is explicitly out of scope for this decision.
+- All internal frontend-backend communication within the monorepo uses tRPC procedures, organized per Andes product.
+- Every tRPC procedure that touches tenant-scoped data must apply the tenant/role context established by [ADR-002](0002-authentication-provider.md) and [RFC-001](../rfc/0001-multi-tenant-architecture.md) — this should be enforced via shared middleware, not per-procedure discipline.
+- A public-facing API for external integrators is explicitly out of scope for this decision.
 
 ## Examples
 
@@ -43,5 +43,5 @@ If and when external third-party integrations are required (e.g. a partner firm'
 
 ## References
 
-* [ADR-001](0001-technology-stack.md)
-* [ADR-004](0004-repository-structure.md)
+- [ADR-001](0001-technology-stack.md)
+- [ADR-004](0004-repository-structure.md)

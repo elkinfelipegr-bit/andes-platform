@@ -12,7 +12,8 @@
     "seed": "tsx prisma/seed.ts",
     "link-member": "tsx prisma/link-member.ts",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "eslint ."
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -24,6 +25,7 @@
     "@andes/config": "workspace:*",
     "@types/node": "^22",
     "dotenv": "^17.0.0",
+    "eslint": "^9.0.0",
     "prisma": "^6.2.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",

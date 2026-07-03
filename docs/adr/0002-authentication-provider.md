@@ -20,8 +20,8 @@ Which authentication library do we standardize on, given the multi-tenant model 
 
 ## Alternatives
 
-* **Auth.js (NextAuth)** — more established, more OAuth providers out of the box, but historically less flexible for custom multi-tenant session/organization models without significant workarounds.
-* **Managed external provider (Clerk, Auth0, WorkOS)** — less code to maintain, but recurring per-user cost and less control over the user data model, which matters once the platform is sold to other engineering firms as SaaS (see [VISION.md](../foundation/VISION.md)) and user data ownership becomes a sales/compliance question.
+- **Auth.js (NextAuth)** — more established, more OAuth providers out of the box, but historically less flexible for custom multi-tenant session/organization models without significant workarounds.
+- **Managed external provider (Clerk, Auth0, WorkOS)** — less code to maintain, but recurring per-user cost and less control over the user data model, which matters once the platform is sold to other engineering firms as SaaS (see [VISION.md](../foundation/VISION.md)) and user data ownership becomes a sales/compliance question.
 
 ## Trade-offs
 
@@ -29,9 +29,9 @@ Better Auth is self-hosted and TypeScript-native, giving full control over the s
 
 ## Consequences
 
-* User, session, and membership (tenant + role) data lives in our own PostgreSQL database, under [ADR-001](0001-technology-stack.md)'s stack.
-* Every authenticated session must resolve to a `tenantId` and `role`, consistent with the Sprint 0 domain model (see `docs/architecture/sprint-0-domain-model.md`).
-* Tenant-scoping logic in auth callbacks becomes security-critical code and must be covered by the testing strategy in `PROJECT_RULES.md`.
+- User, session, and membership (tenant + role) data lives in our own PostgreSQL database, under [ADR-001](0001-technology-stack.md)'s stack.
+- Every authenticated session must resolve to a `tenantId` and `role`, consistent with the Sprint 0 domain model (see `docs/architecture/sprint-0-domain-model.md`).
+- Tenant-scoping logic in auth callbacks becomes security-critical code and must be covered by the testing strategy in `PROJECT_RULES.md`.
 
 ## Examples
 
@@ -43,5 +43,5 @@ None identified yet. Revisit if future enterprise customers require compliance c
 
 ## References
 
-* [ADR-001](0001-technology-stack.md)
-* [RFC-001: Multi-Tenant Architecture](../rfc/0001-multi-tenant-architecture.md)
+- [ADR-001](0001-technology-stack.md)
+- [RFC-001: Multi-Tenant Architecture](../rfc/0001-multi-tenant-architecture.md)

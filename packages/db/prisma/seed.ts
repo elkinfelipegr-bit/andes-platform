@@ -28,7 +28,9 @@ async function main() {
     });
   }
 
-  console.log(`Seeded tenant "${andes.name}" (${andes.slug}) with roles: ${seedRoles.map((r) => r.key).join(", ")}`);
+  console.log(
+    `Seeded tenant "${andes.name}" (${andes.slug}) with roles: ${seedRoles.map((r) => r.key).join(", ")}`,
+  );
 }
 
 main()

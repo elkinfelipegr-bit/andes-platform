@@ -28,9 +28,9 @@ A monorepo makes cross-module refactors and shared-Core changes cheap and keeps 
 
 ## Consequences
 
-* CI runs against the whole repository, using Turborepo's affected-package detection so unrelated products aren't rebuilt/retested unnecessarily.
-* Module boundaries are enforced by package boundaries and import/lint rules — not by repository separation — and must be respected as if they were separate repos.
-* Vercel deployment (tentative direction from [PRODUCT_STRATEGY.md](../foundation/PRODUCT_STRATEGY.md), not yet a standalone ADR) targets this monorepo directly, with preview deployments per pull request per `PROJECT_RULES.md`.
+- CI runs against the whole repository, using Turborepo's affected-package detection so unrelated products aren't rebuilt/retested unnecessarily.
+- Module boundaries are enforced by package boundaries and import/lint rules — not by repository separation — and must be respected as if they were separate repos.
+- Vercel deployment (tentative direction from [PRODUCT_STRATEGY.md](../foundation/PRODUCT_STRATEGY.md), not yet a standalone ADR) targets this monorepo directly, with preview deployments per pull request per `PROJECT_RULES.md`.
 
 ## Examples
 
@@ -59,6 +59,6 @@ If a specific product later needs a fully independent deployment lifecycle or is
 
 ## References
 
-* [ADR-001](0001-technology-stack.md)
-* [VISION.md](../foundation/VISION.md)
-* Open item: Vercel as the deployment target is confirmed as direction but has not been ratified as its own ADR. Recommended before Sprint 0 implementation begins, since it affects environment/secrets structure in the monorepo above.
+- [ADR-001](0001-technology-stack.md)
+- [VISION.md](../foundation/VISION.md)
+- Open item: Vercel as the deployment target is confirmed as direction but has not been ratified as its own ADR. Recommended before Sprint 0 implementation begins, since it affects environment/secrets structure in the monorepo above.

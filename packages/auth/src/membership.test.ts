@@ -37,7 +37,9 @@ describe("getActiveMembership", () => {
   });
 
   it("resolves the single membership to tenant + role context", async () => {
-    await expect(getActiveMembership(readerWith([andesRow]), "u1")).resolves.toEqual({
+    await expect(
+      getActiveMembership(readerWith([andesRow]), "u1"),
+    ).resolves.toEqual({
       membershipId: "m1",
       tenantId: "t-andes",
       tenantSlug: "andes-engineering",

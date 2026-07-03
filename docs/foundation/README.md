@@ -27,33 +27,33 @@ If a decision is not written here, it does not exist as project truth yet.
 
 The full Engineering Handbook is planned to reach 250–500 pages across 40–50 markdown files, organized as:
 
-| Directory | Contents | Status |
-|---|---|---|
-| `docs/foundation/` | Identity, philosophy, principles, glossary, project rules | ✅ Drafted (11 documents) |
-| `docs/product/` | Target market, business model, personas, journeys, roadmap | 🕓 Planned |
-| `docs/architecture/` | Architecture overview, DDD, module definitions, database, API, auth, security, infrastructure | 🔶 Started — Sprint 0 domain model drafted |
-| `docs/design/` | Design system, component library, UX guidelines, navigation, tokens | 🕓 Planned |
-| `docs/engineering/` | Module-by-module technical documentation | 🕓 Planned |
-| `docs/ai/` | Engineering Copilot specification and prompts | 🕓 Planned |
-| `docs/development/` | Setup, workflows, conventions | 🕓 Planned |
-| `docs/sprints/` | Sprint plans and retrospectives | 🕓 Planned |
-| `docs/adr/` | Architecture Decision Records | ✅ Template + ADR-001 to ADR-004 |
-| `docs/rfc/` | Requests for Comments (cross-cutting changes) | ✅ Template + RFC-001 — *added directory, not in the original planned structure* |
+| Directory            | Contents                                                                                      | Status                                                                           |
+| -------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `docs/foundation/`   | Identity, philosophy, principles, glossary, project rules                                     | ✅ Drafted (11 documents)                                                        |
+| `docs/product/`      | Target market, business model, personas, journeys, roadmap                                    | 🕓 Planned                                                                       |
+| `docs/architecture/` | Architecture overview, DDD, module definitions, database, API, auth, security, infrastructure | 🔶 Started — Sprint 0 domain model drafted                                       |
+| `docs/design/`       | Design system, component library, UX guidelines, navigation, tokens                           | 🕓 Planned                                                                       |
+| `docs/engineering/`  | Module-by-module technical documentation                                                      | 🕓 Planned                                                                       |
+| `docs/ai/`           | Engineering Copilot specification and prompts                                                 | 🕓 Planned                                                                       |
+| `docs/development/`  | Setup, workflows, conventions                                                                 | 🕓 Planned                                                                       |
+| `docs/sprints/`      | Sprint plans and retrospectives                                                               | 🕓 Planned                                                                       |
+| `docs/adr/`          | Architecture Decision Records                                                                 | ✅ Template + ADR-001 to ADR-004                                                 |
+| `docs/rfc/`          | Requests for Comments (cross-cutting changes)                                                 | ✅ Template + RFC-001 — _added directory, not in the original planned structure_ |
 
 ## Foundation Documents Index
 
-| Document | Purpose |
-|---|---|
-| [VISION.md](VISION.md) | Where the platform and the company are going, long term |
-| [MISSION.md](MISSION.md) | What we are building right now, and the non-negotiable qualities it must have |
-| [PRODUCT_STRATEGY.md](PRODUCT_STRATEGY.md) | Product portfolio, functional scope, delivery sequencing |
-| [engineering-philosophy.md](engineering-philosophy.md) | The cultural mindset behind how we build |
-| [project-principles.md](project-principles.md) | How the project is governed: human/AI roles, documentation, language |
-| [engineering-principles.md](engineering-principles.md) | How engineering work is executed: workflow, decision standards, sprint discipline |
-| [architecture-principles.md](architecture-principles.md) | How the system is structured: DDD-first, modularity, ADR discipline |
-| [ai-principles.md](ai-principles.md) | The AI Copilot vision and operating rules for any AI assistant working on this project |
-| [PROJECT_RULES.md](PROJECT_RULES.md) | Operational rulebook: git workflow, Definition of Done, testing strategy, AI assistant rules |
-| [glossary.md](glossary.md) | Shared vocabulary — technical and domain-specific |
+| Document                                                 | Purpose                                                                                      |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| [VISION.md](VISION.md)                                   | Where the platform and the company are going, long term                                      |
+| [MISSION.md](MISSION.md)                                 | What we are building right now, and the non-negotiable qualities it must have                |
+| [PRODUCT_STRATEGY.md](PRODUCT_STRATEGY.md)               | Product portfolio, functional scope, delivery sequencing                                     |
+| [engineering-philosophy.md](engineering-philosophy.md)   | The cultural mindset behind how we build                                                     |
+| [project-principles.md](project-principles.md)           | How the project is governed: human/AI roles, documentation, language                         |
+| [engineering-principles.md](engineering-principles.md)   | How engineering work is executed: workflow, decision standards, sprint discipline            |
+| [architecture-principles.md](architecture-principles.md) | How the system is structured: DDD-first, modularity, ADR discipline                          |
+| [ai-principles.md](ai-principles.md)                     | The AI Copilot vision and operating rules for any AI assistant working on this project       |
+| [PROJECT_RULES.md](PROJECT_RULES.md)                     | Operational rulebook: git workflow, Definition of Done, testing strategy, AI assistant rules |
+| [glossary.md](glossary.md)                               | Shared vocabulary — technical and domain-specific                                            |
 
 ## Governing Rule
 
@@ -65,15 +65,15 @@ Any AI assistant working on this codebase must implement previously documented d
 
 The following are no longer tentative — they are binding until superseded by a new ADR/RFC:
 
-* [ADR-001: Technology Stack](../adr/0001-technology-stack.md)
-* [ADR-002: Authentication Provider (Better Auth)](../adr/0002-authentication-provider.md)
-* [ADR-003: API Layer (tRPC)](../adr/0003-api-layer.md)
-* [ADR-004: Repository Structure (Monorepo)](../adr/0004-repository-structure.md)
-* [ADR-005: Deployment Target (Vercel)](../adr/0005-deployment-target.md)
-* [ADR-006: CI Provider (GitHub Actions)](../adr/0006-ci-provider.md)
-* [ADR-007: Developer Tooling (ESLint, Prettier, Vitest)](../adr/0007-dev-tooling.md)
-* [RFC-001: Multi-Tenant Architecture](../rfc/0001-multi-tenant-architecture.md)
-* `docs/architecture/sprint-0-domain-model.md` — Tenant/User/Role/Membership domain sketch for Sprint 0
+- [ADR-001: Technology Stack](../adr/0001-technology-stack.md)
+- [ADR-002: Authentication Provider (Better Auth)](../adr/0002-authentication-provider.md)
+- [ADR-003: API Layer (tRPC)](../adr/0003-api-layer.md)
+- [ADR-004: Repository Structure (Monorepo)](../adr/0004-repository-structure.md)
+- [ADR-005: Deployment Target (Vercel)](../adr/0005-deployment-target.md)
+- [ADR-006: CI Provider (GitHub Actions)](../adr/0006-ci-provider.md)
+- [ADR-007: Developer Tooling (ESLint, Prettier, Vitest)](../adr/0007-dev-tooling.md)
+- [RFC-001: Multi-Tenant Architecture](../rfc/0001-multi-tenant-architecture.md)
+- `docs/architecture/sprint-0-domain-model.md` — Tenant/User/Role/Membership domain sketch for Sprint 0
 
 ## Open Items Found During Drafting
 
