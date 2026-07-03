@@ -10,6 +10,7 @@
     "migrate:dev": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
     "seed": "tsx prisma/seed.ts",
+    "link-member": "tsx prisma/link-member.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
