@@ -1,0 +1,30 @@
+# Local development database (ADR-001: PostgreSQL). Production runs on a
+# managed serverless-friendly provider per ADR-005 — this compose file is
+# dev-only and never deployed.
+#
+# Two connection identities (see packages/db/.env.example):
+#  - postgres (superuser): migrations + seed only. Superusers BYPASS row-level
+#    security, so runtime code must never connect as postgres.
+#  - andes_app (created by docker/initdb): what the app and the RLS
+#    integration tests connect as — RLS actually applies to it.
+services:
+  postgres:
+    image: postgres:17
+    container_name: andes-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: andes
+    ports:
+      - "5432:5432"
+    volumes:
+      - andes-pgdata:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d andes"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+volumes:
+  andes-pgdata:

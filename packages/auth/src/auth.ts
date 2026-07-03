@@ -4,7 +4,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { customSession } from "better-auth/plugins";
-import { prisma } from "@andes/db";
+import { forUser, prisma } from "@andes/db";
 
 import { getActiveMembership } from "./membership.js";
 
@@ -25,10 +25,12 @@ export const auth = betterAuth({
     // Every session carries the user's tenant + role (ADR-002 consequence:
     // "Every authenticated session must resolve to a tenantId and role").
     // null activeMembership = authenticated but not yet in any tenant.
+    // forUser: the lookup runs pre-tenant-context, so RLS admits it via
+    // app.user_id — the user can only ever see their own memberships.
     customSession(async ({ user, session }) => ({
       user,
       session,
-      activeMembership: await getActiveMembership(prisma, user.id),
+      activeMembership: await getActiveMembership(forUser(prisma, user.id), user.id),
     })),
   ],
 });
