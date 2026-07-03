@@ -1,0 +1,19 @@
+node_modules/
+.pnpm-store/
+
+# builds
+dist/
+.next/
+.turbo/
+
+# env — secrets never enter the repo
+.env
+.env.*
+!.env.example
+
+# prisma
+packages/db/generated/
+
+# misc
+*.log
+.DS_Store

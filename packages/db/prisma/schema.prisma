@@ -1,0 +1,78 @@
+// Sprint 0 domain model — implements docs/architecture/sprint-0-domain-model.md
+// Multi-tenancy per RFC-001: every tenant-scoped table carries tenantId.
+// RLS policies (defense-in-depth layer 2) are applied via raw SQL migration,
+// not via Prisma — see prisma/sql/rls.sql.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// The scope itself — not tenant-scoped (RFC-001: tenant = engineering firm).
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  roles       Role[]
+  memberships Membership[]
+
+  @@map("tenant")
+}
+
+// Global identity. Tenant access is exclusively via Membership —
+// deliberately no tenantId here (sprint-0-domain-model.md, open question:
+// multi-tenant membership stays possible without a migration).
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String
+  authProviderId String?  @unique // linked to Better Auth (ADR-002) once auth lands
+  createdAt      DateTime @default(now())
+
+  memberships Membership[]
+
+  @@map("user")
+}
+
+// Roles are data, not an enum (sprint-0-domain-model.md): adding REVIEWER /
+// CLIENT_VIEWER later is an insert, not a schema migration.
+// Tenant-scoped so a tenant can eventually customize its own role set.
+model Role {
+  id       String @id @default(cuid())
+  tenantId String
+  key      String // Sprint 0 seed values: OWNER_ADMIN, ENGINEER
+  label    String
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  memberships Membership[]
+
+  @@unique([tenantId, key])
+  @@index([tenantId])
+  @@map("role")
+}
+
+// Join entity: user U holds role R within tenant T.
+// "One active tenant per user" is enforced at the application layer, not
+// here, so relaxing it later needs no migration (sprint-0-domain-model.md).
+model Membership {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  @@unique([tenantId, userId]) // one role per user per tenant in Sprint 0
+  @@index([userId])
+  @@index([tenantId])
+  @@map("membership")
+}
