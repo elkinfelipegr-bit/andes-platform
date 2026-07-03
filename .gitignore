@@ -17,3 +17,6 @@ packages/db/generated/
 # misc
 *.log
 .DS_Store
+
+# TypeScript incremental build artifacts
+*.tsbuildinfo
