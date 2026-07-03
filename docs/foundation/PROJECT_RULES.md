@@ -55,11 +55,13 @@ These apply in addition to the operating rules in [ai-principles.md](ai-principl
 
 ## Not Yet Decided
 
-The following are intentionally left open rather than assumed, and should be resolved before or during Sprint 0 implementation:
+The items originally listed here were resolved on 2026-07-03 — each is now a ratified ADR:
 
-* Linting/formatting tooling (ESLint/Prettier/Biome configuration specifics).
-* CI provider and pipeline configuration (GitHub Actions is a reasonable default given the monorepo/Vercel direction, but has not been explicitly ratified).
-* Vercel as the formal, ratified deployment target — currently direction, not a standalone ADR (see [ADR-004](../adr/0004-repository-structure.md) references).
+* ~~Linting/formatting tooling~~ — resolved by [ADR-007](../adr/0007-dev-tooling.md) (ESLint + Prettier + Vitest).
+* ~~CI provider and pipeline configuration~~ — resolved by [ADR-006](../adr/0006-ci-provider.md) (GitHub Actions).
+* ~~Vercel as the formal deployment target~~ — resolved by [ADR-005](../adr/0005-deployment-target.md).
+
+Nothing is currently in this list. New open items should be added here as they are discovered, then resolved via the ADR process.
 
 ## Related Documents
 

@@ -19,6 +19,8 @@ This repository is governed by the Engineering Handbook in `docs/`. You must rea
 @docs/rfc/0001-multi-tenant-architecture.md
 @docs/architecture/sprint-0-domain-model.md
 
+Also ratified (browse on demand per the Maintenance Note below, not auto-imported): `docs/adr/0005-deployment-target.md` (Vercel), `docs/adr/0006-ci-provider.md` (GitHub Actions), `docs/adr/0007-dev-tooling.md` (ESLint/Prettier/Vitest).
+
 ## Background context (read if you need the "why", not required for every task)
 
 `docs/foundation/VISION.md`, `docs/foundation/MISSION.md`, `docs/foundation/PRODUCT_STRATEGY.md`, `docs/foundation/engineering-philosophy.md`, `docs/foundation/project-principles.md`, `docs/foundation/glossary.md`
