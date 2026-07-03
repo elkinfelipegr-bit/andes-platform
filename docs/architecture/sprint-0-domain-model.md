@@ -60,6 +60,11 @@ Tenant 1 ──── N Membership N ──── 1 User
 * **Can a `User` hold `Membership`s in more than one `Tenant`?** RFC-001 assumes one active tenant membership per user for Sprint 0 simplicity (e.g. an independent consultant working across firms is out of scope). The schema above (`User` 1-to-N `Membership`) does not technically block multiple memberships — Claude Code should enforce "one active tenant per user" at the application layer for now rather than the schema layer, so this can be relaxed later without a migration.
 * **Permission granularity within a `Role`** (e.g. can `ENGINEER` create projects but not delete them?) is not modeled yet — Sprint 0 only needs role-level, not permission-level, checks. A `Permission` entity can be layered on top of `Role` later without breaking this model.
 
+## Implementation Notes (added during Sprint 0 build)
+
+* **`User.authProviderId` was not implemented.** With Better Auth self-hosted in our own database ([ADR-002](../adr/0002-authentication-provider.md)), the `User` row *is* the auth identity; provider linkage lives in Better Auth's `Account` table (one row per credential/OAuth account), which is strictly more capable than a single id field. The sketch's intent — linking identity to the auth provider — is fulfilled by that table.
+* The "one active tenant per user" rule is enforced in `@andes/auth` (`getActiveMembership`), which fails closed if a user ever holds more than one membership — per open question 1 above, the schema does not block multiple memberships.
+
 ## What This Document Does Not Cover
 
 Database schema (exact Prisma model, indexes, RLS policy syntax) and API design (exact tRPC procedure signatures) are implementation, not domain modeling — they belong to Claude Code's Sprint 0 work, built directly from this document, per [engineering-principles.md](../foundation/engineering-principles.md) workflow (DDD → ADR → ... → Implementation).
