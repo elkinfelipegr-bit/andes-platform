@@ -1,6 +1,6 @@
 # ADR-007: Developer Tooling — ESLint, Prettier, Vitest
 
-**Status:** Proposed — drafted by Claude Code for CTO ratification; not binding until accepted
+**Status:** Accepted — ratified by CTO 2026-07-03
 **Date:** 2026-07-03
 **Deciders:** CTO / Lead Software Architect (Andes Engineering)
 

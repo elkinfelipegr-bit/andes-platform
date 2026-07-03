@@ -1,6 +1,6 @@
 # ADR-005: Deployment Target — Vercel
 
-**Status:** Proposed — drafted by Claude Code for CTO ratification; not binding until accepted
+**Status:** Accepted — ratified by CTO 2026-07-03
 **Date:** 2026-07-03
 **Deciders:** CTO / Lead Software Architect (Andes Engineering)
 
