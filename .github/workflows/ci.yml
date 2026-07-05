@@ -1,0 +1,81 @@
+# CI pipeline (ADR-006): one workflow gating pull requests and pushes to
+# main. Steps per the ADR: pnpm install → turbo run typecheck lint test
+# build, with a disposable PostgreSQL service container so the RLS
+# tenant-isolation tests (RFC-001 strict tier) run on every PR as the
+# non-superuser andes_app identity — not just locally.
+#
+# The connection strings below are not secrets: they only reach the
+# throwaway service container, which exists for the duration of the job.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        # Mirrors docker-compose.yml (postgres:17). Service containers can't
+        # mount docker/initdb, so the andes_app role script runs as an
+        # explicit psql step below instead.
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: andes
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d andes"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+
+    env:
+      # Superuser: migrations only (bypasses RLS — never the runtime identity).
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/andes?schema=public
+      # Non-superuser runtime identity the RLS integration tests connect as.
+      APP_DATABASE_URL: postgresql://andes_app:andes_app@localhost:5432/andes?schema=public
+      # Dummy value so `next build` has a Better Auth environment; no
+      # deployment ever uses it (Vercel runtime secrets are separate, ADR-005).
+      BETTER_AUTH_SECRET: ci-only-dummy-secret-never-deployed
+      BETTER_AUTH_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Reads the pinned pnpm version from package.json "packageManager".
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Create andes_app runtime role (mirrors docker/initdb)
+        run: psql -h localhost -U postgres -d andes -f docker/initdb/01-app-role.sql
+        env:
+          PGPASSWORD: postgres
+
+      - name: Apply migrations
+        run: pnpm --filter @andes/db migrate:deploy
+
+      - name: Check formatting (ADR-007)
+        run: pnpm format:check
+
+      - name: Typecheck, lint, test, build
+        run: pnpm exec turbo run typecheck lint test build
