@@ -14,6 +14,9 @@ dist/
 # prisma
 packages/db/generated/
 
+# vercel — local project link metadata, never committed
+.vercel/
+
 # misc
 *.log
 .DS_Store
