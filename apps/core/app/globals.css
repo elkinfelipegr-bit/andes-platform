@@ -1,1 +1,6 @@
 @import "tailwindcss";
+@import "@andes/ui/theme.css";
+
+/* @andes/ui ships raw TS outside this app's root; point Tailwind's class
+   scanner at it (docs/design/design-system.md). */
+@source "../../../packages/ui/src";
