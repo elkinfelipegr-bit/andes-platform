@@ -32,7 +32,7 @@ The full Engineering Handbook is planned to reach 250–500 pages across 40–50
 | `docs/foundation/`   | Identity, philosophy, principles, glossary, project rules                                     | ✅ Drafted (11 documents)                                                        |
 | `docs/product/`      | Target market, business model, personas, journeys, roadmap                                    | 🕓 Planned                                                                       |
 | `docs/architecture/` | Architecture overview, DDD, module definitions, database, API, auth, security, infrastructure | 🔶 Started — Sprint 0 domain model drafted                                       |
-| `docs/design/`       | Design system, component library, UX guidelines, navigation, tokens                           | 🕓 Planned                                                                       |
+| `docs/design/`       | Design system, component library, UX guidelines, navigation, tokens                           | 🔶 Started — design system + navigation (Sprint 1)                               |
 | `docs/engineering/`  | Module-by-module technical documentation                                                      | 🕓 Planned                                                                       |
 | `docs/ai/`           | Engineering Copilot specification and prompts                                                 | 🕓 Planned                                                                       |
 | `docs/development/`  | Setup, workflows, conventions                                                                 | 🕓 Planned                                                                       |

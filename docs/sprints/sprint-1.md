@@ -1,8 +1,10 @@
 # Sprint 1 — Proposal
 
-**Status:** Proposed — awaiting CTO ratification. No implementation until this is accepted, per the Golden Rule in [PROJECT_RULES.md](../foundation/PROJECT_RULES.md).
+**Status:** Accepted — ratified by the CTO on 2026-07-07.
 **Drafted:** 2026-07-07
-**Objective (proposed):** Andes Core UI shell — design system foundation, navigation, and the dashboard frame.
+**Objective:** Andes Core UI shell — design system foundation, navigation, and the dashboard frame.
+
+**Ratification record (2026-07-07):** the CTO accepted the proposed objective as-is and resolved the open decisions as follows: (1) objective ratified — design system + navigation fold into Sprint 1; (2) brand direction delegated to the recommended starting point, now recorded as the governing doc in [docs/design/design-system.md](../design/design-system.md) — amendable by the CTO at any time; (3) the invite flow stays deferred to a future sprint.
 
 ---
 
@@ -33,9 +35,11 @@ Per the Development Workflow (Idea → PRD → DDD → ADR → RFC → Sprint Pl
 
 ## Open Decisions for the CTO
 
-1. **Ratify or amend this objective** — alternative: strictly follow the table (Dashboard only) and schedule Design System + Navigation as a separate prior sprint.
-2. **Brand direction** — colors/typography/identity input for the design tokens; nothing recorded in the handbook yet.
-3. **Whether the invite flow joins this sprint** or stays deferred.
+Resolved at ratification — see the record at the top of this document.
+
+1. ~~Ratify or amend this objective~~ — ratified as proposed.
+2. ~~Brand direction~~ — delegated; recorded in [docs/design/design-system.md](../design/design-system.md).
+3. ~~Whether the invite flow joins this sprint~~ — stays deferred.
 
 ## References
 
