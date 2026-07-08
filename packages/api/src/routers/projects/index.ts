@@ -6,8 +6,8 @@ import { TRPCError } from "@trpc/server";
 import { Prisma } from "@andes/db";
 
 import { roleProcedure, router, tenantProcedure } from "../../trpc.js";
+import { assertClientInTenant } from "../crm/index.js";
 import {
-  clientCreateSchema,
   projectCreateSchema,
   projectIdSchema,
   projectListSchema,
@@ -20,26 +20,6 @@ function isUniqueViolation(e: unknown): boolean {
   return (
     e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002"
   );
-}
-
-// A clientId from input is user-controlled: verify it exists inside THIS
-// tenant before wiring it to a project (the FK alone cannot express
-// same-tenant, per sprint-2-domain-model.md Relationships).
-async function assertClientInTenant(
-  tenantDb: { client: { findFirst(args: object): Promise<unknown> } },
-  tenantId: string,
-  clientId: string,
-) {
-  const client = await tenantDb.client.findFirst({
-    where: { id: clientId, tenantId },
-    select: { id: true },
-  });
-  if (!client) {
-    throw new TRPCError({
-      code: "BAD_REQUEST",
-      message: "Client not found in this tenant.",
-    });
-  }
 }
 
 export const projectsRouter = router({
@@ -133,19 +113,5 @@ export const projectsRouter = router({
     }),
 });
 
-// Minimal client procedures for inline creation from the project form —
-// the full CRM module (Sprint 3) owns this entity's future.
-export const clientsRouter = router({
-  list: tenantProcedure.query(({ ctx }) =>
-    ctx.tenantDb.client.findMany({
-      where: { tenantId: ctx.tenantId },
-      orderBy: { name: "asc" },
-    }),
-  ),
-
-  create: tenantProcedure.input(clientCreateSchema).mutation(({ ctx, input }) =>
-    ctx.tenantDb.client.create({
-      data: { name: input.name, tenantId: ctx.tenantId },
-    }),
-  ),
-});
+// The clients router moved to ../crm (Sprint 3) — CRM owns Client now;
+// the project form consumes it through the same appRouter key.
