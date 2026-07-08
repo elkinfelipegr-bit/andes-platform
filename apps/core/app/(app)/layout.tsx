@@ -6,6 +6,7 @@ import { auth } from "@andes/auth";
 
 import { Sidebar } from "./_components/sidebar";
 import { Topbar } from "./_components/topbar";
+import { AppProviders } from "./providers";
 
 // Authenticated shell (docs/design/navigation.md): every product page
 // renders inside this layout. Access states: no session → /login; no
@@ -31,7 +32,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
               : null
           }
         />
-        <main className="flex-1 p-8">{children}</main>
+        <main className="flex-1 p-8">
+          <AppProviders>{children}</AppProviders>
+        </main>
       </div>
     </div>
   );

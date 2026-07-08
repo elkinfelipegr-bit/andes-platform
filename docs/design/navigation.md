@@ -29,17 +29,17 @@ Defines the authenticated shell every Andes product renders inside, and the navi
 
 ## Module → Route Map
 
-| Sidebar entry  | Product          | Route         | Sprint 1 state  |
-| -------------- | ---------------- | ------------- | --------------- |
-| Dashboard      | Andes Core       | `/dashboard`  | **Live**        |
-| Projects       | Andes Projects   | `/projects`   | Stub (disabled) |
-| CRM            | Andes CRM        | `/crm`        | Stub (disabled) |
-| Structures     | Andes Structures | `/structures` | Stub (disabled) |
-| Geo            | Andes Geo        | `/geo`        | Stub (disabled) |
-| BIM            | Andes BIM        | `/bim`        | Stub (disabled) |
-| AI             | Andes AI         | `/ai`         | Stub (disabled) |
-| Analytics      | Andes Analytics  | `/analytics`  | Stub (disabled) |
-| Administration | Andes Core       | `/admin`      | Stub (disabled) |
+| Sidebar entry  | Product          | Route         | State               |
+| -------------- | ---------------- | ------------- | ------------------- |
+| Dashboard      | Andes Core       | `/dashboard`  | **Live** (Sprint 1) |
+| Projects       | Andes Projects   | `/projects`   | **Live** (Sprint 2) |
+| CRM            | Andes CRM        | `/crm`        | Stub (disabled)     |
+| Structures     | Andes Structures | `/structures` | Stub (disabled)     |
+| Geo            | Andes Geo        | `/geo`        | Stub (disabled)     |
+| BIM            | Andes BIM        | `/bim`        | Stub (disabled)     |
+| AI             | Andes AI         | `/ai`         | Stub (disabled)     |
+| Analytics      | Andes Analytics  | `/analytics`  | Stub (disabled)     |
+| Administration | Andes Core       | `/admin`      | Stub (disabled)     |
 
 Routes are top-level segments (no `/core/...` prefix): products are one platform to the user; the monorepo package split ([ADR-004](../adr/0004-repository-structure.md)) is an implementation boundary, not a URL scheme.
 
