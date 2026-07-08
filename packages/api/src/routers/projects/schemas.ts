@@ -63,6 +63,4 @@ export const projectListSchema = z
 
 export const projectIdSchema = z.object({ id: z.string().min(1) });
 
-export const clientCreateSchema = z.object({
-  name: z.string().trim().min(1).max(200),
-});
+// clientCreateSchema moved to ../crm/schemas.ts (Sprint 3 — CRM owns Client).

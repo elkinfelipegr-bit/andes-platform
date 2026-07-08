@@ -3,7 +3,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  clientCreateSchema,
   projectCreateSchema,
   projectListSchema,
   projectUpdateSchema,
@@ -97,9 +96,4 @@ describe("projectListSchema", () => {
   });
 });
 
-describe("clientCreateSchema", () => {
-  it("trims and rejects empty names", () => {
-    expect(clientCreateSchema.parse({ name: " ACME " }).name).toBe("ACME");
-    expect(clientCreateSchema.safeParse({ name: "  " }).success).toBe(false);
-  });
-});
+// clientCreateSchema tests moved to ../crm/schemas.test.ts (Sprint 3).
