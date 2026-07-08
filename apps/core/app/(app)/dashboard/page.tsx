@@ -1,4 +1,6 @@
+import { FolderKanban } from "lucide-react";
 import { headers } from "next/headers";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { auth } from "@andes/auth";
@@ -11,17 +13,26 @@ import {
   CardTitle,
 } from "@andes/ui";
 
+import { serverCaller } from "@/lib/server-caller";
+
 import { moduleNav } from "../_components/nav-items";
 
-// Dashboard frame (docs/sprints/sprint-1.md scope item 3): limited to what
-// the domain already supports — session identity, tenant, role — plus the
-// module map as placeholders. Real widgets arrive with their domains.
+// Dashboard (sprint-1.md frame + sprint-2.md scope item 3): session
+// identity, tenant, role — and the first real widget, the active-projects
+// count, now that the Projects domain exists.
 export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/login");
 
   const membership = session.activeMembership;
   const firstName = session.user.name.split(" ")[0] ?? session.user.name;
+
+  let activeProjectCount: number | null = null;
+  if (membership) {
+    const caller = await serverCaller();
+    activeProjectCount = (await caller.projects.list({ status: "ACTIVE" }))
+      .length;
+  }
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
@@ -96,6 +107,25 @@ export default async function DashboardPage() {
           Modules
         </h2>
         <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {membership && (
+            <Link href="/projects" className="group">
+              <Card className="h-full transition-colors group-hover:border-primary/40">
+                <CardHeader>
+                  <FolderKanban
+                    className="size-5 text-primary"
+                    aria-hidden="true"
+                  />
+                  <CardTitle className="text-sm">Projects</CardTitle>
+                  <CardDescription>
+                    <span className="text-2xl font-semibold text-foreground">
+                      {activeProjectCount}
+                    </span>{" "}
+                    active
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+          )}
           {moduleNav
             .filter((item) => !item.enabled)
             .map((item) => (
