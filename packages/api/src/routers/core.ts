@@ -5,6 +5,7 @@ import {
   router,
   tenantProcedure,
 } from "../trpc.js";
+import { clientsRouter, projectsRouter } from "./projects/index.js";
 
 export const coreRouter = router({
   health: publicProcedure.query(() => ({ ok: true as const })),
@@ -33,6 +34,8 @@ export const coreRouter = router({
 
 export const appRouter = router({
   core: coreRouter,
+  projects: projectsRouter,
+  clients: clientsRouter,
 });
 
 export type AppRouter = typeof appRouter;
