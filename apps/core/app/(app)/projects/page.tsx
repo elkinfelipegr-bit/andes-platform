@@ -169,7 +169,16 @@ export default function ProjectsPage() {
                 </TableCell>
                 <TableCell className="font-medium">{project.name}</TableCell>
                 <TableCell className="text-muted-foreground">
-                  {project.client?.name ?? "—"}
+                  {project.client ? (
+                    <Link
+                      href={`/crm/${project.client.id}`}
+                      className="underline-offset-2 hover:text-primary hover:underline"
+                    >
+                      {project.client.name}
+                    </Link>
+                  ) : (
+                    "—"
+                  )}
                 </TableCell>
                 <TableCell>
                   <StatusBadge status={project.status} />

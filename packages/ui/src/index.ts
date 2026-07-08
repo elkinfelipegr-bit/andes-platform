@@ -16,6 +16,7 @@ export {
 export { Badge, badgeVariants, type BadgeProps } from "./components/badge.js";
 export { Input } from "./components/input.js";
 export { Label } from "./components/label.js";
+export { Textarea } from "./components/textarea.js";
 export { Select } from "./components/select.js";
 export {
   Table,

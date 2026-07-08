@@ -1,4 +1,4 @@
-import { FolderKanban } from "lucide-react";
+import { FolderKanban, Handshake } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -28,10 +28,15 @@ export default async function DashboardPage() {
   const firstName = session.user.name.split(" ")[0] ?? session.user.name;
 
   let activeProjectCount: number | null = null;
+  let activeClientCount: number | null = null;
   if (membership) {
     const caller = await serverCaller();
-    activeProjectCount = (await caller.projects.list({ status: "ACTIVE" }))
-      .length;
+    const [activeProjects, activeClients] = await Promise.all([
+      caller.projects.list({ status: "ACTIVE" }),
+      caller.clients.list(),
+    ]);
+    activeProjectCount = activeProjects.length;
+    activeClientCount = activeClients.length;
   }
 
   return (
@@ -108,23 +113,42 @@ export default async function DashboardPage() {
         </h2>
         <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {membership && (
-            <Link href="/projects" className="group">
-              <Card className="h-full transition-colors group-hover:border-primary/40">
-                <CardHeader>
-                  <FolderKanban
-                    className="size-5 text-primary"
-                    aria-hidden="true"
-                  />
-                  <CardTitle className="text-sm">Projects</CardTitle>
-                  <CardDescription>
-                    <span className="text-2xl font-semibold text-foreground">
-                      {activeProjectCount}
-                    </span>{" "}
-                    active
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
+            <>
+              <Link href="/projects" className="group">
+                <Card className="h-full transition-colors group-hover:border-primary/40">
+                  <CardHeader>
+                    <FolderKanban
+                      className="size-5 text-primary"
+                      aria-hidden="true"
+                    />
+                    <CardTitle className="text-sm">Projects</CardTitle>
+                    <CardDescription>
+                      <span className="text-2xl font-semibold text-foreground">
+                        {activeProjectCount}
+                      </span>{" "}
+                      active
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+              <Link href="/crm" className="group">
+                <Card className="h-full transition-colors group-hover:border-primary/40">
+                  <CardHeader>
+                    <Handshake
+                      className="size-5 text-primary"
+                      aria-hidden="true"
+                    />
+                    <CardTitle className="text-sm">CRM</CardTitle>
+                    <CardDescription>
+                      <span className="text-2xl font-semibold text-foreground">
+                        {activeClientCount}
+                      </span>{" "}
+                      clients
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+            </>
           )}
           {moduleNav
             .filter((item) => !item.enabled)
