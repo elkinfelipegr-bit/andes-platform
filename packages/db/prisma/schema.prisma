@@ -1,7 +1,7 @@
 // Sprint 0 domain model — implements docs/architecture/sprint-0-domain-model.md
+// Sprint 2 additions (Client, Project) — docs/architecture/sprint-2-domain-model.md
 // Multi-tenancy per RFC-001: every tenant-scoped table carries tenantId.
-// RLS policies (defense-in-depth layer 2) are applied via raw SQL migration,
-// not via Prisma — see prisma/sql/rls.sql.
+// RLS policies (defense-in-depth layer 2) are applied via raw SQL migrations.
 
 generator client {
   provider = "prisma-client-js"
@@ -24,6 +24,8 @@ model Tenant {
 
   roles       Role[]
   memberships Membership[]
+  clients     Client[]
+  projects    Project[]
 
   @@map("tenant")
 }
@@ -45,9 +47,10 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now()) @updatedAt
 
-  memberships Membership[]
-  sessions    Session[]
-  accounts    Account[]
+  memberships     Membership[]
+  sessions        Session[]
+  accounts        Account[]
+  projectsCreated Project[]
 
   @@map("user")
 }
@@ -141,4 +144,60 @@ model Membership {
   @@index([userId])
   @@index([tenantId])
   @@map("membership")
+}
+
+// ── Sprint 2: Projects domain (sprint-2-domain-model.md) ────────────────
+
+// The tenant's own customer — NOT a tenant (RFC-001 draws this line).
+// Deliberately minimal: a named FK target for Project; the CRM module
+// (Sprint 3) enriches it without touching Project.
+model Client {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String
+  createdAt DateTime @default(now())
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  projects Project[]
+
+  @@index([tenantId])
+  @@map("client")
+}
+
+// Lifecycle states are platform workflow constants (ratified: enum, not a
+// data table — unlike Role, tenants do not customize these).
+enum ProjectStatus {
+  DRAFT
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  ARCHIVED
+
+  @@map("project_status")
+}
+
+// The container all engineering work attaches to. Never hard-deleted —
+// lifecycle ends at ARCHIVED (sprint-2-domain-model.md, process 5).
+model Project {
+  id          String        @id @default(cuid())
+  tenantId    String
+  clientId    String? // optional: internal/R&D work has no client
+  code        String // human-assigned, unique per tenant (e.g. P-2026-014)
+  name        String
+  description String?
+  status      ProjectStatus @default(DRAFT)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdById String // audit only — authorization flows from Membership
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now()) @updatedAt
+
+  tenant    Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  client    Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  createdBy User    @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@index([clientId])
+  @@map("project")
 }

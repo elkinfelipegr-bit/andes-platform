@@ -23,6 +23,9 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
   let roleA!: { id: string };
   let roleB!: { id: string };
   let userInA!: { id: string };
+  let clientA!: { id: string };
+  let projectA!: { id: string };
+  let projectB!: { id: string };
 
   beforeAll(async () => {
     tenantA = await admin.tenant.create({
@@ -42,6 +45,28 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
     });
     await admin.membership.create({
       data: { tenantId: tenantA.id, userId: userInA.id, roleId: roleA.id },
+    });
+    // Sprint 2 fixtures (sprint-2-domain-model.md): a client and a project
+    // per tenant, to prove the same isolation holds for the new tables.
+    clientA = await admin.client.create({
+      data: { tenantId: tenantA.id, name: `Client A ${run}` },
+    });
+    projectA = await admin.project.create({
+      data: {
+        tenantId: tenantA.id,
+        clientId: clientA.id,
+        code: `P-A-${run}`,
+        name: "Project in A",
+        createdById: userInA.id,
+      },
+    });
+    projectB = await admin.project.create({
+      data: {
+        tenantId: tenantB.id,
+        code: `P-B-${run}`,
+        name: "Project in B",
+        createdById: userInA.id,
+      },
     });
   });
 
@@ -109,5 +134,51 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
     const roles = await forUser(app, userInA.id).role.findMany();
     expect(roles.map((r) => r.id)).toContain(roleA.id); // own role via membership
     expect(roles.map((r) => r.id)).not.toContain(roleB.id);
+  });
+
+  // ── Sprint 2: client / project (sprint-2-domain-model.md) ─────────────
+
+  it("forTenant(A) sees only tenant A's projects and clients", async () => {
+    const projects = await forTenant(app, tenantA.id).project.findMany();
+    expect(projects.map((p) => p.id)).toContain(projectA.id);
+    expect(projects.map((p) => p.id)).not.toContain(projectB.id);
+    const clients = await forTenant(app, tenantA.id).client.findMany();
+    expect(clients.map((c) => c.id)).toContain(clientA.id);
+    expect(clients.every((c) => c.tenantId === tenantA.id)).toBe(true);
+  });
+
+  it("fails closed: no tenant context → no project/client rows at all", async () => {
+    await expect(app.project.findMany()).resolves.toHaveLength(0);
+    await expect(app.client.findMany()).resolves.toHaveLength(0);
+  });
+
+  it("rejects cross-tenant project writes (WITH CHECK)", async () => {
+    await expect(
+      forTenant(app, tenantA.id).project.create({
+        data: {
+          tenantId: tenantB.id,
+          code: `EVIL-${run}`,
+          name: "Evil project",
+          createdById: userInA.id,
+        },
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("rejects cross-tenant project updates: tenant B's rows are not reachable", async () => {
+    const updated = await forTenant(app, tenantA.id).project.updateMany({
+      where: { id: projectB.id },
+      data: { name: "Hijacked" },
+    });
+    expect(updated.count).toBe(0);
+  });
+
+  it("forUser grants nothing on project/client — no bootstrap branch by design", async () => {
+    await expect(
+      forUser(app, userInA.id).project.findMany(),
+    ).resolves.toHaveLength(0);
+    await expect(
+      forUser(app, userInA.id).client.findMany(),
+    ).resolves.toHaveLength(0);
   });
 });
