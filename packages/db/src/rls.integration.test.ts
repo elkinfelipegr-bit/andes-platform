@@ -181,4 +181,41 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
       forUser(app, userInA.id).client.findMany(),
     ).resolves.toHaveLength(0);
   });
+
+  // ── Sprint 3: contact (sprint-3-domain-model.md) ──────────────────────
+
+  it("contact isolation: scoped reads, fail-closed, cross-tenant write denied, no forUser access", async () => {
+    const contactA = await admin.contact.create({
+      data: {
+        tenantId: tenantA.id,
+        clientId: clientA.id,
+        name: `Contact A ${run}`,
+      },
+    });
+
+    const seen = await forTenant(app, tenantA.id).contact.findMany();
+    expect(seen.map((c) => c.id)).toContain(contactA.id);
+    expect(seen.every((c) => c.tenantId === tenantA.id)).toBe(true);
+
+    await expect(app.contact.findMany()).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).contact.findMany(),
+    ).resolves.toHaveLength(0);
+
+    // Cross-tenant INSERT: tenant B context cannot plant a contact in A.
+    await expect(
+      forTenant(app, tenantB.id).contact.create({
+        data: {
+          tenantId: tenantA.id,
+          clientId: clientA.id,
+          name: `Evil ${run}`,
+        },
+      }),
+    ).rejects.toThrow();
+
+    await expect(
+      forUser(app, userInA.id).contact.findMany(),
+    ).resolves.toHaveLength(0);
+  });
 });

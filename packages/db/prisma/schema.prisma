@@ -26,6 +26,7 @@ model Tenant {
   memberships Membership[]
   clients     Client[]
   projects    Project[]
+  contacts    Contact[]
 
   @@map("tenant")
 }
@@ -147,21 +148,61 @@ model Membership {
 }
 
 // ── Sprint 2: Projects domain (sprint-2-domain-model.md) ────────────────
+// ── Sprint 3: CRM enrichment (sprint-3-domain-model.md) ─────────────────
 
 // The tenant's own customer — NOT a tenant (RFC-001 draws this line).
-// Deliberately minimal: a named FK target for Project; the CRM module
-// (Sprint 3) enriches it without touching Project.
+// Born minimal in Sprint 2 as an FK target for Project; enriched in
+// Sprint 3 (all additions nullable — additive migration, zero Project
+// impact). taxId is free text (NIT validation deferred, jurisdiction-
+// agnostic per the SaaS path). archivedAt doubles as flag and audit:
+// archived clients keep their projects and stay readable, they only
+// leave active pickers.
 model Client {
-  id        String   @id @default(cuid())
-  tenantId  String
-  name      String
-  createdAt DateTime @default(now())
+  id         String    @id @default(cuid())
+  tenantId   String
+  name       String
+  taxId      String?
+  industry   String?
+  address    String?
+  city       String?
+  phone      String?
+  email      String?
+  notes      String?
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
 
   tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   projects Project[]
+  contacts Contact[]
 
   @@index([tenantId])
   @@map("client")
+}
+
+// A person at a client — the firm's counterpart. Never a platform User
+// (contacts don't log in; a future client portal is a separate linkage).
+// Carries its own tenantId even though reachable via clientId: RLS must
+// not depend on a join (RFC-001). Hard delete is deliberate — address-book
+// data, no engineering artifacts attached (sprint-3-domain-model.md, OQ2).
+model Contact {
+  id        String   @id @default(cuid())
+  tenantId  String
+  clientId  String
+  name      String
+  title     String?
+  email     String?
+  phone     String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([clientId])
+  @@map("contact")
 }
 
 // Lifecycle states are platform workflow constants (ratified: enum, not a
