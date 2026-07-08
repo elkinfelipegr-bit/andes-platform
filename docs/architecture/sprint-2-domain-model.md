@@ -1,7 +1,7 @@
 # Sprint 2 Domain Model — Projects
 
 **Version:** 1.0
-**Status:** Draft — awaiting CTO ratification alongside [sprint-2.md](../sprints/sprint-2.md); entity sketch ready to become a Prisma migration once accepted.
+**Status:** Accepted — ratified by the CTO on 2026-07-07, including the three recommendations in Open Questions (minimal `Client` entity; `status` as Prisma enum; human-assigned per-tenant-unique `code`).
 **Part of:** `docs/architecture/`, following the DDD workflow in [architecture-principles.md](../foundation/architecture-principles.md)
 
 ---
