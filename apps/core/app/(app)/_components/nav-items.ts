@@ -28,7 +28,7 @@ export const moduleNav: NavItem[] = [
     enabled: true,
   },
   { label: "Projects", href: "/projects", icon: FolderKanban, enabled: true },
-  { label: "CRM", href: "/crm", icon: Handshake, enabled: false },
+  { label: "CRM", href: "/crm", icon: Handshake, enabled: true },
   { label: "Structures", href: "/structures", icon: Building2, enabled: false },
   { label: "Geo", href: "/geo", icon: Mountain, enabled: false },
   { label: "BIM", href: "/bim", icon: Boxes, enabled: false },

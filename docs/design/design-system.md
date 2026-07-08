@@ -56,6 +56,7 @@ Exact values live in `packages/ui/src/styles/theme.css` — that file and this t
 - Package exports raw TypeScript (repo convention — apps transpile via `transpilePackages`); Tailwind sees its classes via `@source` in the consuming app's CSS.
 - Sprint 1 set: `Button`, `Card`, `Badge`, `Separator`, `DropdownMenu`, `cn()` utility. Grown per sprint as modules need — reuse before creation.
 - Sprint 2 additions (Projects module): `Input`, `Label`, `Select` (styled native select — swap for Radix only when a design need demands it), `Table` family, `Dialog` (Radix).
+- Sprint 3 additions (CRM module): `Textarea`.
 - Icons: **lucide-react** (shadcn's companion set), sized `size-4` inline / `size-5` nav.
 
 ## Accessibility Baseline
