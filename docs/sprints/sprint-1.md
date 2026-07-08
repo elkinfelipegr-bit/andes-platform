@@ -1,6 +1,6 @@
-# Sprint 1 — Proposal
+# Sprint 1 — Andes Core UI Shell
 
-**Status:** Accepted — ratified by the CTO on 2026-07-07.
+**Status:** Closed — 2026-07-07
 **Drafted:** 2026-07-07
 **Objective:** Andes Core UI shell — design system foundation, navigation, and the dashboard frame.
 
@@ -40,6 +40,24 @@ Resolved at ratification — see the record at the top of this document.
 1. ~~Ratify or amend this objective~~ — ratified as proposed.
 2. ~~Brand direction~~ — delegated; recorded in [docs/design/design-system.md](../design/design-system.md).
 3. ~~Whether the invite flow joins this sprint~~ — stays deferred.
+
+## Retrospective (closure, 2026-07-07)
+
+**Objective met — proposed, ratified, and shipped to production within a single day.** All three scope items delivered across three PRs, each CI-gated:
+
+- **PR #5 — governing docs first:** [design-system.md](../design/design-system.md) (brand direction, token table, `packages/ui` conventions) and [navigation.md](../design/navigation.md) (shell anatomy, module→route map, access states), honoring "documentation before coding."
+- **PR #6 — `@andes/ui`:** Andes tokens (`theme.css` via Tailwind v4 `@theme inline`) and the Sprint 1 component set (Button, Card, Badge, Separator, DropdownMenu, `cn`), matching sibling-package conventions; unit-tested where logic exists.
+- **PR #7 — the shell:** `(app)` route group layout with session check; sidebar with the eight-product map (stubs disabled, "Soon" badges); topbar with always-visible tenant + role (RFC-001) and user menu; dashboard frame scoped to session/tenant/role; login restyled; Inter + JetBrains Mono via `next/font`.
+
+**Verification:** local production build + typecheck/lint/tests; token pipeline confirmed in a real browser (Andes Blue + Inter resolving on `@andes/ui` components across the package boundary); production deploy verified live; **visual approval by the CTO on the deployed shell ("quedó perfecto") closes the sprint.**
+
+**Deviations:** none against the ratified scope. The mobile slide-over navigation was exercised as the deferral navigation.md explicitly allows — the desktop-first layout shipped.
+
+**Carry-over:**
+
+1. Invite flow — still deferred (decision at ratification).
+2. Mobile slide-over/collapsible sidebar — when a sprint's scope touches the shell again.
+3. Dark mode `.dark` token block — token-only change, whenever prioritized.
 
 ## References
 
