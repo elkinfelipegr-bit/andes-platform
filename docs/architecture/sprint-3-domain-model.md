@@ -1,7 +1,7 @@
 # Sprint 3 Domain Model — CRM (Clients & Contacts)
 
 **Version:** 1.0
-**Status:** Draft — awaiting CTO ratification alongside [sprint-3.md](../sprints/sprint-3.md).
+**Status:** Accepted — ratified by the CTO on 2026-07-08, including the three recommendations in Open Questions (archival does not cascade to projects; contact hard-delete; taxId as free text).
 **Part of:** `docs/architecture/`, following the DDD workflow in [architecture-principles.md](../foundation/architecture-principles.md)
 
 ---
