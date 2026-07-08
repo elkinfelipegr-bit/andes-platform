@@ -1,8 +1,8 @@
-# Sprint 2 — Proposal
+# Sprint 2 — Projects Module
 
-**Status:** Accepted — ratified by the CTO on 2026-07-07 as proposed, including the domain model with its three recommendations.
-**Drafted:** 2026-07-07
-**Objective (proposed):** Projects module MVP — tenant-scoped project registry on the Andes Core shell.
+**Status:** Closed — 2026-07-08
+**Drafted:** 2026-07-07 · **Ratified:** 2026-07-07 (as proposed, including the domain model's three recommendations)
+**Objective:** Projects module MVP — tenant-scoped project registry on the Andes Core shell.
 
 ---
 
@@ -32,6 +32,24 @@ Tenant-scoping logic (RLS policies for `client`/`project`, tenantProcedure cover
 
 1. **Ratify the domain model** — including its three recommendations (minimal `Client` entity; `status` as Prisma enum; human-assigned per-tenant-unique `code`). See [sprint-2-domain-model.md](../architecture/sprint-2-domain-model.md).
 2. **Ratify this scope** — or trim item 3's detail page to a follow-up if the sprint runs long (list + create are the core).
+
+## Retrospective (closure, 2026-07-08)
+
+**Objective met — all four scope items shipped to production across three CI-gated PRs**, in the documented order (domain → data → API → UI):
+
+- **PR #10 — data layer:** `Client` + `Project` per the ratified model; migrations `projects_domain` + `projects_rls` (strict tenant scoping, no bootstrap branch); RLS integration suite extended to 13 cases, all green against Postgres as `andes_app`.
+- **PR #11 — API:** `projects` (list/get/create/update/archive) + `clients` (list/create) routers; `archive` role-gated to `OWNER_ADMIN` — the platform's first real `roleProcedure` use; same-tenant client verification; 23 tests including 7 integration cases running the real middleware chain (CRUD path, role gate, cross-tenant read/write denials, per-tenant code uniqueness).
+- **PR #12 — UI:** `/projects` live on the shell (list + filter, create dialog with inline client creation on React Hook Form + Zod — their first platform use — detail/edit, role-mirrored archive); `@andes/ui` grew Input/Label/Select/Table/Dialog; tRPC React client + server caller wired (TanStack Query per ADR-001); dashboard shows the live active-projects count.
+
+**Verification:** full E2E in a real browser against the production build (create with inline client → edit → ENGINEER sees no archive → OWNER_ADMIN archives → read-only state); a date-only timezone shift bug was caught and fixed during that pass. Production rollout: migrations applied to Neon (unpooled URL — the pooler breaks `migrate deploy`), `andes_app` grants on the new tables verified, smoke test green. **CTO approval on the deployed module (2026-07-08) closes the sprint.**
+
+**Deviations:** none against the ratified scope.
+
+**Carry-over:**
+
+1. Client-side date-only handling is formatted in UTC — revisit if the platform ever needs tenant-local calendars.
+2. Project list pagination/search — when real data volume demands it.
+3. Standing items: invite flow, mobile nav, dark-mode tokens (from [sprint-1.md](sprint-1.md)).
 
 ## References
 
