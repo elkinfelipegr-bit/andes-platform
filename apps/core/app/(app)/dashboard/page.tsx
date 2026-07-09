@@ -1,4 +1,9 @@
-import { FileText, FolderKanban, Handshake } from "lucide-react";
+import {
+  ClipboardCheck,
+  FileText,
+  FolderKanban,
+  Handshake,
+} from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -30,16 +35,20 @@ export default async function DashboardPage() {
   let activeProjectCount: number | null = null;
   let activeClientCount: number | null = null;
   let pendingProposalCount: number | null = null;
+  let scheduledInspectionCount: number | null = null;
   if (membership) {
     const caller = await serverCaller();
-    const [activeProjects, activeClients, sentProposals] = await Promise.all([
-      caller.projects.list({ status: "ACTIVE" }),
-      caller.clients.list(),
-      caller.proposals.list({ status: "SENT" }),
-    ]);
+    const [activeProjects, activeClients, sentProposals, scheduled] =
+      await Promise.all([
+        caller.projects.list({ status: "ACTIVE" }),
+        caller.clients.list(),
+        caller.proposals.list({ status: "SENT" }),
+        caller.inspections.list({ status: "SCHEDULED" }),
+      ]);
     activeProjectCount = activeProjects.length;
     activeClientCount = activeClients.length;
     pendingProposalCount = sentProposals.length;
+    scheduledInspectionCount = scheduled.length;
   }
 
   return (
@@ -164,6 +173,23 @@ export default async function DashboardPage() {
                         {pendingProposalCount}
                       </span>{" "}
                       awaiting decision
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+              <Link href="/projects/inspections" className="group">
+                <Card className="h-full transition-colors group-hover:border-primary/40">
+                  <CardHeader>
+                    <ClipboardCheck
+                      className="size-5 text-primary"
+                      aria-hidden="true"
+                    />
+                    <CardTitle className="text-sm">Inspections</CardTitle>
+                    <CardDescription>
+                      <span className="text-2xl font-semibold text-foreground">
+                        {scheduledInspectionCount}
+                      </span>{" "}
+                      scheduled
                     </CardDescription>
                   </CardHeader>
                 </Card>

@@ -22,6 +22,7 @@ import {
   type ProjectFormPayload,
 } from "../_components/project-form";
 import { StatusBadge } from "../_components/status-badge";
+import { InspectionStatusBadge } from "../inspections/_components/inspection-badges";
 
 function toDateInput(value: Date | string | null): string {
   if (!value) return "";
@@ -162,6 +163,49 @@ export default function ProjectDetailPage() {
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Inspections</CardTitle>
+          <CardDescription>
+            Site visits for this project — managed in{" "}
+            <Link
+              href="/projects/inspections"
+              className="text-primary underline-offset-2 hover:underline"
+            >
+              Inspections
+            </Link>
+            .
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {p.inspections.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No inspections for this project yet.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {p.inspections.map((inspection) => (
+                <li
+                  key={inspection.id}
+                  className="flex items-center justify-between gap-4"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Link
+                      href={`/projects/inspections/${inspection.id}`}
+                      className="font-mono text-xs text-primary underline-offset-2 hover:underline"
+                    >
+                      {inspection.code}
+                    </Link>
+                    <span className="truncate text-sm">{inspection.title}</span>
+                  </div>
+                  <InspectionStatusBadge status={inspection.status} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

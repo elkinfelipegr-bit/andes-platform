@@ -28,6 +28,7 @@ import {
   ProjectForm,
   type ProjectFormPayload,
 } from "./_components/project-form";
+import { ProjectsNav } from "./_components/projects-nav";
 import { StatusBadge } from "./_components/status-badge";
 
 const STATUS_FILTERS = [
@@ -117,6 +118,7 @@ export default function ProjectsPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
+      <ProjectsNav />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Projects</h1>
