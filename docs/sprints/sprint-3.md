@@ -1,8 +1,8 @@
-# Sprint 3 — Proposal
+# Sprint 3 — CRM Module
 
-**Status:** Accepted — ratified by the CTO on 2026-07-08 as proposed, including the domain model with its three recommendations.
-**Drafted:** 2026-07-08
-**Objective (proposed):** CRM module MVP — client and contact management on the Andes Core shell.
+**Status:** Closed — 2026-07-08
+**Drafted:** 2026-07-08 · **Ratified:** 2026-07-08 (as proposed, including the domain model's three recommendations)
+**Objective:** CRM module MVP — client and contact management on the Andes Core shell.
 
 ---
 
@@ -32,6 +32,25 @@ Same bar as Sprint 2: tenant-isolation logic (RLS on `contact`, enriched `client
 
 1. **Ratify the domain model** — including its three recommendations (archival doesn't cascade to projects; contact hard-delete; taxId as free text). See [sprint-3-domain-model.md](../architecture/sprint-3-domain-model.md).
 2. **Ratify this scope** — or trim: the projects-section on client detail is the first candidate to defer if the sprint runs long (data + contacts are the core).
+
+## Retrospective (closure, 2026-07-08)
+
+**Objective met — all four scope items shipped to production across three CI-gated PRs** (domain → data → API → UI):
+
+- **PR #15 — data layer:** additive `Client` enrichment + new `contact` table under the strict RLS pattern; isolation suite extended to 14 cases. The migration SQL was hand-written to Prisma's generated conventions because local Docker refused to start (see Deviations) — CI's `migrate deploy` + full suite validated it.
+- **PR #16 — API:** `clients` router relocated to `routers/crm/` (CRM owns `Client`; appRouter key unchanged so Sprint 2 UI kept working) and grown with `get`/`update`/`archive`/`list(includeArchived)`; new `contacts` router (create/update/hard-delete). Integration suite covers enrichment CRUD, contact lifecycle, the archive role gate with project non-cascade, and a cross-tenant denial sweep.
+- **PR #17 — UI:** `/crm` live — clients list with show-archived toggle, detail page (data form, contacts add/edit/delete, client's projects), cross-links from Projects, dashboard clients-count card, `Textarea` in `@andes/ui`.
+
+**Verification:** unit tier locally; integration tier in CI (merge-gated — same guarantee); production rollout with Neon migrations applied (unpooled URL), `andes_app` grants on `contact` verified, smoke test green. **CTO functional verification on production ("quedó funcionando", 2026-07-08) closes the sprint.**
+
+**Deviations:** browser E2E could not run locally — Docker Desktop hung on startup and its memory pressure OOM-killed Next builds on this 8 GB machine (remedy recorded: don't run Docker and builds concurrently; `wsl --shutdown` clears the hang). Verification shifted to CI integration + CTO's production pass. No scope deviations.
+
+**Carry-over:**
+
+1. NIT check-digit validation (UX nicety, no migration needed).
+2. Client list search/pagination — with real data volume.
+3. Contact soft-delete revisit — flagged for when proposals reference contacts (Sprint 4).
+4. Standing items from Sprints 1–2 (invite flow, mobile nav, dark tokens, project search).
 
 ## References
 
