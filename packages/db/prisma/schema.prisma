@@ -29,6 +29,8 @@ model Tenant {
   contacts      Contact[]
   proposals     Proposal[]
   proposalItems ProposalItem[]
+  inspections   Inspection[]
+  findings      Finding[]
 
   @@map("tenant")
 }
@@ -50,11 +52,13 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now()) @updatedAt
 
-  memberships      Membership[]
-  sessions         Session[]
-  accounts         Account[]
-  projectsCreated  Project[]
-  proposalsCreated Proposal[]
+  memberships         Membership[]
+  sessions            Session[]
+  accounts            Account[]
+  projectsCreated     Project[]
+  proposalsCreated    Proposal[]
+  inspectionsAssigned Inspection[] @relation("inspectionsAssigned")
+  inspectionsCreated  Inspection[] @relation("inspectionsCreated")
 
   @@map("user")
 }
@@ -307,13 +311,87 @@ model Project {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @default(now()) @updatedAt
 
-  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  client    Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  createdBy User      @relation(fields: [createdById], references: [id], onDelete: Restrict)
-  proposal  Proposal? // the accepted proposal this project was converted from
+  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  client      Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  createdBy   User         @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  proposal    Proposal? // the accepted proposal this project was converted from
+  inspections Inspection[]
 
   @@unique([tenantId, code])
   @@index([tenantId])
   @@index([clientId])
   @@map("project")
+}
+
+// ── Sprint 5: Inspection Module (sprint-5-domain-model.md) ──────────────
+
+// Forward-only: SCHEDULED → COMPLETED | CANCELLED. Content editable only
+// while SCHEDULED — a completed inspection is what the inspector reported.
+enum InspectionStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+
+  @@map("inspection_status")
+}
+
+enum FindingSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+
+  @@map("finding_severity")
+}
+
+// A site visit within a project — the first engineering record attached
+// to the Sprint 2 project container. inspectorId references a User whose
+// tenant Membership the API verifies (a userId alone proves nothing).
+// Never hard-deleted: CANCELLED is the terminal state for visits that
+// didn't happen.
+model Inspection {
+  id           String           @id @default(cuid())
+  tenantId     String
+  projectId    String
+  inspectorId  String
+  code         String // human-assigned, unique per tenant (precedent)
+  title        String
+  scheduledFor DateTime
+  performedAt  DateTime? // stamped by completion
+  notes        String?
+  status       InspectionStatus @default(SCHEDULED)
+  createdById  String // audit only — authorization flows from Membership
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @default(now()) @updatedAt
+
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  inspector User      @relation("inspectionsAssigned", fields: [inspectorId], references: [id], onDelete: Restrict)
+  createdBy User      @relation("inspectionsCreated", fields: [createdById], references: [id], onDelete: Restrict)
+  findings  Finding[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@index([projectId])
+  @@index([inspectorId])
+  @@map("inspection")
+}
+
+// One observation from the visit — the ProposalItem pattern applied to
+// field data. Own tenantId: RLS never depends on a join (RFC-001).
+model Finding {
+  id           String          @id @default(cuid())
+  tenantId     String
+  inspectionId String
+  position     Int
+  description  String
+  severity     FindingSeverity
+  location     String?
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([inspectionId])
+  @@map("finding")
 }

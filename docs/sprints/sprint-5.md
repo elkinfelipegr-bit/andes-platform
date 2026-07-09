@@ -1,6 +1,6 @@
 # Sprint 5 — Proposal
 
-**Status:** Proposed — awaiting CTO ratification. No implementation until accepted, per the Golden Rule in [PROJECT_RULES.md](../foundation/PROJECT_RULES.md).
+**Status:** Accepted — ratified by the CTO on 2026-07-09 as proposed, including the domain model with its four recommendations.
 **Drafted:** 2026-07-09
 **Objective (proposed):** Inspection Module MVP — scheduled site inspections with severity-graded findings and a printable report, inside projects.
 

@@ -276,4 +276,65 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
       forUser(app, userInA.id).proposalItem.findMany(),
     ).resolves.toHaveLength(0);
   });
+
+  // ── Sprint 5: inspection / finding (sprint-5-domain-model.md) ─────────
+
+  it("inspection + finding isolation: scoped reads, fail-closed, cross-tenant write denied, no forUser access", async () => {
+    const inspectionA = await admin.inspection.create({
+      data: {
+        tenantId: tenantA.id,
+        projectId: projectA.id,
+        inspectorId: userInA.id,
+        code: `INS-A-${run}`,
+        title: "Visita de obra",
+        scheduledFor: new Date("2026-08-01T09:00:00Z"),
+        createdById: userInA.id,
+        findings: {
+          create: [
+            {
+              tenantId: tenantA.id,
+              position: 0,
+              description: "Fisura en viga eje 3",
+              severity: "HIGH",
+              location: "Piso 2",
+            },
+          ],
+        },
+      },
+    });
+
+    const seen = await forTenant(app, tenantA.id).inspection.findMany();
+    expect(seen.map((i) => i.id)).toContain(inspectionA.id);
+    const findings = await forTenant(app, tenantA.id).finding.findMany();
+    expect(findings.every((f) => f.tenantId === tenantA.id)).toBe(true);
+    expect(findings.length).toBeGreaterThan(0);
+
+    await expect(app.inspection.findMany()).resolves.toHaveLength(0);
+    await expect(app.finding.findMany()).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).inspection.findMany(),
+    ).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).inspection.create({
+        data: {
+          tenantId: tenantA.id,
+          projectId: projectA.id,
+          inspectorId: userInA.id,
+          code: `INS-EVIL-${run}`,
+          title: "Evil",
+          scheduledFor: new Date(),
+          createdById: userInA.id,
+        },
+      }),
+    ).rejects.toThrow();
+
+    await expect(
+      forUser(app, userInA.id).inspection.findMany(),
+    ).resolves.toHaveLength(0);
+    await expect(
+      forUser(app, userInA.id).finding.findMany(),
+    ).resolves.toHaveLength(0);
+  });
 });
