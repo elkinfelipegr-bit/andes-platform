@@ -1,7 +1,7 @@
 # Sprint 5 Domain Model — Inspection Module
 
 **Version:** 1.0
-**Status:** Draft — awaiting CTO ratification alongside [sprint-5.md](../sprints/sprint-5.md).
+**Status:** Accepted — ratified by the CTO on 2026-07-09, including the four recommendations in Open Questions (human-assigned codes; photos deferred pending the storage ADR; finding follow-up deferred; inspector as membership-verified User).
 **Part of:** `docs/architecture/`, following the DDD workflow in [architecture-principles.md](../foundation/architecture-principles.md)
 
 ---
