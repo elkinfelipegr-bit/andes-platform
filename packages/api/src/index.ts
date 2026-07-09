@@ -32,3 +32,12 @@ export {
   proposalItemInputSchema,
 } from "./routers/crm/proposal-schemas.js";
 export { proposalTotal } from "./routers/crm/proposal-total.js";
+export { inspectionsRouter } from "./routers/projects/inspections.js";
+export {
+  INSPECTION_STATUSES,
+  FINDING_SEVERITIES,
+  inspectionStatusSchema,
+  findingSeveritySchema,
+  inspectionCreateSchema,
+  inspectionUpdateSchema,
+} from "./routers/projects/inspection-schemas.js";

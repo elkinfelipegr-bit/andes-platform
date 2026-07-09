@@ -8,6 +8,7 @@ import {
 import { clientsRouter, contactsRouter } from "./crm/index.js";
 import { proposalsRouter } from "./crm/proposals.js";
 import { projectsRouter } from "./projects/index.js";
+import { inspectionsRouter } from "./projects/inspections.js";
 
 export const coreRouter = router({
   health: publicProcedure.query(() => ({ ok: true as const })),
@@ -32,6 +33,19 @@ export const coreRouter = router({
       roleKey: ctx.roleKey,
     };
   }),
+
+  // The tenant's staff — pickers that assign work to people (first use:
+  // the inspection inspector, sprint-5.md) read this, never raw users.
+  members: tenantProcedure.query(({ ctx }) =>
+    ctx.tenantDb.membership.findMany({
+      where: { tenantId: ctx.tenantId },
+      select: {
+        user: { select: { id: true, name: true, email: true } },
+        role: { select: { key: true, label: true } },
+      },
+      orderBy: { user: { name: "asc" } },
+    }),
+  ),
 });
 
 export const appRouter = router({
@@ -40,6 +54,7 @@ export const appRouter = router({
   clients: clientsRouter,
   contacts: contactsRouter,
   proposals: proposalsRouter,
+  inspections: inspectionsRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -37,7 +37,19 @@ export const projectsRouter = router({
   get: tenantProcedure.input(projectIdSchema).query(async ({ ctx, input }) => {
     const project = await ctx.tenantDb.project.findFirst({
       where: { id: input.id, tenantId: ctx.tenantId },
-      include: { client: clientSummary },
+      include: {
+        client: clientSummary,
+        inspections: {
+          select: {
+            id: true,
+            code: true,
+            title: true,
+            status: true,
+            scheduledFor: true,
+          },
+          orderBy: { scheduledFor: "desc" },
+        },
+      },
     });
     if (!project) throw new TRPCError({ code: "NOT_FOUND" });
     return project;
