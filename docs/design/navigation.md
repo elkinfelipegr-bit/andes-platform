@@ -43,6 +43,8 @@ Defines the authenticated shell every Andes product renders inside, and the navi
 
 Routes are top-level segments (no `/core/...` prefix): products are one platform to the user; the monorepo package split ([ADR-004](../adr/0004-repository-structure.md)) is an implementation boundary, not a URL scheme.
 
+**In-module navigation (Sprint 4 amendment):** functional modules of a product live under that product's segment with tab navigation inside the page — the sidebar stays one-entry-per-product. First case: Andes CRM's Proposal Generator at `/crm/proposals` (tabs: Clients | Proposals). The shell (sidebar, topbar) and in-module chrome are `print:hidden` so document views (e.g. the proposal print view) print clean.
+
 ## Access States
 
 Implemented with a Next.js route group `(app)` whose layout owns the shell and the session check:

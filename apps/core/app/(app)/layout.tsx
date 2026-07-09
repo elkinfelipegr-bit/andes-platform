@@ -32,7 +32,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
               : null
           }
         />
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-8 print:p-0">
           <AppProviders>{children}</AppProviders>
         </main>
       </div>
