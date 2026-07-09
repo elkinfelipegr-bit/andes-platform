@@ -22,11 +22,13 @@ model Tenant {
   slug      String   @unique
   createdAt DateTime @default(now())
 
-  roles       Role[]
-  memberships Membership[]
-  clients     Client[]
-  projects    Project[]
-  contacts    Contact[]
+  roles         Role[]
+  memberships   Membership[]
+  clients       Client[]
+  projects      Project[]
+  contacts      Contact[]
+  proposals     Proposal[]
+  proposalItems ProposalItem[]
 
   @@map("tenant")
 }
@@ -48,10 +50,11 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now()) @updatedAt
 
-  memberships     Membership[]
-  sessions        Session[]
-  accounts        Account[]
-  projectsCreated Project[]
+  memberships      Membership[]
+  sessions         Session[]
+  accounts         Account[]
+  projectsCreated  Project[]
+  proposalsCreated Proposal[]
 
   @@map("user")
 }
@@ -172,9 +175,10 @@ model Client {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @default(now()) @updatedAt
 
-  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  projects Project[]
-  contacts Contact[]
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  projects  Project[]
+  contacts  Contact[]
+  proposals Proposal[]
 
   @@index([tenantId])
   @@map("client")
@@ -197,12 +201,82 @@ model Contact {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  client    Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  proposals Proposal[]
 
   @@index([tenantId])
   @@index([clientId])
   @@map("contact")
+}
+
+// ── Sprint 4: Proposal Generator (sprint-4-domain-model.md) ─────────────
+
+// Forward-only commercial lifecycle: DRAFT → SENT → ACCEPTED | REJECTED,
+// plus SENT → EXPIRED. Decided states are terminal — a revision is a new
+// proposal. Enum by the same ratified reasoning as ProjectStatus.
+enum ProposalStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+
+  @@map("proposal_status")
+}
+
+// A commercial offer to a client — the bridge between CRM and Projects.
+// Content is editable only in DRAFT (once sent, it is what the client
+// saw) and proposals are never hard-deleted: they are the firm's
+// commercial record. projectId is stamped by conversion, at most once.
+model Proposal {
+  id          String         @id @default(cuid())
+  tenantId    String
+  clientId    String
+  contactId   String? // optional recipient — must belong to the client
+  projectId   String?        @unique
+  code        String // human-assigned, unique per tenant (project precedent)
+  title       String
+  scope       String?
+  currency    String         @default("COP")
+  validUntil  DateTime?
+  status      ProposalStatus @default(DRAFT)
+  createdById String // audit only — authorization flows from Membership
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @default(now()) @updatedAt
+
+  tenant    Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  client    Client         @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  contact   Contact?       @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  project   Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  createdBy User           @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  items     ProposalItem[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@index([clientId])
+  @@map("proposal")
+}
+
+// One priced line of the offer. Money is exact Decimal, never float;
+// totals are computed from items, never stored (single source of truth).
+// Carries its own tenantId — RLS never depends on a join (RFC-001).
+model ProposalItem {
+  id          String  @id @default(cuid())
+  tenantId    String
+  proposalId  String
+  position    Int
+  description String
+  quantity    Decimal @db.Decimal(14, 2)
+  unit        String // m², un, global, …
+  unitPrice   Decimal @db.Decimal(14, 2)
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([proposalId])
+  @@map("proposal_item")
 }
 
 // Lifecycle states are platform workflow constants (ratified: enum, not a
@@ -233,9 +307,10 @@ model Project {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @default(now()) @updatedAt
 
-  tenant    Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  client    Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  createdBy User    @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  client    Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  createdBy User      @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  proposal  Proposal? // the accepted proposal this project was converted from
 
   @@unique([tenantId, code])
   @@index([tenantId])
