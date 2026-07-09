@@ -23,6 +23,7 @@ import { trpc } from "@/lib/trpc";
 import { StatusBadge } from "../../projects/_components/status-badge";
 import { ClientForm, type ClientFormPayload } from "../_components/client-form";
 import { ContactDialog } from "../_components/contact-dialog";
+import { ProposalStatusBadge } from "../proposals/_components/proposal-status-badge";
 
 export default function ClientDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -262,6 +263,49 @@ export default function ClientDetailPage() {
                     <span className="truncate text-sm">{project.name}</span>
                   </div>
                   <StatusBadge status={project.status} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Proposals</CardTitle>
+          <CardDescription>
+            Commercial offers to {c.name} — managed in{" "}
+            <Link
+              href="/crm/proposals"
+              className="text-primary underline-offset-2 hover:underline"
+            >
+              Proposals
+            </Link>
+            .
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {c.proposals.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No proposals for this client yet.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {c.proposals.map((proposal) => (
+                <li
+                  key={proposal.id}
+                  className="flex items-center justify-between gap-4"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Link
+                      href={`/crm/proposals/${proposal.id}`}
+                      className="font-mono text-xs text-primary underline-offset-2 hover:underline"
+                    >
+                      {proposal.code}
+                    </Link>
+                    <span className="truncate text-sm">{proposal.title}</span>
+                  </div>
+                  <ProposalStatusBadge status={proposal.status} />
                 </li>
               ))}
             </ul>

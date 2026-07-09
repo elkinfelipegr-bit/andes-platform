@@ -1,4 +1,4 @@
-import { FolderKanban, Handshake } from "lucide-react";
+import { FileText, FolderKanban, Handshake } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -29,14 +29,17 @@ export default async function DashboardPage() {
 
   let activeProjectCount: number | null = null;
   let activeClientCount: number | null = null;
+  let pendingProposalCount: number | null = null;
   if (membership) {
     const caller = await serverCaller();
-    const [activeProjects, activeClients] = await Promise.all([
+    const [activeProjects, activeClients, sentProposals] = await Promise.all([
       caller.projects.list({ status: "ACTIVE" }),
       caller.clients.list(),
+      caller.proposals.list({ status: "SENT" }),
     ]);
     activeProjectCount = activeProjects.length;
     activeClientCount = activeClients.length;
+    pendingProposalCount = sentProposals.length;
   }
 
   return (
@@ -144,6 +147,23 @@ export default async function DashboardPage() {
                         {activeClientCount}
                       </span>{" "}
                       clients
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+              <Link href="/crm/proposals" className="group">
+                <Card className="h-full transition-colors group-hover:border-primary/40">
+                  <CardHeader>
+                    <FileText
+                      className="size-5 text-primary"
+                      aria-hidden="true"
+                    />
+                    <CardTitle className="text-sm">Proposals</CardTitle>
+                    <CardDescription>
+                      <span className="text-2xl font-semibold text-foreground">
+                        {pendingProposalCount}
+                      </span>{" "}
+                      awaiting decision
                     </CardDescription>
                   </CardHeader>
                 </Card>
