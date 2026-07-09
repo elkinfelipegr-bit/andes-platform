@@ -36,7 +36,7 @@ The full Engineering Handbook is planned to reach 250–500 pages across 40–50
 | `docs/engineering/`  | Module-by-module technical documentation                                                      | 🕓 Planned                                                                         |
 | `docs/ai/`           | Engineering Copilot specification and prompts                                                 | 🕓 Planned                                                                         |
 | `docs/development/`  | Setup, workflows, conventions                                                                 | 🕓 Planned                                                                         |
-| `docs/sprints/`      | Sprint plans and retrospectives                                                               | 🔶 Active — Sprints [0](../sprints/sprint-0.md)–[2](../sprints/sprint-2.md) closed |
+| `docs/sprints/`      | Sprint plans and retrospectives                                                               | 🔶 Active — Sprints [0](../sprints/sprint-0.md)–[3](../sprints/sprint-3.md) closed |
 | `docs/adr/`          | Architecture Decision Records                                                                 | ✅ Template + ADR-001 to ADR-004                                                   |
 | `docs/rfc/`          | Requests for Comments (cross-cutting changes)                                                 | ✅ Template + RFC-001 — _added directory, not in the original planned structure_   |
 
