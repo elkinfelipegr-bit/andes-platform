@@ -1,6 +1,7 @@
-# Sprint 4 — Proposal
+# Sprint 4 — Proposal Generator
 
-**Status:** Accepted — ratified by the CTO on 2026-07-08 as proposed, including the domain model with its four recommendations.
+**Status:** Closed — 2026-07-09
+**Ratified:** 2026-07-08 (as proposed, including the domain model's four recommendations)
 **Drafted:** 2026-07-08
 **Objective (proposed):** Proposal Generator MVP — itemized commercial proposals with lifecycle tracking and conversion to projects.
 
@@ -32,6 +33,24 @@ Same bar as Sprints 2–3: tenant-isolation logic at the strict tier (RLS on bot
 
 1. **Ratify the domain model** — including its four recommendations (line items with computed totals; PDF deferred in favor of a print view; forward-only transitions; conversion creating a linked DRAFT project).
 2. **Ratify this scope** — trim candidates if it runs long: the dashboard card first, the in-module CRM navigation second (list can hang off `/crm` links).
+
+## Retrospective (closure, 2026-07-09)
+
+**Objective met — all four scope items shipped to production across three CI-gated PRs** (domain → data → API → UI):
+
+- **PR #20 — data layer:** `Proposal` + `ProposalItem` with `Decimal(14,2)` money, unique conversion FK, and the strict RLS pattern; isolation suite extended. Migration SQL hand-written to Prisma conventions (Docker stays off on this machine per the Sprint 3 constraint) — CI validated.
+- **PR #21 — API:** full forward-only lifecycle (`create`/`update` DRAFT-only with atomic item replacement, `send`, `decide`, `markExpired`) and `convertToProject` — atomic nested create linking an accepted proposal to a new DRAFT project with a user-chosen code. Totals computed with Decimal math, never stored. Integration suite: lifecycle path, every transition denial, double-conversion, cross-tenant sweep.
+- **PR #22 — UI:** CRM in-module tabs (navigation.md amendment — the pattern's first case), `/crm/proposals` list + draft editor with live totals, per-status action bar, and the frozen **print view** as the MVP generated document (shell `print:hidden`). Client detail and dashboard integration.
+
+**Verification:** unit tier locally (Decimal totals incl. float-drift case, schemas); integration in CI (merge-gated); production rollout with Neon migrations, `andes_app` grants verified, smoke test green. **CTO functional pass on production (2026-07-09) closes the sprint.**
+
+**Deviations:** none against scope. Two operational notes recorded for the future: a commit accidentally landed on local `main` and was relocated to its branch before pushing (branch protection would have rejected the push regardless), and `z.coerce.number()` breaks React Hook Form resolver typing under Zod 4 — numeric form fields stay strings client-side.
+
+**Carry-over:**
+
+1. PDF file generation + object storage — needs its own ADR (S3 per ADR-001) when prioritized; print view covers the need meanwhile.
+2. Proposal revisions/copy-from-existing; taxes/IVA breakdown and discounts.
+3. Standing items from Sprints 1–3.
 
 ## References
 
