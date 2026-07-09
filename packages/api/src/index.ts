@@ -23,3 +23,12 @@ export {
   contactCreateSchema,
   contactUpdateSchema,
 } from "./routers/crm/schemas.js";
+export { proposalsRouter } from "./routers/crm/proposals.js";
+export {
+  PROPOSAL_STATUSES,
+  proposalStatusSchema,
+  proposalCreateSchema,
+  proposalUpdateSchema,
+  proposalItemInputSchema,
+} from "./routers/crm/proposal-schemas.js";
+export { proposalTotal } from "./routers/crm/proposal-total.js";
