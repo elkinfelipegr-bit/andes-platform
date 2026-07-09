@@ -218,4 +218,62 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
       forUser(app, userInA.id).contact.findMany(),
     ).resolves.toHaveLength(0);
   });
+
+  // ── Sprint 4: proposal / proposal_item (sprint-4-domain-model.md) ─────
+
+  it("proposal + item isolation: scoped reads, fail-closed, cross-tenant write denied, no forUser access", async () => {
+    const proposalA = await admin.proposal.create({
+      data: {
+        tenantId: tenantA.id,
+        clientId: clientA.id,
+        code: `PR-A-${run}`,
+        title: "Propuesta A",
+        createdById: userInA.id,
+        items: {
+          create: [
+            {
+              tenantId: tenantA.id,
+              position: 0,
+              description: "Diseño estructural",
+              quantity: 450,
+              unit: "m²",
+              unitPrice: 12000,
+            },
+          ],
+        },
+      },
+    });
+
+    const seen = await forTenant(app, tenantA.id).proposal.findMany();
+    expect(seen.map((p) => p.id)).toContain(proposalA.id);
+    const items = await forTenant(app, tenantA.id).proposalItem.findMany();
+    expect(items.every((i) => i.tenantId === tenantA.id)).toBe(true);
+    expect(items.length).toBeGreaterThan(0);
+
+    await expect(app.proposal.findMany()).resolves.toHaveLength(0);
+    await expect(app.proposalItem.findMany()).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).proposal.findMany(),
+    ).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).proposal.create({
+        data: {
+          tenantId: tenantA.id,
+          clientId: clientA.id,
+          code: `PR-EVIL-${run}`,
+          title: "Evil",
+          createdById: userInA.id,
+        },
+      }),
+    ).rejects.toThrow();
+
+    await expect(
+      forUser(app, userInA.id).proposal.findMany(),
+    ).resolves.toHaveLength(0);
+    await expect(
+      forUser(app, userInA.id).proposalItem.findMany(),
+    ).resolves.toHaveLength(0);
+  });
 });

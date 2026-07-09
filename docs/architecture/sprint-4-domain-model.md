@@ -1,7 +1,7 @@
 # Sprint 4 Domain Model — Proposal Generator
 
 **Version:** 1.0
-**Status:** Draft — awaiting CTO ratification alongside [sprint-4.md](../sprints/sprint-4.md).
+**Status:** Accepted — ratified by the CTO on 2026-07-08, including the four recommendations in Open Questions (line items with computed totals; PDF deferred in favor of a print view; forward-only transitions; conversion creating a linked DRAFT project).
 **Part of:** `docs/architecture/`, following the DDD workflow in [architecture-principles.md](../foundation/architecture-principles.md)
 
 ---
