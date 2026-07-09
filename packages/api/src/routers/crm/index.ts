@@ -64,6 +64,10 @@ export const clientsRouter = router({
           },
           orderBy: { createdAt: "desc" },
         },
+        proposals: {
+          select: { id: true, code: true, title: true, status: true },
+          orderBy: { createdAt: "desc" },
+        },
       },
     });
     if (!client) throw new TRPCError({ code: "NOT_FOUND" });
