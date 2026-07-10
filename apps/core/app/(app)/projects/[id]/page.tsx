@@ -23,6 +23,7 @@ import {
 } from "../_components/project-form";
 import { StatusBadge } from "../_components/status-badge";
 import { InspectionStatusBadge } from "../inspections/_components/inspection-badges";
+import { CalcRecordStatusBadge } from "../../structures/_components/structures-badges";
 
 function toDateInput(value: Date | string | null): string {
   if (!value) return "";
@@ -200,6 +201,49 @@ export default function ProjectDetailPage() {
                     <span className="truncate text-sm">{inspection.title}</span>
                   </div>
                   <InspectionStatusBadge status={inspection.status} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Calculation records</CardTitle>
+          <CardDescription>
+            Memorias de cálculo for this project — managed in{" "}
+            <Link
+              href="/structures"
+              className="text-primary underline-offset-2 hover:underline"
+            >
+              Structures
+            </Link>
+            .
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {p.calcRecords.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No calculation records for this project yet.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {p.calcRecords.map((calcRecord) => (
+                <li
+                  key={calcRecord.id}
+                  className="flex items-center justify-between gap-4"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Link
+                      href={`/structures/${calcRecord.id}`}
+                      className="font-mono text-xs text-primary underline-offset-2 hover:underline"
+                    >
+                      {calcRecord.code}
+                    </Link>
+                    <span className="truncate text-sm">{calcRecord.title}</span>
+                  </div>
+                  <CalcRecordStatusBadge status={calcRecord.status} />
                 </li>
               ))}
             </ul>
