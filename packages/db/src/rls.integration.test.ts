@@ -337,4 +337,73 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
       forUser(app, userInA.id).finding.findMany(),
     ).resolves.toHaveLength(0);
   });
+
+  // ── Sprint 6: calc_record / beam_flexure_check (sprint-6-domain-model.md)
+
+  it("calc record + check isolation: scoped reads, fail-closed, cross-tenant write denied, no forUser access", async () => {
+    const recordA = await admin.calcRecord.create({
+      data: {
+        tenantId: tenantA.id,
+        projectId: projectA.id,
+        code: `MC-A-${run}`,
+        title: "Memoria de cálculo",
+        fc: 21,
+        fy: 420,
+        createdById: userInA.id,
+        checks: {
+          create: [
+            {
+              tenantId: tenantA.id,
+              position: 0,
+              label: "Viga eje 3",
+              b: 300,
+              h: 500,
+              cover: 60,
+              mu: 120,
+              d: 440,
+              rhoRequired: 0.005872,
+              rhoMin: 0.003333,
+              rhoMax: 0.013547,
+              requiredAs: 775,
+              verdict: "OK",
+            },
+          ],
+        },
+      },
+    });
+
+    const seen = await forTenant(app, tenantA.id).calcRecord.findMany();
+    expect(seen.map((r) => r.id)).toContain(recordA.id);
+    const checks = await forTenant(app, tenantA.id).beamFlexureCheck.findMany();
+    expect(checks.every((c) => c.tenantId === tenantA.id)).toBe(true);
+    expect(checks.length).toBeGreaterThan(0);
+
+    await expect(app.calcRecord.findMany()).resolves.toHaveLength(0);
+    await expect(app.beamFlexureCheck.findMany()).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).calcRecord.findMany(),
+    ).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).calcRecord.create({
+        data: {
+          tenantId: tenantA.id,
+          projectId: projectA.id,
+          code: `MC-EVIL-${run}`,
+          title: "Evil",
+          fc: 21,
+          fy: 420,
+          createdById: userInA.id,
+        },
+      }),
+    ).rejects.toThrow();
+
+    await expect(
+      forUser(app, userInA.id).calcRecord.findMany(),
+    ).resolves.toHaveLength(0);
+    await expect(
+      forUser(app, userInA.id).beamFlexureCheck.findMany(),
+    ).resolves.toHaveLength(0);
+  });
 });

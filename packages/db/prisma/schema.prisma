@@ -22,15 +22,17 @@ model Tenant {
   slug      String   @unique
   createdAt DateTime @default(now())
 
-  roles         Role[]
-  memberships   Membership[]
-  clients       Client[]
-  projects      Project[]
-  contacts      Contact[]
-  proposals     Proposal[]
-  proposalItems ProposalItem[]
-  inspections   Inspection[]
-  findings      Finding[]
+  roles             Role[]
+  memberships       Membership[]
+  clients           Client[]
+  projects          Project[]
+  contacts          Contact[]
+  proposals         Proposal[]
+  proposalItems     ProposalItem[]
+  inspections       Inspection[]
+  findings          Finding[]
+  calcRecords       CalcRecord[]
+  beamFlexureChecks BeamFlexureCheck[]
 
   @@map("tenant")
 }
@@ -59,6 +61,7 @@ model User {
   proposalsCreated    Proposal[]
   inspectionsAssigned Inspection[] @relation("inspectionsAssigned")
   inspectionsCreated  Inspection[] @relation("inspectionsCreated")
+  calcRecordsCreated  CalcRecord[]
 
   @@map("user")
 }
@@ -316,6 +319,7 @@ model Project {
   createdBy   User         @relation(fields: [createdById], references: [id], onDelete: Restrict)
   proposal    Proposal? // the accepted proposal this project was converted from
   inspections Inspection[]
+  calcRecords CalcRecord[]
 
   @@unique([tenantId, code])
   @@index([tenantId])
@@ -394,4 +398,89 @@ model Finding {
   @@index([tenantId])
   @@index([inspectionId])
   @@map("finding")
+}
+
+// ── Sprint 6: Structural Module (sprint-6-domain-model.md) ──────────────
+
+// Forward-only: DRAFT → ISSUED. An issued record is frozen professional
+// evidence — no un-issue; a correction is a new record.
+enum CalcRecordStatus {
+  DRAFT
+  ISSUED
+
+  @@map("calc_record_status")
+}
+
+enum CheckVerdict {
+  OK
+  USE_MIN
+  INCREASE_SECTION
+
+  @@map("check_verdict")
+}
+
+// The memoria de cálculo: design criteria + the checks that justify the
+// drawings. Materials live here — checks inherit them, so a material
+// change recomputes every check (DRAFT only). The platform computes; the
+// engineer reviews, decides, and signs (engineering-philosophy 6).
+model CalcRecord {
+  id          String           @id @default(cuid())
+  tenantId    String
+  projectId   String
+  code        String // human-assigned, unique per tenant (precedent)
+  title       String
+  designCode  String           @default("NSR-10")
+  fc          Decimal          @db.Decimal(6, 2) // f'c, MPa
+  fy          Decimal          @db.Decimal(6, 2) // fy, MPa
+  notes       String?
+  status      CalcRecordStatus @default(DRAFT)
+  issuedAt    DateTime? // stamped by issue
+  createdById String // audit only — authorization flows from Membership
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @default(now()) @updatedAt
+
+  tenant    Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  project   Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy User               @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  checks    BeamFlexureCheck[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@index([projectId])
+  @@map("calc_record")
+}
+
+// One designed element line. Inputs AND outputs are stored at compute
+// time (ratified decision 4): an issued memoria is immutable evidence of
+// what was calculated then — a library fix never rewrites history.
+// rhoRequired/requiredAs are null when the verdict is INCREASE_SECTION
+// via the infeasible path. Future check types are sibling typed tables,
+// not JSON blobs. Own tenantId: RLS never joins (RFC-001).
+model BeamFlexureCheck {
+  id           String  @id @default(cuid())
+  tenantId     String
+  calcRecordId String
+  position     Int
+  label        String
+
+  // Inputs (mm, kN·m; materials inherited from the record)
+  b     Decimal @db.Decimal(8, 2)
+  h     Decimal @db.Decimal(8, 2)
+  cover Decimal @db.Decimal(8, 2)
+  mu    Decimal @db.Decimal(12, 2)
+
+  // Stored outputs (@andes/structures beamFlexure)
+  d           Decimal      @db.Decimal(8, 2)
+  rhoRequired Decimal?     @db.Decimal(10, 6)
+  rhoMin      Decimal      @db.Decimal(10, 6)
+  rhoMax      Decimal      @db.Decimal(10, 6)
+  requiredAs  Decimal?     @db.Decimal(12, 2) // mm²
+  verdict     CheckVerdict
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  calcRecord CalcRecord @relation(fields: [calcRecordId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([calcRecordId])
+  @@map("beam_flexure_check")
 }
