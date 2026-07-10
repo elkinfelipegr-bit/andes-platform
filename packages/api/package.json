@@ -14,7 +14,8 @@
     "@andes/auth": "workspace:*",
     "@andes/db": "workspace:*",
     "@trpc/server": "^11.0.0",
-    "zod": "^4.0.0"
+    "zod": "^4.0.0",
+    "@andes/structures": "workspace:*"
   },
   "devDependencies": {
     "@andes/config": "workspace:*",

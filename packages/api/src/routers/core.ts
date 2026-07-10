@@ -9,6 +9,7 @@ import { clientsRouter, contactsRouter } from "./crm/index.js";
 import { proposalsRouter } from "./crm/proposals.js";
 import { projectsRouter } from "./projects/index.js";
 import { inspectionsRouter } from "./projects/inspections.js";
+import { calcRecordsRouter } from "./structures/index.js";
 
 export const coreRouter = router({
   health: publicProcedure.query(() => ({ ok: true as const })),
@@ -55,6 +56,7 @@ export const appRouter = router({
   contacts: contactsRouter,
   proposals: proposalsRouter,
   inspections: inspectionsRouter,
+  calcRecords: calcRecordsRouter,
 });
 
 export type AppRouter = typeof appRouter;
