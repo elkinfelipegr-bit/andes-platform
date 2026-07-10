@@ -1,7 +1,7 @@
 # Sprint 6 Domain Model — Structural Module
 
 **Version:** 1.0
-**Status:** Draft — awaiting CTO ratification alongside [sprint-6.md](../sprints/sprint-6.md).
+**Status:** Accepted — ratified by the CTO on 2026-07-10, including the four recommendations in Open Questions (beam check included; no numerical-service ADR yet; `@andes/structures` package; outputs stored as immutable evidence).
 **Part of:** `docs/architecture/`, following the DDD workflow in [architecture-principles.md](../foundation/architecture-principles.md)
 
 ---
