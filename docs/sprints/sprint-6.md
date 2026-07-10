@@ -1,6 +1,6 @@
 # Sprint 6 — Proposal
 
-**Status:** Proposed — awaiting CTO ratification. No implementation until accepted, per the Golden Rule in [PROJECT_RULES.md](../foundation/PROJECT_RULES.md).
+**Status:** Accepted — ratified by the CTO on 2026-07-10 as proposed, including the domain model with its four recommendations.
 **Drafted:** 2026-07-10
 **Objective (proposed):** Structural Module MVP — calculation records (memorias de cálculo) with the first deterministic design check (RC beam flexure per NSR-10) and a printable memoria.
 
