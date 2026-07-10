@@ -48,9 +48,10 @@ async function assertInspectorIsMember(
   }
 }
 
-// New inspections only on live projects; archived ones keep their
-// history readable but accept no new work.
-async function assertActiveProject(
+// New engineering records only on live projects; archived ones keep
+// their history readable but accept no new work. Shared with the
+// Structures router.
+export async function assertActiveProject(
   tenantDb: { project: { findFirst(args: object): Promise<unknown> } },
   tenantId: string,
   projectId: string,

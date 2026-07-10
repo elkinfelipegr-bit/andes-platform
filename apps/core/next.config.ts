@@ -3,7 +3,13 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Internal workspace packages ship raw TypeScript (ADR-004 monorepo);
   // Next must transpile them.
-  transpilePackages: ["@andes/api", "@andes/auth", "@andes/db", "@andes/ui"],
+  transpilePackages: [
+    "@andes/api",
+    "@andes/auth",
+    "@andes/db",
+    "@andes/structures",
+    "@andes/ui",
+  ],
   // Prisma's generated client (and its query engine binary) lives under the
   // pnpm store at the monorepo root; Vercel's file tracing misses it, leaving
   // serverless functions without an engine at runtime (ADR-005). Include it

@@ -49,6 +49,10 @@ export const projectsRouter = router({
           },
           orderBy: { scheduledFor: "desc" },
         },
+        calcRecords: {
+          select: { id: true, code: true, title: true, status: true },
+          orderBy: { createdAt: "desc" },
+        },
       },
     });
     if (!project) throw new TRPCError({ code: "NOT_FOUND" });

@@ -41,3 +41,12 @@ export {
   inspectionCreateSchema,
   inspectionUpdateSchema,
 } from "./routers/projects/inspection-schemas.js";
+export { calcRecordsRouter } from "./routers/structures/index.js";
+export {
+  CALC_RECORD_STATUSES,
+  calcRecordStatusSchema,
+  calcRecordCreateSchema,
+  calcRecordUpdateSchema,
+  checkAddSchema,
+  checkUpdateSchema,
+} from "./routers/structures/schemas.js";
