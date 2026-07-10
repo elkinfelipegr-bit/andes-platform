@@ -1,6 +1,7 @@
-# Sprint 5 — Proposal
+# Sprint 5 — Inspection Module
 
-**Status:** Accepted — ratified by the CTO on 2026-07-09 as proposed, including the domain model with its four recommendations.
+**Status:** Closed — 2026-07-10
+**Ratified:** 2026-07-09 (as proposed, including the domain model's four recommendations)
 **Drafted:** 2026-07-09
 **Objective (proposed):** Inspection Module MVP — scheduled site inspections with severity-graded findings and a printable report, inside projects.
 
@@ -32,6 +33,24 @@ Same bar as Sprints 2–4: strict-tier tenant isolation for both new tables; sch
 
 1. **Ratify the domain model** — including its four recommendations (human-assigned codes; photos deferred pending storage ADR; finding follow-up deferred; inspector as membership-verified User).
 2. **Ratify this scope** — trim candidates if long: dashboard card first, project-detail section second.
+
+## Retrospective (closure, 2026-07-10)
+
+**Objective met — all four scope items shipped to production across three CI-gated PRs** (domain → data → API → UI):
+
+- **PR #25 — data layer:** `Inspection` + `Finding` with the strict RLS pattern; migrations hand-written to Prisma conventions (Docker stays off on this machine); isolation suite extended.
+- **PR #26 — API:** full forward-only lifecycle (SCHEDULED-only edits with atomic findings replacement, `complete` stamping `performedAt`, `cancel` terminal), **inspector verified against `Membership`** — the platform's first User-reference validation beyond the session, re-verified on swap — archived projects rejecting new inspections, `core.members` as the reusable staff-picker query, and `projects.get` joining its inspections. Integration suite: lifecycle, frozen-state denials, non-member/archived/duplicate rejections, cross-tenant sweep, members scoping.
+- **PR #27 — UI:** Projects in-module tabs (second case of the navigation.md pattern), `/projects/inspections` list + schedule dialog, detail with findings editor (severity-graded rows) and the frozen **report view with Print**, project-detail section, dashboard scheduled card.
+
+**Verification:** unit tier locally; integration in CI (merge-gated); production rollout with Neon migrations, `andes_app` grants on both tables verified, smoke test green. **CTO functional pass on production (2026-07-10) closes the sprint.**
+
+**Deviations:** none against scope. Operational note: the production build outgrew a 3 GB heap — local builds now need `NODE_OPTIONS=--max-old-space-size=4096` (recorded).
+
+**Carry-over:**
+
+1. Photos/attachments on findings — blocked on the object-storage ADR (shared with proposal PDFs).
+2. Finding resolution/follow-up workflow; inspection checklists/templates.
+3. Standing items from Sprints 1–4.
 
 ## References
 
