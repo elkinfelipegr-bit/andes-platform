@@ -61,3 +61,15 @@ export {
   bearingCheckAddSchema,
   bearingCheckUpdateSchema,
 } from "./routers/geo/schemas.js";
+export { bimModelsRouter } from "./routers/bim/index.js";
+export {
+  BIM_DISCIPLINES,
+  BIM_VERSION_STATUSES,
+  MAX_UPLOAD_BYTES,
+  IFC_CONTENT_TYPE,
+  bimDisciplineSchema,
+  bimVersionStatusSchema,
+  bimModelCreateSchema,
+  bimModelUpdateSchema,
+  uploadRequestSchema,
+} from "./routers/bim/schemas.js";

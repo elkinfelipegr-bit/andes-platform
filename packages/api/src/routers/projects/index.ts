@@ -57,6 +57,16 @@ export const projectsRouter = router({
           select: { id: true, code: true, title: true, status: true },
           orderBy: { createdAt: "desc" },
         },
+        bimModels: {
+          select: {
+            id: true,
+            code: true,
+            title: true,
+            discipline: true,
+            _count: { select: { versions: { where: { status: "READY" } } } },
+          },
+          orderBy: { createdAt: "desc" },
+        },
       },
     });
     if (!project) throw new TRPCError({ code: "NOT_FOUND" });
