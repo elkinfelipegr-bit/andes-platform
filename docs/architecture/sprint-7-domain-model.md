@@ -1,7 +1,7 @@
 # Sprint 7 Domain Model — Geotechnical Module
 
 **Version:** 1.0
-**Status:** Draft — awaiting CTO ratification alongside [sprint-7.md](../sprints/sprint-7.md).
+**Status:** Accepted — ratified by the CTO on 2026-07-11 as proposed, including the domain model's five recommendations.
 **Part of:** `docs/architecture/`, following the DDD workflow in [architecture-principles.md](../foundation/architecture-principles.md)
 
 ---
