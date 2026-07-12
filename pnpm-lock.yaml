@@ -108,6 +108,9 @@ importers:
       '@andes/db':
         specifier: workspace:*
         version: link:../db
+      '@andes/geo':
+        specifier: workspace:*
+        version: link:../geo
       '@andes/structures':
         specifier: workspace:*
         version: link:../structures

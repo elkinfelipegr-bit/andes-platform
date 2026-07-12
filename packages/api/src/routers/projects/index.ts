@@ -53,6 +53,10 @@ export const projectsRouter = router({
           select: { id: true, code: true, title: true, status: true },
           orderBy: { createdAt: "desc" },
         },
+        geoRecords: {
+          select: { id: true, code: true, title: true, status: true },
+          orderBy: { createdAt: "desc" },
+        },
       },
     });
     if (!project) throw new TRPCError({ code: "NOT_FOUND" });
