@@ -1,6 +1,6 @@
 # ADR-008: Object Storage Provider — Cloudflare R2
 
-**Status:** Proposed — awaiting CTO ratification
+**Status:** Accepted — ratified by CTO 2026-07-12
 **Date:** 2026-07-12
 **Deciders:** CTO / Lead Software Architect (Andes Engineering)
 
