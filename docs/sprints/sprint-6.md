@@ -1,6 +1,7 @@
-# Sprint 6 — Proposal
+# Sprint 6 — Structural Module
 
-**Status:** Accepted — ratified by the CTO on 2026-07-10 as proposed, including the domain model with its four recommendations.
+**Status:** Closed — 2026-07-11
+**Ratified:** 2026-07-10 (as proposed, including the domain model's four recommendations)
 **Drafted:** 2026-07-10
 **Objective (proposed):** Structural Module MVP — calculation records (memorias de cálculo) with the first deterministic design check (RC beam flexure per NSR-10) and a printable memoria.
 
@@ -31,6 +32,28 @@ The strictest sprint yet: `beamFlexure()` gets exhaustive known-answer unit test
 
 1. **Ratify the domain model** — including its four recommendations (include the beam check; no numerical-service ADR yet; `@andes/structures` package; stored outputs as immutable evidence).
 2. **Ratify this scope** — trim candidates if long: dashboard card first, project-detail section second (the check + memoria are the core).
+
+## Retrospective (closure, 2026-07-11)
+
+**Objective met — the platform's first calculation domain shipped to production across four CI-gated PRs** (library → data → API → UI):
+
+- **PR #30 — `@andes/structures`:** the first product-specific package. `beamFlexure()` as a pure function (NSR-10 C.10: φ=0.90 tension-controlled, ρmin both branches, ρmax at εt=0.005 via β1 with the 0.65 floor; infeasible and over-reinforced both **reject** rather than silently switching assumptions), with **12 hand-worked known-answer tests as the contract**.
+- **PR #31 — data layer:** `CalcRecord` + `BeamFlexureCheck` with inputs **and outputs stored together** (nullable outputs for the infeasible path); strict RLS; suite extended.
+- **PR #32 — API:** the server as the library's only caller; material changes recompute every check; issue requires ≥1 check, stamps `issuedAt`, freezes. Integration suite verifies stored outputs against a direct library call.
+- **PR #33 — UI:** `/structures` live — criteria editor, checks with verdict badges (the UI never computes), Issue, and the frozen memoria print view carrying the responsible-engineer line.
+
+**ADR-001 evaluation held:** closed-form checks stayed in TypeScript; the dedicated-numerical-service ADR trigger remains documented and mandatory before FEM/analysis/ETABS work.
+
+**Verification:** known-answer + integration suites in CI (merge-gated); production rollout with Neon migrations, `andes_app` grants verified, smoke test green. **CTO approval on production (2026-07-11) closes the sprint.**
+
+**Deviations:** none against scope. Operational note: `f'c` in JSX needs `&apos;` (react/no-unescaped-entities) — caught by lint before merge.
+
+**Carry-over:**
+
+1. More check types (columns, slabs, footings, shear) — each repeats this sprint's pattern.
+2. Load combinations; record revision linking; rebar selection suggestions.
+3. FEM/analysis + ETABS/SAFE integration — **blocked on the dedicated-numerical-service ADR** by ratified decision.
+4. Standing items from Sprints 1–5.
 
 ## References
 
