@@ -1,6 +1,6 @@
 # Sprint 7 — Proposal
 
-**Status:** Proposed — awaiting CTO ratification. No implementation until accepted, per the Golden Rule in [PROJECT_RULES.md](../foundation/PROJECT_RULES.md).
+**Status:** Accepted — ratified by the CTO on 2026-07-11 as proposed, including the domain model's five recommendations.
 **Drafted:** 2026-07-11
 **Objective (proposed):** Geotechnical Module MVP — geotechnical records with deterministic bearing-capacity checks and a printable memoria.
 
