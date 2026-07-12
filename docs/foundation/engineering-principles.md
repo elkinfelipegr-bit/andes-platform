@@ -71,7 +71,7 @@ ADRs live in `docs/adr/` and follow the Decision Documentation Standard above. R
 **RFCs (Request for Comments)** document larger, cross-cutting changes before they are implemented, and live in `docs/rfc/` — a directory added during Sprint 0 preparation since the original Documentation Structure listed `docs/adr/` but had no home for RFCs. Status:
 
 - [RFC-001 — Multi-tenant Architecture](../rfc/0001-multi-tenant-architecture.md) — Accepted.
-- RFC-002 — BIM Viewer — not yet drafted.
+- [RFC-002 — BIM Viewer](../rfc/0002-bim-viewer.md) — Proposed (drafted 2026-07-12 with the Sprint 8 proposal; awaiting ratification).
 - RFC-003 — AI Agent — not yet drafted.
 
 ## Sprint Philosophy
