@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     "@andes/api",
     "@andes/auth",
     "@andes/db",
+    "@andes/geo",
     "@andes/structures",
     "@andes/ui",
   ],

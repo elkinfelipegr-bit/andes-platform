@@ -50,3 +50,14 @@ export {
   checkAddSchema,
   checkUpdateSchema,
 } from "./routers/structures/schemas.js";
+export { geoRecordsRouter } from "./routers/geo/index.js";
+export {
+  GEO_RECORD_STATUSES,
+  FOOTING_SHAPES,
+  geoRecordStatusSchema,
+  footingShapeSchema,
+  geoRecordCreateSchema,
+  geoRecordUpdateSchema,
+  bearingCheckAddSchema,
+  bearingCheckUpdateSchema,
+} from "./routers/geo/schemas.js";
