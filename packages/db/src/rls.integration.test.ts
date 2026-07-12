@@ -406,4 +406,71 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
       forUser(app, userInA.id).beamFlexureCheck.findMany(),
     ).resolves.toHaveLength(0);
   });
+
+  // ── Sprint 7: geo_record / bearing_check (sprint-7-domain-model.md) ───
+
+  it("geo record + bearing check isolation: scoped reads, fail-closed, cross-tenant write denied, no forUser access", async () => {
+    const geoA = await admin.geoRecord.create({
+      data: {
+        tenantId: tenantA.id,
+        projectId: projectA.id,
+        code: `EG-A-${run}`,
+        title: "Estudio geotécnico",
+        createdById: userInA.id,
+        checks: {
+          create: [
+            {
+              tenantId: tenantA.id,
+              position: 0,
+              label: "Zapata Z-1",
+              b: 1.5,
+              df: 1.5,
+              gamma: 18,
+              c: 0,
+              phi: 30,
+              fs: 3,
+              shape: "STRIP",
+              nc: 30.14,
+              nq: 18.401,
+              ngamma: 22.402,
+              qUlt: 799.26,
+              qAdm: 266.42,
+            },
+          ],
+        },
+      },
+    });
+
+    const seen = await forTenant(app, tenantA.id).geoRecord.findMany();
+    expect(seen.map((r) => r.id)).toContain(geoA.id);
+    const checks = await forTenant(app, tenantA.id).bearingCheck.findMany();
+    expect(checks.every((c) => c.tenantId === tenantA.id)).toBe(true);
+    expect(checks.length).toBeGreaterThan(0);
+
+    await expect(app.geoRecord.findMany()).resolves.toHaveLength(0);
+    await expect(app.bearingCheck.findMany()).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).geoRecord.findMany(),
+    ).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).geoRecord.create({
+        data: {
+          tenantId: tenantA.id,
+          projectId: projectA.id,
+          code: `EG-EVIL-${run}`,
+          title: "Evil",
+          createdById: userInA.id,
+        },
+      }),
+    ).rejects.toThrow();
+
+    await expect(
+      forUser(app, userInA.id).geoRecord.findMany(),
+    ).resolves.toHaveLength(0);
+    await expect(
+      forUser(app, userInA.id).bearingCheck.findMany(),
+    ).resolves.toHaveLength(0);
+  });
 });
