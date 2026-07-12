@@ -1,6 +1,6 @@
 # Sprint 8 — Proposal
 
-**Status:** Proposed — awaiting CTO ratification (together with RFC-002 and ADR-008)
+**Status:** Accepted — ratified by the CTO on 2026-07-12 as proposed, together with RFC-002, ADR-008, and the domain model's five recommendations.
 **Drafted:** 2026-07-12
 **Objective (proposed):** BIM Module MVP — BIM models as project records with immutable file versions and an in-browser IFC viewer.
 

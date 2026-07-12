@@ -1,7 +1,7 @@
 # Sprint 8 Domain Model — BIM Module
 
 **Version:** 1.0
-**Status:** Draft — awaiting CTO ratification together with [sprint-8.md](../sprints/sprint-8.md), [RFC-002](../rfc/0002-bim-viewer.md), and [ADR-008](../adr/0008-object-storage.md)
+**Status:** Accepted — ratified by the CTO on 2026-07-12 together with [sprint-8.md](../sprints/sprint-8.md), [RFC-002](../rfc/0002-bim-viewer.md), and [ADR-008](../adr/0008-object-storage.md), including this model's five recommendations.
 **Part of:** `docs/architecture/`, following the DDD workflow in [architecture-principles.md](../foundation/architecture-principles.md)
 
 ---
