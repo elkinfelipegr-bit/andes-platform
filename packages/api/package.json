@@ -16,7 +16,8 @@
     "@trpc/server": "^11.0.0",
     "zod": "^4.0.0",
     "@andes/structures": "workspace:*",
-    "@andes/geo": "workspace:*"
+    "@andes/geo": "workspace:*",
+    "@andes/storage": "workspace:*"
   },
   "devDependencies": {
     "@andes/config": "workspace:*",

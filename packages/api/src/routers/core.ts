@@ -11,6 +11,7 @@ import { projectsRouter } from "./projects/index.js";
 import { inspectionsRouter } from "./projects/inspections.js";
 import { calcRecordsRouter } from "./structures/index.js";
 import { geoRecordsRouter } from "./geo/index.js";
+import { bimModelsRouter } from "./bim/index.js";
 
 export const coreRouter = router({
   health: publicProcedure.query(() => ({ ok: true as const })),
@@ -59,6 +60,7 @@ export const appRouter = router({
   inspections: inspectionsRouter,
   calcRecords: calcRecordsRouter,
   geoRecords: geoRecordsRouter,
+  bimModels: bimModelsRouter,
 });
 
 export type AppRouter = typeof appRouter;

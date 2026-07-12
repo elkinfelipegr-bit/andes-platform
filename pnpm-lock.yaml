@@ -111,6 +111,9 @@ importers:
       '@andes/geo':
         specifier: workspace:*
         version: link:../geo
+      '@andes/storage':
+        specifier: workspace:*
+        version: link:../storage
       '@andes/structures':
         specifier: workspace:*
         version: link:../structures
