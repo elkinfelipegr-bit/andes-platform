@@ -30,7 +30,7 @@ export const moduleNav: NavItem[] = [
   { label: "Projects", href: "/projects", icon: FolderKanban, enabled: true },
   { label: "CRM", href: "/crm", icon: Handshake, enabled: true },
   { label: "Structures", href: "/structures", icon: Building2, enabled: true },
-  { label: "Geo", href: "/geo", icon: Mountain, enabled: false },
+  { label: "Geo", href: "/geo", icon: Mountain, enabled: true },
   { label: "BIM", href: "/bim", icon: Boxes, enabled: false },
   { label: "AI", href: "/ai", icon: Sparkles, enabled: false },
   { label: "Analytics", href: "/analytics", icon: ChartColumn, enabled: false },

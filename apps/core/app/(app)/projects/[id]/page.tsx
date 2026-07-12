@@ -24,6 +24,7 @@ import {
 import { StatusBadge } from "../_components/status-badge";
 import { InspectionStatusBadge } from "../inspections/_components/inspection-badges";
 import { CalcRecordStatusBadge } from "../../structures/_components/structures-badges";
+import { GeoRecordStatusBadge } from "../../geo/_components/geo-badges";
 
 function toDateInput(value: Date | string | null): string {
   if (!value) return "";
@@ -244,6 +245,49 @@ export default function ProjectDetailPage() {
                     <span className="truncate text-sm">{calcRecord.title}</span>
                   </div>
                   <CalcRecordStatusBadge status={calcRecord.status} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Geotechnical records</CardTitle>
+          <CardDescription>
+            Estudios geotécnicos for this project — managed in{" "}
+            <Link
+              href="/geo"
+              className="text-primary underline-offset-2 hover:underline"
+            >
+              Geo
+            </Link>
+            .
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {p.geoRecords.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No geotechnical records for this project yet.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {p.geoRecords.map((geoRecord) => (
+                <li
+                  key={geoRecord.id}
+                  className="flex items-center justify-between gap-4"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Link
+                      href={`/geo/${geoRecord.id}`}
+                      className="font-mono text-xs text-primary underline-offset-2 hover:underline"
+                    >
+                      {geoRecord.code}
+                    </Link>
+                    <span className="truncate text-sm">{geoRecord.title}</span>
+                  </div>
+                  <GeoRecordStatusBadge status={geoRecord.status} />
                 </li>
               ))}
             </ul>

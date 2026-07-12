@@ -4,6 +4,7 @@ import {
   FileText,
   FolderKanban,
   Handshake,
+  Mountain,
 } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -38,21 +39,30 @@ export default async function DashboardPage() {
   let pendingProposalCount: number | null = null;
   let scheduledInspectionCount: number | null = null;
   let draftCalcRecordCount: number | null = null;
+  let draftGeoRecordCount: number | null = null;
   if (membership) {
     const caller = await serverCaller();
-    const [activeProjects, activeClients, sentProposals, scheduled, drafts] =
-      await Promise.all([
-        caller.projects.list({ status: "ACTIVE" }),
-        caller.clients.list(),
-        caller.proposals.list({ status: "SENT" }),
-        caller.inspections.list({ status: "SCHEDULED" }),
-        caller.calcRecords.list({ status: "DRAFT" }),
-      ]);
+    const [
+      activeProjects,
+      activeClients,
+      sentProposals,
+      scheduled,
+      drafts,
+      geoDrafts,
+    ] = await Promise.all([
+      caller.projects.list({ status: "ACTIVE" }),
+      caller.clients.list(),
+      caller.proposals.list({ status: "SENT" }),
+      caller.inspections.list({ status: "SCHEDULED" }),
+      caller.calcRecords.list({ status: "DRAFT" }),
+      caller.geoRecords.list({ status: "DRAFT" }),
+    ]);
     activeProjectCount = activeProjects.length;
     activeClientCount = activeClients.length;
     pendingProposalCount = sentProposals.length;
     scheduledInspectionCount = scheduled.length;
     draftCalcRecordCount = drafts.length;
+    draftGeoRecordCount = geoDrafts.length;
   }
 
   return (
@@ -209,6 +219,23 @@ export default async function DashboardPage() {
                     <CardDescription>
                       <span className="text-2xl font-semibold text-foreground">
                         {draftCalcRecordCount}
+                      </span>{" "}
+                      draft records
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+              <Link href="/geo" className="group">
+                <Card className="h-full transition-colors group-hover:border-primary/40">
+                  <CardHeader>
+                    <Mountain
+                      className="size-5 text-primary"
+                      aria-hidden="true"
+                    />
+                    <CardTitle className="text-sm">Geo</CardTitle>
+                    <CardDescription>
+                      <span className="text-2xl font-semibold text-foreground">
+                        {draftGeoRecordCount}
                       </span>{" "}
                       draft records
                     </CardDescription>
