@@ -4,7 +4,7 @@
 // RLS policies (defense-in-depth layer 2) are applied via raw SQL migrations.
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   // native: local dev machine; rhel-openssl-3.0.x: Vercel serverless runtime
   // (ADR-005) — without it the deployed function has no query engine.
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
@@ -35,6 +35,8 @@ model Tenant {
   beamFlexureChecks BeamFlexureCheck[]
   geoRecords        GeoRecord[]
   bearingChecks     BearingCheck[]
+  bimModels         BimModel[]
+  bimModelVersions  BimModelVersion[]
 
   @@map("tenant")
 }
@@ -61,10 +63,12 @@ model User {
   accounts            Account[]
   projectsCreated     Project[]
   proposalsCreated    Proposal[]
-  inspectionsAssigned Inspection[] @relation("inspectionsAssigned")
-  inspectionsCreated  Inspection[] @relation("inspectionsCreated")
+  inspectionsAssigned Inspection[]      @relation("inspectionsAssigned")
+  inspectionsCreated  Inspection[]      @relation("inspectionsCreated")
   calcRecordsCreated  CalcRecord[]
   geoRecordsCreated   GeoRecord[]
+  bimModelsCreated    BimModel[]
+  bimVersionsUploaded BimModelVersion[]
 
   @@map("user")
 }
@@ -324,6 +328,7 @@ model Project {
   inspections Inspection[]
   calcRecords CalcRecord[]
   geoRecords  GeoRecord[]
+  bimModels   BimModel[]
 
   @@unique([tenantId, code])
   @@index([tenantId])
@@ -461,7 +466,7 @@ model CalcRecord {
 // via the infeasible path. Future check types are sibling typed tables,
 // not JSON blobs. Own tenantId: RLS never joins (RFC-001).
 model BeamFlexureCheck {
-  id           String  @id @default(cuid())
+  id           String @id @default(cuid())
   tenantId     String
   calcRecordId String
   position     Int
@@ -538,7 +543,7 @@ model GeoRecord {
 // (immutable evidence). No verdict: q_adm is the number the structural
 // engineer compares against demand later. Own tenantId: RLS never joins.
 model BearingCheck {
-  id          String  @id @default(cuid())
+  id          String @id @default(cuid())
   tenantId    String
   geoRecordId String
   position    Int
@@ -566,4 +571,84 @@ model BearingCheck {
   @@index([tenantId])
   @@index([geoRecordId])
   @@map("bearing_check")
+}
+
+// ── Sprint 8: BIM Module (sprint-8-domain-model.md) ─────────────────────
+
+enum BimDiscipline {
+  ARCHITECTURE
+  STRUCTURAL
+  MEP
+  SITE
+  OTHER
+
+  @@map("bim_discipline")
+}
+
+// Upload lifecycle: a version is born PENDING when the presigned URL is
+// issued and becomes READY only after the server confirms the object
+// exists in storage. Versions are append-only — no terminal/failed state
+// needed: a PENDING version whose upload never completed holds no object
+// and is never shown as content.
+enum BimVersionStatus {
+  PENDING
+  READY
+
+  @@map("bim_version_status")
+}
+
+// One model/discipline stream on a project (e.g. "Structural — Tower A").
+// Carries identity and metadata, never file bytes (RFC-002/ADR-008). No
+// lifecycle of its own — unlike proposals or memorias, a model record is
+// not "issued": its immutable versions are the artifacts. Archiving
+// follows the project (archived projects accept no new models/versions).
+model BimModel {
+  id          String        @id @default(cuid())
+  tenantId    String
+  projectId   String
+  code        String // human-assigned, unique per tenant (precedent)
+  title       String
+  discipline  BimDiscipline
+  createdById String // audit only — authorization flows from Membership
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now()) @updatedAt
+
+  tenant    Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  project   Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy User              @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  versions  BimModelVersion[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@index([projectId])
+  @@map("bim_model")
+}
+
+// One immutable uploaded IFC file (the Sprint 6 evidence rule extended to
+// files). storageKey is built exclusively by @andes/storage under
+// ADR-008's tenant-prefix rule; fileSize is stamped at confirmation from
+// the object head, never trusted from the client. Append-only: no hard
+// delete, no overwrite. Own tenantId: RLS never joins (RFC-001).
+model BimModelVersion {
+  id            String           @id @default(cuid())
+  tenantId      String
+  bimModelId    String
+  versionNumber Int
+  status        BimVersionStatus @default(PENDING)
+  storageKey    String           @unique
+  fileName      String
+  fileSize      Int? // bytes; null until confirmed (300 MB cap fits Int)
+  contentType   String
+  uploadedById  String // audit only — authorization flows from Membership
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @default(now()) @updatedAt
+
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  bimModel   BimModel @relation(fields: [bimModelId], references: [id], onDelete: Cascade)
+  uploadedBy User     @relation(fields: [uploadedById], references: [id], onDelete: Restrict)
+
+  @@unique([bimModelId, versionNumber])
+  @@index([tenantId])
+  @@index([bimModelId])
+  @@map("bim_model_version")
 }
