@@ -201,7 +201,8 @@ describe.skipIf(!APP_URL)("bimModels router (integration)", () => {
       }),
     ).rejects.toMatchObject({ code: "CONFLICT" });
 
-    // Archived project: no new models, no new versions, no metadata edits.
+    // Archived project: no new models, no new versions, no metadata edits
+    // (assertActiveProject → BAD_REQUEST, the shared precedent).
     await callerFor(tenantA.id, "OWNER_ADMIN").projects.archive({
       id: project.id,
     });
@@ -212,17 +213,17 @@ describe.skipIf(!APP_URL)("bimModels router (integration)", () => {
         title: "Tarde",
         discipline: "OTHER",
       }),
-    ).rejects.toMatchObject({ code: "CONFLICT" });
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
     await expect(
       caller.bimModels.requestUpload({
         bimModelId: model.id,
         fileName: "tarde.ifc",
         fileSize: 1024,
       }),
-    ).rejects.toMatchObject({ code: "CONFLICT" });
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
     await expect(
       caller.bimModels.update({ id: model.id, title: "Tarde" }),
-    ).rejects.toMatchObject({ code: "CONFLICT" });
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });
 
   it("cross-tenant sweep: records, versions, uploads, and downloads are invisible to tenant B", async () => {
