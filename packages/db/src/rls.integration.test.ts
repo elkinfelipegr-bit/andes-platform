@@ -473,4 +473,72 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
       forUser(app, userInA.id).bearingCheck.findMany(),
     ).resolves.toHaveLength(0);
   });
+
+  // ── Sprint 8: bim_model / bim_model_version (sprint-8-domain-model.md) ─
+
+  it("bim model + version isolation: scoped reads, fail-closed, cross-tenant write denied, no forUser access", async () => {
+    const modelA = await admin.bimModel.create({
+      data: {
+        tenantId: tenantA.id,
+        projectId: projectA.id,
+        code: `BIM-A-${run}`,
+        title: "Modelo estructural",
+        discipline: "STRUCTURAL",
+        createdById: userInA.id,
+        versions: {
+          create: [
+            {
+              tenantId: tenantA.id,
+              versionNumber: 1,
+              status: "READY",
+              storageKey: `tenants/${tenantA.id}/bim/test-${run}/v1.ifc`,
+              fileName: "torre-a.ifc",
+              fileSize: 1024,
+              contentType: "application/x-step",
+              uploadedById: userInA.id,
+            },
+          ],
+        },
+      },
+    });
+
+    const seen = await forTenant(app, tenantA.id).bimModel.findMany();
+    expect(seen.map((m) => m.id)).toContain(modelA.id);
+    const versions = await forTenant(
+      app,
+      tenantA.id,
+    ).bimModelVersion.findMany();
+    expect(versions.every((v) => v.tenantId === tenantA.id)).toBe(true);
+    expect(versions.length).toBeGreaterThan(0);
+
+    await expect(app.bimModel.findMany()).resolves.toHaveLength(0);
+    await expect(app.bimModelVersion.findMany()).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).bimModel.findMany(),
+    ).resolves.toHaveLength(0);
+    await expect(
+      forTenant(app, tenantB.id).bimModelVersion.findMany(),
+    ).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).bimModel.create({
+        data: {
+          tenantId: tenantA.id,
+          projectId: projectA.id,
+          code: `BIM-EVIL-${run}`,
+          title: "Evil",
+          discipline: "OTHER",
+          createdById: userInA.id,
+        },
+      }),
+    ).rejects.toThrow();
+
+    await expect(
+      forUser(app, userInA.id).bimModel.findMany(),
+    ).resolves.toHaveLength(0);
+    await expect(
+      forUser(app, userInA.id).bimModelVersion.findMany(),
+    ).resolves.toHaveLength(0);
+  });
 });
