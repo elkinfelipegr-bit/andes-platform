@@ -46,7 +46,7 @@ describe.skipIf(!APP_URL)("bimModels router (integration)", () => {
   let tenantB!: { id: string };
   let user!: { id: string };
 
-  function callerFor(tenantId: string) {
+  function callerFor(tenantId: string, roleKey = "ENGINEER") {
     const session: SessionInfo = {
       userId: user.id,
       email: `bim-${run}@test.local`,
@@ -54,8 +54,8 @@ describe.skipIf(!APP_URL)("bimModels router (integration)", () => {
         membershipId: `m-${run}`,
         tenantId,
         tenantSlug: `slug-${tenantId}`,
-        roleKey: "ENGINEER",
-        roleLabel: "Engineer",
+        roleKey,
+        roleLabel: roleKey,
       },
     };
     const ctx: Context = { db: app, session };
@@ -202,7 +202,9 @@ describe.skipIf(!APP_URL)("bimModels router (integration)", () => {
     ).rejects.toMatchObject({ code: "CONFLICT" });
 
     // Archived project: no new models, no new versions, no metadata edits.
-    await callerFor(tenantA.id).projects.archive({ id: project.id });
+    await callerFor(tenantA.id, "OWNER_ADMIN").projects.archive({
+      id: project.id,
+    });
     await expect(
       caller.bimModels.create({
         projectId: project.id,
