@@ -1,6 +1,6 @@
 # RFC-002: BIM Viewer
 
-**Status:** Proposed — awaiting CTO ratification
+**Status:** Accepted — ratified by the CTO on 2026-07-12
 **Date:** 2026-07-12
 **Deciders:** CTO / Lead Software Architect (Andes Engineering)
 
