@@ -1,6 +1,7 @@
-# Sprint 10 — Proposal
+# Sprint 10 — Inspection Photos
 
-**Status:** Accepted — ratified by the CTO on 2026-07-13 as proposed, including the domain model's four recommendations.
+**Status:** Closed — 2026-07-13
+**Ratified:** 2026-07-13 (as proposed, including the domain model's four recommendations)
 **Drafted:** 2026-07-13
 **Objective (proposed):** Inspection Photos — photographic evidence attached to inspections and findings, printed in the report.
 
@@ -37,6 +38,25 @@ Strict tier: key scoping in `@andes/storage` and tenant isolation for the new ta
 2. **Formats JPEG/PNG/WebP, 15 MB per photo** (recommended — covers any phone camera).
 3. **Hard delete while SCHEDULED** (recommended — draft evidence, mirrors findings replacement semantics; frozen after completion).
 4. **Ratify this scope** — trim candidate: captions second, gallery-per-finding grouping first.
+
+## Retrospective (closure, 2026-07-13)
+
+**Objective met — photographic evidence shipped to production the same day it was ratified, across three CI-gated PRs**, composing two ratified patterns without a single new decision:
+
+- **PR #52 — keys + data:** `inspectionPhotoKey` with the extension from a closed whitelist derived from the validated content type — never the file name; `InspectionPhoto` with the Sprint 8 upload lifecycle and `findingId` SetNull; strict RLS; suites extended.
+- **PR #53 — API:** the photo lifecycle on the inspections router, SCHEDULED-only edits, frozen (but viewable/printable) with the completed report. Two notable pieces: `deleteObject` added to `@andes/storage` so draft-evidence deletes leave no orphan objects (ADR-008: the database is the index), and **photos re-link by finding position across the Sprint 5 atomic findings replacement** — editing a finding's text no longer orphans its photos; a removed finding demotes them to general.
+- **PR #54 — UI:** PhotoManager (direct-to-R2 upload with progress, attach-to selector, inline captions, delete) and ReportPhotos (grouped per finding + general, in the print view). All images serve through fresh short-lived presigned GETs — nothing public, ever.
+
+**Verification:** unit + integration suites in CI (lifecycle, re-link, frozen denials, delete cleanup, cross-tenant sweep); Neon migrations applied with grants verified; zero new infrastructure or cost. **CTO functional pass in production — upload, captions, freeze, printed evidence — closes the sprint (2026-07-13).**
+
+**Deviations:** none against scope.
+
+**Carry-over:**
+
+1. Thumbnails/EXIF/compression pipeline — future work; if server-side, an ADR-001 trigger conversation.
+2. Mobile field-capture UX beyond the file picker.
+3. Photos on other records (proposals, geo) — same pattern, own scopes.
+4. Standing items from Sprints 1–9 (incl. Sprint 9's activation, deferred with the Anthropic key).
 
 ## References
 
