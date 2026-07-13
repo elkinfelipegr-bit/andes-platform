@@ -37,7 +37,9 @@ function defineTool<S extends z.ZodTypeAny>(
     name,
     description,
     inputSchema,
-    execute: (caller, input) => execute(caller, inputSchema.parse(input)),
+    // async so a schema failure rejects rather than throwing synchronously
+    execute: async (caller, input) =>
+      execute(caller, inputSchema.parse(input)),
   };
 }
 
