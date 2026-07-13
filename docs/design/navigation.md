@@ -37,7 +37,7 @@ Defines the authenticated shell every Andes product renders inside, and the navi
 | Structures     | Andes Structures | `/structures` | **Live** (Sprint 6) |
 | Geo            | Andes Geo        | `/geo`        | **Live** (Sprint 7) |
 | BIM            | Andes BIM        | `/bim`        | **Live** (Sprint 8) |
-| AI             | Andes AI         | `/ai`         | Stub (disabled)     |
+| AI             | Andes AI         | `/ai`         | **Live** (Sprint 9) |
 | Analytics      | Andes Analytics  | `/analytics`  | Stub (disabled)     |
 | Administration | Andes Core       | `/admin`      | Stub (disabled)     |
 

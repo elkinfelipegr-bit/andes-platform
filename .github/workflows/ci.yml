@@ -79,3 +79,7 @@ jobs:
 
       - name: Typecheck, lint, test, build
         run: pnpm exec turbo run typecheck lint test build
+        env:
+          # Next's build-trace collection outgrew Node's default heap once
+          # the app carried the 3D viewer + AI SDK graphs (Sprints 8-9).
+          NODE_OPTIONS: --max-old-space-size=6144
