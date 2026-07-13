@@ -38,6 +38,7 @@ import {
   InspectionStatusBadge,
   SeverityBadge,
 } from "../_components/inspection-badges";
+import { PhotoManager, ReportPhotos } from "../_components/inspection-photos";
 
 type InspectionDetail = RouterOutputs["inspections"]["get"];
 
@@ -356,6 +357,8 @@ function InspectionReport({ inspection }: { inspection: InspectionDetail }) {
           </Table>
         )}
       </div>
+
+      <ReportPhotos inspection={inspection} />
     </div>
   );
 }
@@ -468,7 +471,10 @@ export default function InspectionDetailPage() {
       )}
 
       {ins.status === "SCHEDULED" ? (
-        <ScheduledEditor key={ins.updatedAt.toString()} inspection={ins} />
+        <>
+          <ScheduledEditor key={ins.updatedAt.toString()} inspection={ins} />
+          <PhotoManager inspection={ins} />
+        </>
       ) : (
         <InspectionReport inspection={ins} />
       )}
