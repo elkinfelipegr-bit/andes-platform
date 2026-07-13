@@ -6,6 +6,7 @@ import {
   FolderKanban,
   Handshake,
   Mountain,
+  Sparkles,
 } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -42,6 +43,7 @@ export default async function DashboardPage() {
   let draftCalcRecordCount: number | null = null;
   let draftGeoRecordCount: number | null = null;
   let bimModelCount: number | null = null;
+  let aiConversationCount: number | null = null;
   if (membership) {
     const caller = await serverCaller();
     const [
@@ -52,6 +54,7 @@ export default async function DashboardPage() {
       drafts,
       geoDrafts,
       bimModels,
+      aiConversations,
     ] = await Promise.all([
       caller.projects.list({ status: "ACTIVE" }),
       caller.clients.list(),
@@ -60,6 +63,7 @@ export default async function DashboardPage() {
       caller.calcRecords.list({ status: "DRAFT" }),
       caller.geoRecords.list({ status: "DRAFT" }),
       caller.bimModels.list(),
+      caller.ai.listConversations(),
     ]);
     activeProjectCount = activeProjects.length;
     activeClientCount = activeClients.length;
@@ -68,6 +72,7 @@ export default async function DashboardPage() {
     draftCalcRecordCount = drafts.length;
     draftGeoRecordCount = geoDrafts.length;
     bimModelCount = bimModels.length;
+    aiConversationCount = aiConversations.length;
   }
 
   return (
@@ -257,6 +262,23 @@ export default async function DashboardPage() {
                         {bimModelCount}
                       </span>{" "}
                       models
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+              <Link href="/ai" className="group">
+                <Card className="h-full transition-colors group-hover:border-primary/40">
+                  <CardHeader>
+                    <Sparkles
+                      className="size-5 text-primary"
+                      aria-hidden="true"
+                    />
+                    <CardTitle className="text-sm">AI</CardTitle>
+                    <CardDescription>
+                      <span className="text-2xl font-semibold text-foreground">
+                        {aiConversationCount}
+                      </span>{" "}
+                      conversations
                     </CardDescription>
                   </CardHeader>
                 </Card>

@@ -32,7 +32,7 @@ export const moduleNav: NavItem[] = [
   { label: "Structures", href: "/structures", icon: Building2, enabled: true },
   { label: "Geo", href: "/geo", icon: Mountain, enabled: true },
   { label: "BIM", href: "/bim", icon: Boxes, enabled: true },
-  { label: "AI", href: "/ai", icon: Sparkles, enabled: false },
+  { label: "AI", href: "/ai", icon: Sparkles, enabled: true },
   { label: "Analytics", href: "/analytics", icon: ChartColumn, enabled: false },
 ];
 
