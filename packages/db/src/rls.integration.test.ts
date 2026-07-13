@@ -541,4 +541,61 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
       forUser(app, userInA.id).bimModelVersion.findMany(),
     ).resolves.toHaveLength(0);
   });
+
+  // ── Sprint 9: ai_conversation / ai_message (sprint-9-domain-model.md) ──
+  // Owner privacy (userId) is an application-layer concern tested in the
+  // API suite; this covers the RLS layer: tenant isolation.
+
+  it("ai conversation + message isolation: scoped reads, fail-closed, cross-tenant write denied, no forUser access", async () => {
+    const conversationA = await admin.aiConversation.create({
+      data: {
+        tenantId: tenantA.id,
+        userId: userInA.id,
+        title: "Consulta de proyecto",
+        messages: {
+          create: [
+            {
+              tenantId: tenantA.id,
+              role: "USER",
+              content: "¿Qué propuestas siguen abiertas?",
+              position: 0,
+            },
+          ],
+        },
+      },
+    });
+
+    const seen = await forTenant(app, tenantA.id).aiConversation.findMany();
+    expect(seen.map((c) => c.id)).toContain(conversationA.id);
+    const messages = await forTenant(app, tenantA.id).aiMessage.findMany();
+    expect(messages.every((m) => m.tenantId === tenantA.id)).toBe(true);
+    expect(messages.length).toBeGreaterThan(0);
+
+    await expect(app.aiConversation.findMany()).resolves.toHaveLength(0);
+    await expect(app.aiMessage.findMany()).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).aiConversation.findMany(),
+    ).resolves.toHaveLength(0);
+    await expect(
+      forTenant(app, tenantB.id).aiMessage.findMany(),
+    ).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).aiConversation.create({
+        data: {
+          tenantId: tenantA.id,
+          userId: userInA.id,
+          title: "Evil",
+        },
+      }),
+    ).rejects.toThrow();
+
+    await expect(
+      forUser(app, userInA.id).aiConversation.findMany(),
+    ).resolves.toHaveLength(0);
+    await expect(
+      forUser(app, userInA.id).aiMessage.findMany(),
+    ).resolves.toHaveLength(0);
+  });
 });

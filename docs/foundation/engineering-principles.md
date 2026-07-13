@@ -72,7 +72,7 @@ ADRs live in `docs/adr/` and follow the Decision Documentation Standard above. R
 
 - [RFC-001 — Multi-tenant Architecture](../rfc/0001-multi-tenant-architecture.md) — Accepted.
 - [RFC-002 — BIM Viewer](../rfc/0002-bim-viewer.md) — Accepted (ratified 2026-07-12 with the Sprint 8 plan).
-- [RFC-003 — AI Agent](../rfc/0003-ai-agent.md) — Proposed (drafted 2026-07-12 with the Sprint 9 proposal; awaiting ratification).
+- [RFC-003 — AI Agent](../rfc/0003-ai-agent.md) — Accepted (ratified 2026-07-13 with the Sprint 9 plan).
 
 ## Sprint Philosophy
 

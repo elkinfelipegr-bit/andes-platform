@@ -1,6 +1,6 @@
 # RFC-003: AI Agent — the Engineering Copilot
 
-**Status:** Proposed — awaiting CTO ratification
+**Status:** Accepted — ratified by the CTO on 2026-07-13
 **Date:** 2026-07-12
 **Deciders:** CTO / Lead Software Architect (Andes Engineering)
 
