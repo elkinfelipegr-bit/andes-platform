@@ -25,6 +25,7 @@ import { StatusBadge } from "../_components/status-badge";
 import { InspectionStatusBadge } from "../inspections/_components/inspection-badges";
 import { CalcRecordStatusBadge } from "../../structures/_components/structures-badges";
 import { GeoRecordStatusBadge } from "../../geo/_components/geo-badges";
+import { DisciplineBadge } from "../../bim/_components/bim-badges";
 
 function toDateInput(value: Date | string | null): string {
   if (!value) return "";
@@ -288,6 +289,53 @@ export default function ProjectDetailPage() {
                     <span className="truncate text-sm">{geoRecord.title}</span>
                   </div>
                   <GeoRecordStatusBadge status={geoRecord.status} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">BIM models</CardTitle>
+          <CardDescription>
+            IFC models for this project — managed in{" "}
+            <Link
+              href="/bim"
+              className="text-primary underline-offset-2 hover:underline"
+            >
+              BIM
+            </Link>
+            .
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {p.bimModels.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No BIM models for this project yet.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {p.bimModels.map((bimModel) => (
+                <li
+                  key={bimModel.id}
+                  className="flex items-center justify-between gap-4"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Link
+                      href={`/bim/${bimModel.id}`}
+                      className="font-mono text-xs text-primary underline-offset-2 hover:underline"
+                    >
+                      {bimModel.code}
+                    </Link>
+                    <span className="truncate text-sm">{bimModel.title}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {bimModel._count.versions} version
+                      {bimModel._count.versions === 1 ? "" : "s"}
+                    </span>
+                  </div>
+                  <DisciplineBadge discipline={bimModel.discipline} />
                 </li>
               ))}
             </ul>

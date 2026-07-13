@@ -1,4 +1,5 @@
 import {
+  Boxes,
   Building2,
   ClipboardCheck,
   FileText,
@@ -40,6 +41,7 @@ export default async function DashboardPage() {
   let scheduledInspectionCount: number | null = null;
   let draftCalcRecordCount: number | null = null;
   let draftGeoRecordCount: number | null = null;
+  let bimModelCount: number | null = null;
   if (membership) {
     const caller = await serverCaller();
     const [
@@ -49,6 +51,7 @@ export default async function DashboardPage() {
       scheduled,
       drafts,
       geoDrafts,
+      bimModels,
     ] = await Promise.all([
       caller.projects.list({ status: "ACTIVE" }),
       caller.clients.list(),
@@ -56,6 +59,7 @@ export default async function DashboardPage() {
       caller.inspections.list({ status: "SCHEDULED" }),
       caller.calcRecords.list({ status: "DRAFT" }),
       caller.geoRecords.list({ status: "DRAFT" }),
+      caller.bimModels.list(),
     ]);
     activeProjectCount = activeProjects.length;
     activeClientCount = activeClients.length;
@@ -63,6 +67,7 @@ export default async function DashboardPage() {
     scheduledInspectionCount = scheduled.length;
     draftCalcRecordCount = drafts.length;
     draftGeoRecordCount = geoDrafts.length;
+    bimModelCount = bimModels.length;
   }
 
   return (
@@ -238,6 +243,20 @@ export default async function DashboardPage() {
                         {draftGeoRecordCount}
                       </span>{" "}
                       draft records
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+              <Link href="/bim" className="group">
+                <Card className="h-full transition-colors group-hover:border-primary/40">
+                  <CardHeader>
+                    <Boxes className="size-5 text-primary" aria-hidden="true" />
+                    <CardTitle className="text-sm">BIM</CardTitle>
+                    <CardDescription>
+                      <span className="text-2xl font-semibold text-foreground">
+                        {bimModelCount}
+                      </span>{" "}
+                      models
                     </CardDescription>
                   </CardHeader>
                 </Card>
