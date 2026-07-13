@@ -1,6 +1,7 @@
-# Sprint 8 — Proposal
+# Sprint 8 — BIM Module
 
-**Status:** Accepted — ratified by the CTO on 2026-07-12 as proposed, together with RFC-002, ADR-008, and the domain model's five recommendations.
+**Status:** Closed — 2026-07-12
+**Ratified:** 2026-07-12 (as proposed, together with RFC-002, ADR-008, and the domain model's five recommendations)
 **Drafted:** 2026-07-12
 **Objective (proposed):** BIM Module MVP — BIM models as project records with immutable file versions and an in-browser IFC viewer.
 
@@ -38,6 +39,28 @@ Four new secrets per environment (R2 endpoint, access key ID, secret, bucket) ad
 2. **Ratify ADR-008** — Cloudflare R2, presigned-only, tenant-prefixed keys, `@andes/storage`.
 3. **Ratify the domain model** — including its five recommendations (enum discipline, 300 MB cap, no model-level lifecycle).
 4. **Ratify this scope** — trim candidates: dashboard card first, properties panel second (upload + versions + basic viewing are the core).
+
+## Retrospective (closure, 2026-07-12)
+
+**Objective met — the platform's first file domain shipped to production across four CI-gated PRs** (storage → data → API → UI), implementing RFC-002 and ADR-008 as ratified:
+
+- **PR #42 — `@andes/storage`:** the only module allowed to touch storage credentials or build object keys. Tenant-prefixed keys with ids validated to a closed alphabet (traversal and prefix-forging impossible by construction), fail-closed `assertKeyInTenant`, presigned PUT pinning content type + exact length. **54 strict-tier tests** — key scoping treated exactly like the tRPC middleware and RLS.
+- **PR #43 — data layer:** `BimModel` (no lifecycle of its own — the versions are the artifacts) + `BimModelVersion` (append-only, PENDING→READY); hand-written migrations + strict RLS; isolation suite extended.
+- **PR #44 — API:** the two-step upload lifecycle — request (PENDING row + presigned PUT) and confirm (HEAD against storage; **recorded size comes from the object, never the client**). PENDING versions are never listed or served. Storage injected behind a test seam so CI never needs R2 credentials.
+- **PR #45 — UI:** `/bim` live — models, direct-to-storage uploads with progress, and the **100% client-side IFC viewer** (web-ifc WASM served from the app, Three.js via @thatopen/components, click-to-select with IFC attributes), dynamically imported so the 3D stack stays out of every other bundle.
+
+**RFC-002 held:** no server-side geometry work exists anywhere; the escalation path remains the ADR-001 dedicated-service trigger.
+
+**Verification:** strict-tier suites in CI (merge-gated); Neon migrations applied with `andes_app` grants verified; R2 bucket + scoped API token provisioned by the CTO, credentials round-tripped against the real bucket (PUT/HEAD/GET/cleanup) before the production redeploy; **CTO functional pass in production — upload, immutable versioning, and the viewer — closes the sprint (2026-07-12).**
+
+**Deviations:** none against scope. Operational notes: two CI test corrections during PR #44 (archive requires an OWNER_ADMIN caller; `assertActiveProject` throws BAD_REQUEST); the build outgrew the dev machine during trace collection — fixed by excluding the client-only 3D stack from server file tracing plus a 5 GB heap; viewer peer set that resolves cleanly: `@thatopen/components` ~2.4 + `@thatopen/fragments` ~3.0 + `web-ifc` 0.0.68 + `three` ^0.175.
+
+**Carry-over:**
+
+1. Clash detection, BCF issue exchange, federated multi-model views, 4D/5D — future proposals on this domain.
+2. Streaming/tiled loading for very large models — **blocked on the ADR-001 dedicated-service trigger** by ratified decision.
+3. Other file-bearing features now unblocked by ADR-008: inspection photos, proposal PDFs, geo borehole logs — each in its own scope.
+4. Standing items from Sprints 1–7.
 
 ## References
 
