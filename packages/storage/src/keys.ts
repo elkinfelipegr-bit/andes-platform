@@ -42,6 +42,29 @@ export function bimVersionKey(input: {
   return `tenants/${input.tenantId}/bim/${input.bimModelId}/${input.versionId}.ifc`;
 }
 
+// Extensions are a closed whitelist, never derived from the uploaded
+// file name — the same reject-by-construction posture as ids.
+export const PHOTO_EXTENSIONS = ["jpg", "jpeg", "png", "webp"] as const;
+export type PhotoExtension = (typeof PHOTO_EXTENSIONS)[number];
+
+/** Key for one inspection photo (sprint-10-domain-model.md). */
+export function inspectionPhotoKey(input: {
+  tenantId: string;
+  inspectionId: string;
+  photoId: string;
+  extension: PhotoExtension;
+}): string {
+  assertId(input.tenantId, "tenantId");
+  assertId(input.inspectionId, "inspectionId");
+  assertId(input.photoId, "photoId");
+  if (!PHOTO_EXTENSIONS.includes(input.extension)) {
+    throw new StorageKeyError(
+      "extension is not an accepted photo format for a storage key",
+    );
+  }
+  return `tenants/${input.tenantId}/inspections/${input.inspectionId}/${input.photoId}.${input.extension}`;
+}
+
 /**
  * Fails closed unless `key` lives under the tenant's prefix. Callers must
  * run this on any key read back from the database before signing a URL for

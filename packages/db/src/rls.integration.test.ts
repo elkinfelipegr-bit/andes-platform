@@ -598,4 +598,60 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
       forUser(app, userInA.id).aiMessage.findMany(),
     ).resolves.toHaveLength(0);
   });
+
+  // ── Sprint 10: inspection_photo (sprint-10-domain-model.md) ───────────
+
+  it("inspection photo isolation: scoped reads, fail-closed, cross-tenant write denied, no forUser access", async () => {
+    const inspectionA = await admin.inspection.create({
+      data: {
+        tenantId: tenantA.id,
+        projectId: projectA.id,
+        inspectorId: userInA.id,
+        code: `INSP-PH-${run}`,
+        title: "Visita con fotos",
+        scheduledFor: new Date(),
+        createdById: userInA.id,
+      },
+    });
+    const photoA = await admin.inspectionPhoto.create({
+      data: {
+        tenantId: tenantA.id,
+        inspectionId: inspectionA.id,
+        status: "READY",
+        storageKey: `tenants/${tenantA.id}/inspections/${inspectionA.id}/ph-${run}.jpg`,
+        fileName: "grieta.jpg",
+        fileSize: 2048,
+        contentType: "image/jpeg",
+        position: 0,
+        uploadedById: userInA.id,
+      },
+    });
+
+    const seen = await forTenant(app, tenantA.id).inspectionPhoto.findMany();
+    expect(seen.map((p) => p.id)).toContain(photoA.id);
+    expect(seen.every((p) => p.tenantId === tenantA.id)).toBe(true);
+
+    await expect(app.inspectionPhoto.findMany()).resolves.toHaveLength(0);
+    await expect(
+      forTenant(app, tenantB.id).inspectionPhoto.findMany(),
+    ).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).inspectionPhoto.create({
+        data: {
+          tenantId: tenantA.id,
+          inspectionId: inspectionA.id,
+          storageKey: `tenants/${tenantA.id}/inspections/${inspectionA.id}/evil-${run}.jpg`,
+          fileName: "evil.jpg",
+          contentType: "image/jpeg",
+          position: 1,
+          uploadedById: userInA.id,
+        },
+      }),
+    ).rejects.toThrow();
+
+    await expect(
+      forUser(app, userInA.id).inspectionPhoto.findMany(),
+    ).resolves.toHaveLength(0);
+  });
 });

@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import {
   assertKeyInTenant,
   bimVersionKey,
+  inspectionPhotoKey,
   StorageKeyError,
   tenantPrefix,
 } from "./keys.js";
@@ -62,6 +63,46 @@ describe("bimVersionKey", () => {
       ).toThrow(StorageKeyError);
     });
   }
+});
+
+describe("inspectionPhotoKey", () => {
+  const input = {
+    tenantId: TENANT,
+    inspectionId: MODEL,
+    photoId: VERSION,
+    extension: "jpg" as const,
+  };
+
+  it("builds the tenant-prefixed key for every accepted extension", () => {
+    for (const extension of ["jpg", "jpeg", "png", "webp"] as const) {
+      expect(inspectionPhotoKey({ ...input, extension })).toBe(
+        `tenants/${TENANT}/inspections/${MODEL}/${VERSION}.${extension}`,
+      );
+    }
+  });
+
+  it("rejects extensions outside the whitelist — never derived from file names", () => {
+    for (const extension of ["exe", "svg", "php", "", "jpg/../x", "JPG"]) {
+      expect(() =>
+        inspectionPhotoKey({
+          ...input,
+          extension: extension as "jpg",
+        }),
+      ).toThrow(StorageKeyError);
+    }
+  });
+
+  it("rejects invalid ids on every field", () => {
+    expect(() => inspectionPhotoKey({ ...input, tenantId: "../etc" })).toThrow(
+      StorageKeyError,
+    );
+    expect(() =>
+      inspectionPhotoKey({ ...input, inspectionId: "UPPER/case" }),
+    ).toThrow(StorageKeyError);
+    expect(() => inspectionPhotoKey({ ...input, photoId: "" })).toThrow(
+      StorageKeyError,
+    );
+  });
 });
 
 describe("tenantPrefix", () => {

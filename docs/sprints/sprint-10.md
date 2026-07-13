@@ -1,6 +1,6 @@
 # Sprint 10 — Proposal
 
-**Status:** Proposed — awaiting CTO ratification
+**Status:** Accepted — ratified by the CTO on 2026-07-13 as proposed, including the domain model's four recommendations.
 **Drafted:** 2026-07-13
 **Objective (proposed):** Inspection Photos — photographic evidence attached to inspections and findings, printed in the report.
 
