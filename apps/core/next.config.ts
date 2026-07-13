@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     "@andes/auth",
     "@andes/db",
     "@andes/geo",
+    "@andes/storage",
     "@andes/structures",
     "@andes/ui",
   ],
@@ -17,6 +18,16 @@ const nextConfig: NextConfig = {
   // explicitly for every route.
   outputFileTracingIncludes: {
     "/**": ["../../node_modules/.pnpm/**/.prisma/client/**"],
+  },
+  // The 3D viewer stack is client-only (RFC-002: dynamically imported,
+  // never runs on the server) — excluding it from server file tracing
+  // keeps the trace graph inside this machine's memory budget.
+  outputFileTracingExcludes: {
+    "/**": [
+      "../../node_modules/.pnpm/**/three/**",
+      "../../node_modules/.pnpm/**/web-ifc/**",
+      "../../node_modules/.pnpm/**/@thatopen/**",
+    ],
   },
   webpack: (config) => {
     // Workspace packages use NodeNext-style ".js" specifiers that resolve
