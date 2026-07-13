@@ -31,6 +31,9 @@ function fakeStorage() {
     async headObject(key) {
       return objects.get(key) ?? null;
     },
+    async deleteObject(key) {
+      objects.delete(key);
+    },
   };
   return { client, objects, signed };
 }

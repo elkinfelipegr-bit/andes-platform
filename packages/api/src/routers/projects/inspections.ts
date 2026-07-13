@@ -13,12 +13,28 @@ import {
   inspectionListSchema,
   inspectionUpdateSchema,
 } from "./inspection-schemas.js";
+import { inspectionPhotoProcedures } from "./inspection-photos.js";
 
 const projectSummary = {
   select: { id: true, code: true, name: true },
 } as const;
 const inspectorSummary = {
   select: { id: true, name: true, email: true },
+} as const;
+// Only confirmed uploads are content (Sprint 8 rule): PENDING photos
+// hold no object and are never listed or served.
+const readyPhotos = {
+  where: { status: "READY" as const },
+  orderBy: { position: "asc" as const },
+  select: {
+    id: true,
+    findingId: true,
+    fileName: true,
+    fileSize: true,
+    contentType: true,
+    caption: true,
+    position: true,
+  },
 } as const;
 
 function isUniqueViolation(e: unknown): boolean {
@@ -94,6 +110,7 @@ export const inspectionsRouter = router({
           project: projectSummary,
           inspector: inspectorSummary,
           findings: { orderBy: { position: "asc" } },
+          photos: readyPhotos,
         },
       });
       if (!inspection) throw new TRPCError({ code: "NOT_FOUND" });
@@ -149,10 +166,39 @@ export const inspectionsRouter = router({
       if (inspectorId) {
         await assertInspectorIsMember(ctx.tenantDb, ctx.tenantId, inspectorId);
       }
+      // Findings are replaced atomically (Sprint 5), which SetNulls the
+      // photos' finding links — capture each photo's finding POSITION
+      // first, and re-link to the finding at the same position after
+      // (Sprint 10): editing finding text must not orphan its photos.
+      // A removed finding's photos correctly stay general.
+      let photoLinks: Array<{ photoId: string; position: number }> = [];
+      if (findings) {
+        const oldFindings = await ctx.tenantDb.finding.findMany({
+          where: { inspectionId: id, tenantId: ctx.tenantId },
+          select: { id: true, position: true },
+        });
+        const positionByFindingId = new Map(
+          oldFindings.map((f) => [f.id, f.position]),
+        );
+        const linkedPhotos = await ctx.tenantDb.inspectionPhoto.findMany({
+          where: {
+            inspectionId: id,
+            tenantId: ctx.tenantId,
+            findingId: { not: null },
+          },
+          select: { id: true, findingId: true },
+        });
+        photoLinks = linkedPhotos.flatMap((photo) => {
+          const position = positionByFindingId.get(photo.findingId!);
+          return position !== undefined && position < findings.length
+            ? [{ photoId: photo.id, position }]
+            : [];
+        });
+      }
       try {
         // Single nested write so the findings replacement is atomic; the
         // tenant scope was verified above and RLS backstops the update.
-        return await ctx.tenantDb.inspection.update({
+        const updated = await ctx.tenantDb.inspection.update({
           where: { id },
           data: {
             ...fields,
@@ -174,8 +220,32 @@ export const inspectionsRouter = router({
             project: projectSummary,
             inspector: inspectorSummary,
             findings: { orderBy: { position: "asc" } },
+            photos: readyPhotos,
           },
         });
+        if (findings && photoLinks.length > 0) {
+          const newIdByPosition = new Map(
+            updated.findings.map((f) => [f.position, f.id]),
+          );
+          for (const link of photoLinks) {
+            const findingId = newIdByPosition.get(link.position);
+            if (!findingId) continue;
+            await ctx.tenantDb.inspectionPhoto.updateMany({
+              where: { id: link.photoId, tenantId: ctx.tenantId },
+              data: { findingId },
+            });
+          }
+          updated.photos = await ctx.tenantDb.inspectionPhoto.findMany({
+            where: {
+              inspectionId: id,
+              tenantId: ctx.tenantId,
+              ...readyPhotos.where,
+            },
+            orderBy: readyPhotos.orderBy,
+            select: readyPhotos.select,
+          });
+        }
+        return updated;
       } catch (e) {
         if (isUniqueViolation(e)) {
           throw new TRPCError({
@@ -232,4 +302,7 @@ export const inspectionsRouter = router({
       });
       return { id: input.id, status: "CANCELLED" as const };
     }),
+
+  // ── Sprint 10: photo lifecycle (sprint-10-domain-model.md) ────────────
+  ...inspectionPhotoProcedures,
 });

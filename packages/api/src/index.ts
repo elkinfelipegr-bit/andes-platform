@@ -41,6 +41,13 @@ export {
   inspectionCreateSchema,
   inspectionUpdateSchema,
 } from "./routers/projects/inspection-schemas.js";
+export {
+  PHOTO_CONTENT_TYPES,
+  MAX_PHOTO_BYTES,
+  photoContentTypeSchema,
+  photoUploadRequestSchema,
+  photoUpdateSchema,
+} from "./routers/projects/inspection-photo-schemas.js";
 export { calcRecordsRouter } from "./routers/structures/index.js";
 export {
   CALC_RECORD_STATUSES,

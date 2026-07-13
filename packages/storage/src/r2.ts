@@ -3,6 +3,7 @@
 // File bytes never transit the app (Vercel body limits, ADR-005): the
 // server only signs short-lived URLs; browsers talk to R2 directly.
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
   PutObjectCommand,
@@ -64,6 +65,12 @@ export interface StorageClient {
   presignedGetUrl(key: string, opts?: { expiresIn?: number }): Promise<string>;
   /** null when the object does not exist. */
   headObject(key: string): Promise<HeadResult | null>;
+  /**
+   * Removes an object. Only for draft-evidence flows where the row was
+   * deleted first (ADR-008: the database is the index — no orphans).
+   * Idempotent: deleting a missing key is not an error in S3.
+   */
+  deleteObject(key: string): Promise<void>;
 }
 
 const DEFAULT_EXPIRES_IN = 900; // 15 min
@@ -134,6 +141,11 @@ export function createStorageClient(
         if (isNotFound(error)) return null;
         throw error;
       }
+    },
+    async deleteObject(key) {
+      await s3.send(
+        new DeleteObjectCommand({ Bucket: config.bucket, Key: key }),
+      );
     },
   };
 }
