@@ -73,3 +73,24 @@ export {
   bimModelUpdateSchema,
   uploadRequestSchema,
 } from "./routers/bim/schemas.js";
+export { aiRouter } from "./routers/ai/index.js";
+export {
+  AI_MESSAGE_ROLES,
+  aiMessageRoleSchema,
+  chatMessageSchema,
+  chatRequestSchema,
+} from "./routers/ai/schemas.js";
+export { COPILOT_SYSTEM_PROMPT } from "./routers/ai/prompt.js";
+export {
+  copilotTools,
+  createCopilotCaller,
+  type CopilotCaller,
+  type CopilotTool,
+} from "./routers/ai/tools.js";
+export {
+  appendMessage,
+  createConversation,
+  deriveTitle,
+  loadOwnConversation,
+  type CopilotSessionCtx,
+} from "./routers/ai/service.js";
