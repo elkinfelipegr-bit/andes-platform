@@ -37,6 +37,8 @@ model Tenant {
   bearingChecks     BearingCheck[]
   bimModels         BimModel[]
   bimModelVersions  BimModelVersion[]
+  aiConversations   AiConversation[]
+  aiMessages        AiMessage[]
 
   @@map("tenant")
 }
@@ -69,6 +71,7 @@ model User {
   geoRecordsCreated   GeoRecord[]
   bimModelsCreated    BimModel[]
   bimVersionsUploaded BimModelVersion[]
+  aiConversations     AiConversation[]
 
   @@map("user")
 }
@@ -651,4 +654,57 @@ model BimModelVersion {
   @@index([tenantId])
   @@index([bimModelId])
   @@map("bim_model_version")
+}
+
+// ── Sprint 9: AI Module (sprint-9-domain-model.md) ──────────────────────
+
+enum AiMessageRole {
+  USER
+  ASSISTANT
+
+  @@map("ai_message_role")
+}
+
+// A Copilot chat thread — the platform's first USER-PRIVATE record:
+// tenant-scoped via RLS as always, and additionally owner-filtered at
+// the application layer (every procedure adds userId = session.userId).
+// Owner-deletable by ratified decision: a chat is working aid, not the
+// engineering/commercial evidence the no-delete rule protects. userId
+// cascades (unlike audit createdById fields elsewhere) — a removed
+// user's private chats go with them.
+model AiConversation {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String
+  title     String // auto-derived from the first question
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  tenant   Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AiMessage[]
+
+  @@index([tenantId])
+  @@index([userId])
+  @@map("ai_conversation")
+}
+
+// One turn of the conversation. Tool-call traces are streamed to the UI
+// for transparency but not persisted (sprint-9-domain-model.md, rec. 5).
+// Own tenantId: RLS never joins (RFC-001).
+model AiMessage {
+  id             String        @id @default(cuid())
+  tenantId       String
+  conversationId String
+  role           AiMessageRole
+  content        String
+  position       Int
+  createdAt      DateTime      @default(now())
+
+  tenant       Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  conversation AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([conversationId])
+  @@map("ai_message")
 }

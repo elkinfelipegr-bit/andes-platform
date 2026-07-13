@@ -1,6 +1,6 @@
 # Sprint 9 — Proposal
 
-**Status:** Proposed — awaiting CTO ratification (together with RFC-003 and ADR-009)
+**Status:** Accepted — ratified by the CTO on 2026-07-13 as proposed, together with RFC-003, ADR-009, and the domain model's five recommendations.
 **Drafted:** 2026-07-12
 **Objective (proposed):** AI Module MVP — the Engineering Copilot: a tenant-scoped, read-only assistant grounded in the platform's own records, with persisted conversations.
 

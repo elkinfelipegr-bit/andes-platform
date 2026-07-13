@@ -1,6 +1,6 @@
 # ADR-009: LLM Provider & SDK — Anthropic Claude via the Vercel AI SDK
 
-**Status:** Proposed — awaiting CTO ratification
+**Status:** Accepted — ratified by CTO 2026-07-13
 **Date:** 2026-07-12
 **Deciders:** CTO / Lead Software Architect (Andes Engineering)
 

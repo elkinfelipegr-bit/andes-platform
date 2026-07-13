@@ -1,7 +1,7 @@
 # Sprint 9 Domain Model — AI Module
 
 **Version:** 1.0
-**Status:** Draft — awaiting CTO ratification together with [sprint-9.md](../sprints/sprint-9.md), [RFC-003](../rfc/0003-ai-agent.md), and [ADR-009](../adr/0009-llm-provider.md)
+**Status:** Accepted — ratified by the CTO on 2026-07-13 together with [sprint-9.md](../sprints/sprint-9.md), [RFC-003](../rfc/0003-ai-agent.md), and [ADR-009](../adr/0009-llm-provider.md), including this model's five recommendations.
 **Part of:** `docs/architecture/`, following the DDD workflow in [architecture-principles.md](../foundation/architecture-principles.md)
 
 ---

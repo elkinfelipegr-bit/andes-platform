@@ -73,8 +73,10 @@ The following are no longer tentative — they are binding until superseded by a
 - [ADR-006: CI Provider (GitHub Actions)](../adr/0006-ci-provider.md)
 - [ADR-007: Developer Tooling (ESLint, Prettier, Vitest)](../adr/0007-dev-tooling.md)
 - [ADR-008: Object Storage (Cloudflare R2)](../adr/0008-object-storage.md)
+- [ADR-009: LLM Provider (Anthropic via Vercel AI SDK)](../adr/0009-llm-provider.md)
 - [RFC-001: Multi-Tenant Architecture](../rfc/0001-multi-tenant-architecture.md)
 - [RFC-002: BIM Viewer](../rfc/0002-bim-viewer.md)
+- [RFC-003: AI Agent](../rfc/0003-ai-agent.md)
 - `docs/architecture/sprint-0-domain-model.md` — Tenant/User/Role/Membership domain sketch for Sprint 0
 
 ## Open Items Found During Drafting
