@@ -1,7 +1,7 @@
 # Sprint 10 Domain Model — Inspection Photos
 
 **Version:** 1.0
-**Status:** Draft — awaiting CTO ratification together with [sprint-10.md](../sprints/sprint-10.md)
+**Status:** Accepted — ratified by the CTO on 2026-07-13 together with [sprint-10.md](../sprints/sprint-10.md), including this model's four recommendations.
 **Part of:** `docs/architecture/`, following the DDD workflow in [architecture-principles.md](../foundation/architecture-principles.md)
 
 ---

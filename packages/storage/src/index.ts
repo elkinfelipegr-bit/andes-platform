@@ -4,8 +4,11 @@
 export {
   assertKeyInTenant,
   bimVersionKey,
+  inspectionPhotoKey,
+  PHOTO_EXTENSIONS,
   StorageKeyError,
   tenantPrefix,
+  type PhotoExtension,
 } from "./keys.js";
 export {
   createStorageClient,

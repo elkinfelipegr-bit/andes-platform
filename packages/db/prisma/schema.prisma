@@ -39,6 +39,7 @@ model Tenant {
   bimModelVersions  BimModelVersion[]
   aiConversations   AiConversation[]
   aiMessages        AiMessage[]
+  inspectionPhotos  InspectionPhoto[]
 
   @@map("tenant")
 }
@@ -72,6 +73,7 @@ model User {
   bimModelsCreated    BimModel[]
   bimVersionsUploaded BimModelVersion[]
   aiConversations     AiConversation[]
+  photosUploaded      InspectionPhoto[]
 
   @@map("user")
 }
@@ -380,11 +382,12 @@ model Inspection {
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @default(now()) @updatedAt
 
-  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  inspector User      @relation("inspectionsAssigned", fields: [inspectorId], references: [id], onDelete: Restrict)
-  createdBy User      @relation("inspectionsCreated", fields: [createdById], references: [id], onDelete: Restrict)
+  tenant    Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  project   Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  inspector User              @relation("inspectionsAssigned", fields: [inspectorId], references: [id], onDelete: Restrict)
+  createdBy User              @relation("inspectionsCreated", fields: [createdById], references: [id], onDelete: Restrict)
   findings  Finding[]
+  photos    InspectionPhoto[]
 
   @@unique([tenantId, code])
   @@index([tenantId])
@@ -404,8 +407,9 @@ model Finding {
   severity     FindingSeverity
   location     String?
 
-  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  tenant     Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  inspection Inspection        @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  photos     InspectionPhoto[]
 
   @@index([tenantId])
   @@index([inspectionId])
@@ -707,4 +711,49 @@ model AiMessage {
   @@index([tenantId])
   @@index([conversationId])
   @@map("ai_message")
+}
+
+// ── Sprint 10: Inspection Photos (sprint-10-domain-model.md) ────────────
+
+// Own enum, same values as BimVersionStatus — enums stay per-domain so
+// they can diverge (ratified in the domain model).
+enum PhotoStatus {
+  PENDING
+  READY
+
+  @@map("photo_status")
+}
+
+// Photographic evidence on an inspection (the Sprint 5 carry-over
+// unblocked by ADR-008). Sprint 8 upload lifecycle verbatim: born
+// PENDING, visible only once storage confirms. Editable/deletable only
+// while the inspection is SCHEDULED (API-enforced, like findings);
+// frozen with the completed report. findingId SetNull: deleting a
+// finding demotes its photos to general rather than losing evidence.
+// Own tenantId: RLS never joins (RFC-001).
+model InspectionPhoto {
+  id           String      @id @default(cuid())
+  tenantId     String
+  inspectionId String
+  findingId    String?
+  status       PhotoStatus @default(PENDING)
+  storageKey   String      @unique
+  fileName     String
+  fileSize     Int? // bytes; null until confirmed (15 MB cap fits Int)
+  contentType  String
+  caption      String?
+  position     Int
+  uploadedById String // audit only — authorization flows from Membership
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @default(now()) @updatedAt
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  finding    Finding?   @relation(fields: [findingId], references: [id], onDelete: SetNull)
+  uploadedBy User       @relation(fields: [uploadedById], references: [id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([inspectionId])
+  @@index([findingId])
+  @@map("inspection_photo")
 }
