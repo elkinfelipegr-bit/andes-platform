@@ -137,3 +137,20 @@ describe("headObject", () => {
     await expect(storage.headObject(KEY)).rejects.toThrow("denied");
   });
 });
+
+describe("deleteObject", () => {
+  it("sends a DeleteObject command for the key", async () => {
+    const sent: unknown[] = [];
+    const storage = createStorageClient(config, {
+      send: async (command: unknown) => {
+        sent.push(command);
+        return {};
+      },
+    } as unknown as S3Client);
+    await storage.deleteObject(KEY);
+    expect(sent).toHaveLength(1);
+    expect(
+      (sent[0] as { input: { Bucket: string; Key: string } }).input,
+    ).toEqual({ Bucket: config.bucket, Key: KEY });
+  });
+});
