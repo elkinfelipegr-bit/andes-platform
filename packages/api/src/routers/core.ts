@@ -13,6 +13,7 @@ import { calcRecordsRouter } from "./structures/index.js";
 import { geoRecordsRouter } from "./geo/index.js";
 import { bimModelsRouter } from "./bim/index.js";
 import { aiRouter } from "./ai/index.js";
+import { normsRouter } from "./norms/index.js";
 
 export const coreRouter = router({
   health: publicProcedure.query(() => ({ ok: true as const })),
@@ -63,6 +64,7 @@ export const appRouter = router({
   geoRecords: geoRecordsRouter,
   bimModels: bimModelsRouter,
   ai: aiRouter,
+  norms: normsRouter,
 });
 
 export type AppRouter = typeof appRouter;
