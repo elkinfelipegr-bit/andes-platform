@@ -1,7 +1,7 @@
 # Sprint 11 Domain Model — Norms Reference (Consulta de Normas)
 
 **Version:** 1.0
-**Status:** Draft — awaiting CTO ratification together with [sprint-11.md](../sprints/sprint-11.md)
+**Status:** Accepted — ratified by the CTO on 2026-07-13 together with [sprint-11.md](../sprints/sprint-11.md), including this model's five decisions.
 **Part of:** `docs/architecture/`, following the DDD workflow in [architecture-principles.md](../foundation/architecture-principles.md)
 
 ---
