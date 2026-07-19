@@ -1,6 +1,6 @@
 # Sprint 11 — Proposal
 
-**Status:** Proposed — awaiting CTO ratification
+**Status:** Accepted — ratified by the CTO on 2026-07-13 as proposed, including the domain model's five decisions.
 **Drafted:** 2026-07-13
 **Objective (proposed):** Norms Reference MVP — the firm's licensed standards (NSR-10, ACI 318-25) searchable inside the platform, with section-cited passages.
 

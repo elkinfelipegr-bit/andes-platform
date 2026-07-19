@@ -757,3 +757,49 @@ model InspectionPhoto {
   @@index([findingId])
   @@map("inspection_photo")
 }
+
+// ── Sprint 11: Norms Reference (sprint-11-domain-model.md) ──────────────
+
+// Platform-scoped reference content — the ratified RFC-001 exception:
+// NO tenantId (identical licensed content across the platform, like the
+// Tenant table itself is shared infrastructure). Enforcement is
+// inverted: andes_app holds SELECT-only grants (writes are structurally
+// impossible from the app); ingestion runs as the operator role via
+// `pnpm --filter @andes/db ingest-norms`. Copyright boundary: this text
+// exists ONLY in the private database — never repo, bundle, or URLs.
+model NormDocument {
+  id        String   @id @default(cuid())
+  key       String   @unique // nsr10, aci, aci-si, apendice-e
+  title     String
+  language  String // "spanish" | "english" — drives the FTS config
+  units     String // SI, US, SI+US
+  lineCount Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  chunks NormChunk[]
+
+  @@map("norm_document")
+}
+
+// One overlapping window of converted norm text (24 lines / 8 overlap —
+// the validated docs_Tec scheme) with stable line coordinates and the
+// nearest section locator, so every search result is citable.
+// searchVector is populated by the ingest script per the document's
+// language config (to_tsvector(lang, unaccent(content))) — not a
+// generated column, because unaccent/regconfig are not IMMUTABLE and
+// chunks are only ever written by ingestion anyway.
+model NormChunk {
+  id           String                   @id @default(cuid())
+  documentId   String
+  startLine    Int
+  endLine      Int
+  section      String?
+  content      String
+  searchVector Unsupported("tsvector")?
+
+  document NormDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, startLine])
+  @@map("norm_chunk")
+}
