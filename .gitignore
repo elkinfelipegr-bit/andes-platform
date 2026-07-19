@@ -23,3 +23,6 @@ packages/db/generated/
 
 # TypeScript incremental build artifacts
 *.tsbuildinfo
+
+# technical standards — copyrighted (ACI, NSR-10), local only
+docs_Tec/
