@@ -47,7 +47,9 @@ export function chunkLines(
     chunks.push({
       startLine: i + 1,
       endLine: end,
-      section: nearestLocator(lines, i),
+      // Anchor from the chunk's END backwards: a section header inside
+      // the chunk cites itself; otherwise the nearest preceding one.
+      section: nearestLocator(lines, end - 1),
       content: lines.slice(i, end).join("\n"),
     });
     if (end === n) break;

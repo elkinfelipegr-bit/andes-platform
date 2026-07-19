@@ -101,3 +101,8 @@ export {
   loadOwnConversation,
   type CopilotSessionCtx,
 } from "./routers/ai/service.js";
+export { normsRouter } from "./routers/norms/index.js";
+export {
+  normsSearchSchema,
+  normsRangeSchema,
+} from "./routers/norms/schemas.js";

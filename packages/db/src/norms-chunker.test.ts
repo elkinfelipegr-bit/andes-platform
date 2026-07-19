@@ -37,13 +37,14 @@ describe("chunkLines", () => {
     expect(chunks[0]!.content.split("\n")).toHaveLength(24);
   });
 
-  it("attaches the nearest preceding section locator", () => {
+  it("anchors the section from the chunk end backwards — in-chunk headers cite themselves", () => {
     const chunks = chunkLines(lines);
-    // chunk starting at line 17 looks back and finds A.6.4.1.4 (line 10)
+    // A.6.4.1.4 sits at line 10, inside the first chunk (1-24): cited.
+    expect(chunks[0]!.section).toBe("A.6.4.1.4");
+    // chunk 17-40 has no header inside; nearest preceding one wins.
     expect(chunks[1]!.section).toBe("A.6.4.1.4");
-    // first chunk starts before any locator upstream, but line 10 is
-    // inside look-forward? no — locator search is at-or-above start
-    expect(chunks[0]!.section).toBeNull();
+    // a document with no locator at all yields null
+    expect(chunkLines(["a", "b", "c"], 3, 1)[0]!.section).toBeNull();
   });
 
   it("round-trips content by line coordinates (getRange contract)", () => {
