@@ -8,7 +8,7 @@ import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { PrismaClient } from "@prisma/client";
 
-import { forTenant, forUser } from "./tenant-client.js";
+import { forInviteToken, forTenant, forUser } from "./tenant-client.js";
 
 const APP_URL = process.env.APP_DATABASE_URL;
 
@@ -652,6 +652,117 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
 
     await expect(
       forUser(app, userInA.id).inspectionPhoto.findMany(),
+    ).resolves.toHaveLength(0);
+  });
+
+  // ── Sprint 12: invitation + the forInviteToken bootstrap ──────────────
+  // Strict tier: a scoping bug here is cross-tenant onboarding.
+
+  it("invitation isolation: tenant-scoped reads, fail-closed, cross-tenant write denied", async () => {
+    const invitationA = await admin.invitation.create({
+      data: {
+        tenantId: tenantA.id,
+        email: `invitee-${run}@test.local`,
+        roleId: roleA.id,
+        token: `tok-a-${run}`,
+        expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000),
+        invitedById: userInA.id,
+      },
+    });
+
+    const seen = await forTenant(app, tenantA.id).invitation.findMany();
+    expect(seen.map((i) => i.id)).toContain(invitationA.id);
+
+    await expect(app.invitation.findMany()).resolves.toHaveLength(0);
+    await expect(
+      forTenant(app, tenantB.id).invitation.findMany(),
+    ).resolves.toHaveLength(0);
+
+    await expect(
+      forTenant(app, tenantB.id).invitation.create({
+        data: {
+          tenantId: tenantA.id,
+          email: `evil-${run}@test.local`,
+          roleId: roleA.id,
+          token: `tok-evil-${run}`,
+          expiresAt: new Date(Date.now() + 3600 * 1000),
+          invitedById: userInA.id,
+        },
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("forInviteToken exposes exactly one invitation (+ its tenant and role) and grants no writes", async () => {
+    const token = `tok-boot-${run}`;
+    const mine = await admin.invitation.create({
+      data: {
+        tenantId: tenantA.id,
+        email: `boot-${run}@test.local`,
+        roleId: roleA.id,
+        token,
+        expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000),
+        invitedById: userInA.id,
+      },
+    });
+    const otherToken = `tok-other-${run}`;
+    const other = await admin.invitation.create({
+      data: {
+        tenantId: tenantB.id,
+        email: `other-${run}@test.local`,
+        roleId: roleB.id,
+        token: otherToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000),
+        invitedById: userInA.id,
+      },
+    });
+
+    const scoped = forInviteToken(app, token);
+    const visible = await scoped.invitation.findMany();
+    // The security invariant: the token identity may see rows carrying
+    // THAT token and nothing else. Stated over the rows themselves (not
+    // a fixed id list) so any leaked row is named in the failure.
+    const foreign = visible.filter((i) => i.token !== token);
+    expect(
+      foreign.map((i) => ({ token: i.token, tenantId: i.tenantId })),
+    ).toEqual([]);
+    expect(visible.map((i) => i.id)).toContain(mine.id);
+    expect(visible.map((i) => i.id)).not.toContain(other.id);
+
+    // The offered role is readable so the accept screen can name it —
+    // and no other role is. (The tenant table is deliberately outside
+    // RLS since Sprint 0, so tenant reads are not asserted here: that
+    // authorization lives in the procedure, which only reaches the read
+    // after the presented token resolves to a real invitation.)
+    const roles = await scoped.role.findMany();
+    expect(roles.map((r) => r.id)).toEqual([roleA.id]);
+    expect(roles.map((r) => r.id)).not.toContain(roleB.id);
+
+    // No tenant data leaks through the bootstrap identity.
+    await expect(scoped.project.findMany()).resolves.toHaveLength(0);
+    await expect(scoped.membership.findMany()).resolves.toHaveLength(0);
+    await expect(scoped.client.findMany()).resolves.toHaveLength(0);
+
+    // And it grants NO writes: the token branch is SELECT-only, so a
+    // holder cannot self-grant a membership or mutate the invitation.
+    await expect(
+      scoped.membership.create({
+        data: {
+          tenantId: tenantA.id,
+          userId: userInA.id,
+          roleId: roleA.id,
+        },
+      }),
+    ).rejects.toThrow();
+    await expect(
+      scoped.invitation.updateMany({
+        where: { id: mine.id },
+        data: { status: "ACCEPTED" },
+      }),
+    ).resolves.toMatchObject({ count: 0 });
+
+    // A bogus token sees nothing at all.
+    await expect(
+      forInviteToken(app, `tok-nope-${run}`).invitation.findMany(),
     ).resolves.toHaveLength(0);
   });
 });
