@@ -7,7 +7,7 @@
 // able to lock itself out of its own account.
 import { randomBytes } from "node:crypto";
 import { TRPCError } from "@trpc/server";
-import { forInviteToken, forTenant, Prisma } from "@andes/db";
+import { forInviteToken, forTenant, forUser, Prisma } from "@andes/db";
 
 import {
   protectedProcedure,
@@ -314,8 +314,13 @@ export const adminRouter = router({
         });
       }
 
-      // One active tenant per user (Sprint 0 / RFC-001).
-      const existing = await ctx.db.membership.findFirst({
+      // One active tenant per user (Sprint 0 / RFC-001). Read through
+      // forUser: the unscoped client sees nothing under RLS (fails
+      // closed), which would silently wave every existing member through.
+      const existing = await forUser(
+        ctx.db,
+        ctx.session.userId,
+      ).membership.findFirst({
         where: { userId: ctx.session.userId },
         select: { tenantId: true },
       });
