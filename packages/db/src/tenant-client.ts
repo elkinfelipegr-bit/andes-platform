@@ -42,10 +42,14 @@ export function forUser(prisma: PrismaClient, userId: string) {
 
 // Invitation acceptance bootstrap (Sprint 12): the invitee has a session
 // but no tenant yet, so they cannot use forTenant. This exposes exactly
-// the one invitation row matching the presented token — plus, through
-// it, the offered tenant's name and role label (see the admin_rls
-// migration). Read-only by policy: writes stay tenant-scoped, so
-// acceptance re-scopes with forTenant once the token is validated.
+// the one invitation row matching the presented token, plus the offered
+// role label through it (see the admin_rls migration). Read-only by
+// policy: writes stay tenant-scoped, so acceptance re-scopes with
+// forTenant once the token is validated.
+//
+// The tenant name shown on the accept screen is NOT gated here — the
+// tenant table is deliberately outside RLS since Sprint 0; that read is
+// authorized by the procedure, which only runs after the token resolves.
 export function forInviteToken(prisma: PrismaClient, token: string) {
   return withSetting(prisma, "app.invite_token", token);
 }

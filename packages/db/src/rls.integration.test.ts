@@ -728,12 +728,14 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
     expect(visible.map((i) => i.id)).toContain(mine.id);
     expect(visible.map((i) => i.id)).not.toContain(other.id);
 
-    // The offered tenant + role are readable so the accept screen can
-    // name them — and nothing else is.
-    const tenants = await scoped.tenant.findMany();
-    expect(tenants.map((t) => t.id)).toEqual([tenantA.id]);
+    // The offered role is readable so the accept screen can name it —
+    // and no other role is. (The tenant table is deliberately outside
+    // RLS since Sprint 0, so tenant reads are not asserted here: that
+    // authorization lives in the procedure, which only reaches the read
+    // after the presented token resolves to a real invitation.)
     const roles = await scoped.role.findMany();
     expect(roles.map((r) => r.id)).toEqual([roleA.id]);
+    expect(roles.map((r) => r.id)).not.toContain(roleB.id);
 
     // No tenant data leaks through the bootstrap identity.
     await expect(scoped.project.findMany()).resolves.toHaveLength(0);
