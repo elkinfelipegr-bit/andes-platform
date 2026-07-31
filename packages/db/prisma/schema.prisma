@@ -40,6 +40,7 @@ model Tenant {
   aiConversations   AiConversation[]
   aiMessages        AiMessage[]
   inspectionPhotos  InspectionPhoto[]
+  invitations       Invitation[]
 
   @@map("tenant")
 }
@@ -74,6 +75,8 @@ model User {
   bimVersionsUploaded BimModelVersion[]
   aiConversations     AiConversation[]
   photosUploaded      InspectionPhoto[]
+  invitationsSent     Invitation[]      @relation("invitationsSent")
+  invitationsAccepted Invitation[]      @relation("invitationsAccepted")
 
   @@map("user")
 }
@@ -143,6 +146,7 @@ model Role {
 
   tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   memberships Membership[]
+  invitations Invitation[]
 
   @@unique([tenantId, key])
   @@index([tenantId])
@@ -167,6 +171,49 @@ model Membership {
   @@index([userId])
   @@index([tenantId])
   @@map("membership")
+}
+
+// ── Sprint 12: Administration — invitations (sprint-12-domain-model.md) ─
+
+// Forward-only: PENDING → ACCEPTED | REVOKED | EXPIRED. Terminal states
+// are kept as audit trail — invitations are never hard-deleted.
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+
+  @@map("invitation_status")
+}
+
+// A pending, revocable, expiring offer of membership. Email-bound and
+// role-bound; the token is high-entropy and single-use (consumed on
+// acceptance). The invitee has a session but no tenant yet, so the
+// token lookup rides forInviteToken — the forUser bootstrap pattern
+// (see the admin_rls migration); the membership it creates is written
+// under the invitation's own tenant scope, so no write path widens.
+model Invitation {
+  id               String           @id @default(cuid())
+  tenantId         String
+  email            String // stored lowercased; acceptance must match
+  roleId           String
+  token            String           @unique
+  status           InvitationStatus @default(PENDING)
+  expiresAt        DateTime
+  invitedById      String // audit only — authorization flows from Membership
+  acceptedByUserId String?
+  acceptedAt       DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @default(now()) @updatedAt
+
+  tenant         Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  role           Role   @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  invitedBy      User   @relation("invitationsSent", fields: [invitedById], references: [id], onDelete: Restrict)
+  acceptedByUser User?  @relation("invitationsAccepted", fields: [acceptedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId])
+  @@index([roleId])
+  @@map("invitation")
 }
 
 // ── Sprint 2: Projects domain (sprint-2-domain-model.md) ────────────────

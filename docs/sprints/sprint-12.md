@@ -1,6 +1,6 @@
 # Sprint 12 — Proposal
 
-**Status:** Proposed — awaiting CTO ratification
+**Status:** Accepted — ratified by the CTO on 2026-07-19 as proposed, including the domain model's five recommendations.
 **Drafted:** 2026-07-13
 **Objective (proposed):** Administration MVP — members list, role management, and self-service invitations by single-use link.
 
@@ -39,4 +39,4 @@ Zero new infrastructure, secrets, or cost. Only migrations to Neon. The CTO's wa
 
 - [sprint-12-domain-model.md](../architecture/sprint-12-domain-model.md) — the domain this sprint implements.
 - `sprint-0-domain-model.md`, [RFC-001](../rfc/0001-multi-tenant-architecture.md) — the identity model and invite process this operationalizes.
-- [sprint-10.md](sprint-10.md) — closed; [sprint-9.md](sprint-9.md) — executed, closure pending Copilot activation.
+- [sprint-11.md](sprint-11.md) — closed (Norms Reference); [sprint-9.md](sprint-9.md) — executed, closure pending Copilot activation.

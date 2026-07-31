@@ -1,7 +1,7 @@
 # Sprint 12 Domain Model — Administration: Members & Invitations
 
 **Version:** 1.0
-**Status:** Draft — awaiting CTO ratification together with [sprint-12.md](../sprints/sprint-12.md)
+**Status:** Accepted — ratified by the CTO on 2026-07-19 together with [sprint-12.md](../sprints/sprint-12.md), including this model's five recommendations.
 **Part of:** `docs/architecture/`, following the DDD workflow in [architecture-principles.md](../foundation/architecture-principles.md)
 
 ---
