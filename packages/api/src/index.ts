@@ -101,6 +101,13 @@ export {
   loadOwnConversation,
   type CopilotSessionCtx,
 } from "./routers/ai/service.js";
+export { adminRouter } from "./routers/admin/index.js";
+export {
+  createInvitationSchema,
+  changeRoleSchema,
+  inviteTokenSchema,
+  INVITE_TTL_DAYS,
+} from "./routers/admin/schemas.js";
 export { normsRouter } from "./routers/norms/index.js";
 export {
   normsSearchSchema,
