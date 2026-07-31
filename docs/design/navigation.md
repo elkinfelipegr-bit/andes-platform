@@ -29,17 +29,18 @@ Defines the authenticated shell every Andes product renders inside, and the navi
 
 ## Module → Route Map
 
-| Sidebar entry  | Product          | Route         | State               |
-| -------------- | ---------------- | ------------- | ------------------- |
-| Dashboard      | Andes Core       | `/dashboard`  | **Live** (Sprint 1) |
-| Projects       | Andes Projects   | `/projects`   | **Live** (Sprint 2) |
-| CRM            | Andes CRM        | `/crm`        | **Live** (Sprint 3) |
-| Structures     | Andes Structures | `/structures` | **Live** (Sprint 6) |
-| Geo            | Andes Geo        | `/geo`        | **Live** (Sprint 7) |
-| BIM            | Andes BIM        | `/bim`        | **Live** (Sprint 8) |
-| AI             | Andes AI         | `/ai`         | **Live** (Sprint 9) |
-| Analytics      | Andes Analytics  | `/analytics`  | Stub (disabled)     |
-| Administration | Andes Core       | `/admin`      | Stub (disabled)     |
+| Sidebar entry  | Product          | Route         | State                |
+| -------------- | ---------------- | ------------- | -------------------- |
+| Dashboard      | Andes Core       | `/dashboard`  | **Live** (Sprint 1)  |
+| Projects       | Andes Projects   | `/projects`   | **Live** (Sprint 2)  |
+| CRM            | Andes CRM        | `/crm`        | **Live** (Sprint 3)  |
+| Structures     | Andes Structures | `/structures` | **Live** (Sprint 6)  |
+| Geo            | Andes Geo        | `/geo`        | **Live** (Sprint 7)  |
+| BIM            | Andes BIM        | `/bim`        | **Live** (Sprint 8)  |
+| AI             | Andes AI         | `/ai`         | **Live** (Sprint 9)  |
+| Normas         | Andes Core       | `/normas`     | **Live** (Sprint 11) |
+| Analytics      | Andes Analytics  | `/analytics`  | Stub (disabled)      |
+| Administration | Andes Core       | `/admin`      | Stub (disabled)      |
 
 Routes are top-level segments (no `/core/...` prefix): products are one platform to the user; the monorepo package split ([ADR-004](../adr/0004-repository-structure.md)) is an implementation boundary, not a URL scheme.
 

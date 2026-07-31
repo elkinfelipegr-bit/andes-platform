@@ -70,15 +70,18 @@ async function main() {
         `→ ${doc.key}: ${lines.length.toLocaleString()} líneas, ${chunks.length.toLocaleString()} chunks`,
       );
 
+      // `file` is catalog-only metadata — never a column.
+      const fields = {
+        key: doc.key,
+        title: doc.title,
+        language: doc.language,
+        units: doc.units,
+        lineCount: lines.length,
+      };
       const record = await db.normDocument.upsert({
         where: { key: doc.key },
-        create: { ...doc, lineCount: lines.length },
-        update: {
-          title: doc.title,
-          language: doc.language,
-          units: doc.units,
-          lineCount: lines.length,
-        },
+        create: fields,
+        update: fields,
       });
       // Atomic-enough replacement for reference content: readers only
       // ever see a fully ingested document because search joins on the

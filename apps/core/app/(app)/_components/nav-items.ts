@@ -1,6 +1,7 @@
 // Module → route map from docs/design/navigation.md. The eight products
 // stay visible as disabled stubs until their sprint ships them.
 import {
+  BookOpen,
   Boxes,
   Building2,
   ChartColumn,
@@ -33,6 +34,7 @@ export const moduleNav: NavItem[] = [
   { label: "Geo", href: "/geo", icon: Mountain, enabled: true },
   { label: "BIM", href: "/bim", icon: Boxes, enabled: true },
   { label: "AI", href: "/ai", icon: Sparkles, enabled: true },
+  { label: "Normas", href: "/normas", icon: BookOpen, enabled: true },
   { label: "Analytics", href: "/analytics", icon: ChartColumn, enabled: false },
 ];
 
