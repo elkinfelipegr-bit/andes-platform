@@ -718,7 +718,14 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
 
     const scoped = forInviteToken(app, token);
     const visible = await scoped.invitation.findMany();
-    expect(visible.map((i) => i.id)).toEqual([mine.id]); // exactly one
+    // The security invariant: the token identity may see rows carrying
+    // THAT token and nothing else. Stated over the rows themselves (not
+    // a fixed id list) so any leaked row is named in the failure.
+    const foreign = visible.filter((i) => i.token !== token);
+    expect(
+      foreign.map((i) => ({ token: i.token, tenantId: i.tenantId })),
+    ).toEqual([]);
+    expect(visible.map((i) => i.id)).toContain(mine.id);
     expect(visible.map((i) => i.id)).not.toContain(other.id);
 
     // The offered tenant + role are readable so the accept screen can
