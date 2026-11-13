@@ -7,6 +7,15 @@ import { Button, Card, CardContent, CardHeader } from "@andes/ui";
 
 import { authClient } from "@/lib/auth-client";
 
+// Where to land after authenticating. Only the invitation acceptance
+// route may be requested (sprint-12.md scope item 3) — anything else,
+// including absolute or protocol-relative URLs, falls back to the
+// dashboard so `next` can never become an open redirect.
+function postLoginDestination(): string {
+  const next = new URLSearchParams(window.location.search).get("next");
+  return next && /^\/invite\/[A-Za-z0-9_-]+$/.test(next) ? next : "/dashboard";
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
@@ -29,7 +38,7 @@ export default function LoginPage() {
       setError(result.error.message ?? "Something went wrong.");
       return;
     }
-    router.push("/dashboard");
+    router.push(postLoginDestination());
     router.refresh();
   }
 

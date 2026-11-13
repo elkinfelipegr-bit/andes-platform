@@ -40,7 +40,7 @@ Defines the authenticated shell every Andes product renders inside, and the navi
 | AI             | Andes AI         | `/ai`         | **Live** (Sprint 9)  |
 | Normas         | Andes Core       | `/normas`     | **Live** (Sprint 11) |
 | Analytics      | Andes Analytics  | `/analytics`  | Stub (disabled)      |
-| Administration | Andes Core       | `/admin`      | Stub (disabled)      |
+| Administration | Andes Core       | `/admin`      | **Live** (Sprint 12) |
 
 Routes are top-level segments (no `/core/...` prefix): products are one platform to the user; the monorepo package split ([ADR-004](../adr/0004-repository-structure.md)) is an implementation boundary, not a URL scheme.
 
@@ -55,6 +55,10 @@ Implemented with a Next.js route group `(app)` whose layout owns the shell and t
 3. **Session + membership** → full shell; tenant + role always visible in the topbar.
 
 Role-based visibility (e.g. Administration only for `OWNER_ADMIN`) applies when those pages carry real functionality — stubs stay visible to everyone in Sprint 1.
+
+**Sprint 12 amendment:** Administration now carries real functionality, so the rule above applies — its sidebar entry renders for `OWNER_ADMIN` only, and `/admin` redirects any other role to `/dashboard`. Both are navigation courtesy; the gate is the admin router's `roleProcedure("OWNER_ADMIN")`.
+
+**Invitation landing (`/invite/[token]`, Sprint 12):** the one authenticated page that lives _outside_ the `(app)` shell, because its visitor usually has no account or no membership yet. No session → `/login?next=/invite/<token>`, and the login page returns there after sign-in/sign-up (`next` is honored only for `/invite/<token>` paths — never an arbitrary URL). State 2 above now reads "ask your firm's administrator for an invitation link"; the operator `link-member` script remains only for bootstrapping a tenant's first `OWNER_ADMIN`.
 
 ## References
 
