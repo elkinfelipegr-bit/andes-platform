@@ -1,5 +1,7 @@
 // Module → route map from docs/design/navigation.md. The eight products
 // stay visible as disabled stubs until their sprint ships them.
+// Administration is live since Sprint 12 and shown to OWNER_ADMIN only
+// (the sidebar decides visibility; the API enforces the role).
 import {
   BookOpen,
   Boxes,
@@ -42,5 +44,5 @@ export const adminNav: NavItem = {
   label: "Administration",
   href: "/admin",
   icon: Settings,
-  enabled: false,
+  enabled: true,
 };
