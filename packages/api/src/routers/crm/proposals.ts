@@ -26,6 +26,29 @@ const contactSummary = {
 const projectSummary = {
   select: { id: true, code: true, name: true },
 } as const;
+const opportunitySummary = {
+  select: { id: true, title: true, stage: true },
+} as const;
+
+// An opportunityId is user-controlled input: it must exist in this tenant
+// AND be the same client's (sprint-15-domain-model.md).
+async function assertOpportunityOfClient(
+  tenantDb: { opportunity: { findFirst(args: object): Promise<unknown> } },
+  tenantId: string,
+  clientId: string,
+  opportunityId: string,
+) {
+  const opportunity = await tenantDb.opportunity.findFirst({
+    where: { id: opportunityId, tenantId, clientId },
+    select: { id: true },
+  });
+  if (!opportunity) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Opportunity not found for this client.",
+    });
+  }
+}
 
 function isUniqueViolation(e: unknown): boolean {
   return (
@@ -100,6 +123,7 @@ export const proposalsRouter = router({
         client: clientSummary,
         contact: contactSummary,
         project: projectSummary,
+        opportunity: opportunitySummary,
         items: { orderBy: { position: "asc" } },
       },
     });
@@ -122,6 +146,14 @@ export const proposalsRouter = router({
           ctx.tenantId,
           input.clientId,
           contactId,
+        );
+      }
+      if (input.opportunityId) {
+        await assertOpportunityOfClient(
+          ctx.tenantDb,
+          ctx.tenantId,
+          input.clientId,
+          input.opportunityId,
         );
       }
       try {
@@ -226,7 +258,11 @@ export const proposalsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const existing = await ctx.tenantDb.proposal.findFirst({
         where: { id: input.id, tenantId: ctx.tenantId },
-        select: { status: true, _count: { select: { items: true } } },
+        select: {
+          status: true,
+          opportunityId: true,
+          _count: { select: { items: true } },
+        },
       });
       if (!existing) throw new TRPCError({ code: "NOT_FOUND" });
       if (existing.status !== "DRAFT") {
@@ -243,8 +279,20 @@ export const proposalsRouter = router({
       }
       await ctx.tenantDb.proposal.updateMany({
         where: { id: input.id, tenantId: ctx.tenantId },
-        data: { status: "SENT" },
+        data: { status: "SENT", sentAt: new Date() },
       });
+      // Sprint 15 automation: a quote went out, so an opportunity that
+      // was still early moves to QUOTED. Later stages are left alone.
+      if (existing.opportunityId) {
+        await ctx.tenantDb.opportunity.updateMany({
+          where: {
+            id: existing.opportunityId,
+            tenantId: ctx.tenantId,
+            stage: { in: ["LEAD", "CONTACTED"] },
+          },
+          data: { stage: "QUOTED" },
+        });
+      }
       return { id: input.id, status: "SENT" as const };
     }),
 
@@ -253,7 +301,7 @@ export const proposalsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const existing = await ctx.tenantDb.proposal.findFirst({
         where: { id: input.id, tenantId: ctx.tenantId },
-        select: { status: true },
+        select: { status: true, opportunityId: true },
       });
       if (!existing) throw new TRPCError({ code: "NOT_FOUND" });
       if (existing.status !== "SENT") {
@@ -264,8 +312,26 @@ export const proposalsRouter = router({
       }
       await ctx.tenantDb.proposal.updateMany({
         where: { id: input.id, tenantId: ctx.tenantId },
-        data: { status: input.decision },
+        data: { status: input.decision, decidedAt: new Date() },
       });
+      // Sprint 15 automation: an accepted quote wins its open
+      // opportunity. A rejection does not lose it — a revised quote is
+      // common, so that call stays with the user.
+      if (input.decision === "ACCEPTED" && existing.opportunityId) {
+        await ctx.tenantDb.opportunity.updateMany({
+          where: {
+            id: existing.opportunityId,
+            tenantId: ctx.tenantId,
+            stage: { in: ["LEAD", "CONTACTED", "QUOTED", "NEGOTIATION"] },
+          },
+          data: {
+            stage: "WON",
+            closedAt: new Date(),
+            nextAction: null,
+            nextActionAt: null,
+          },
+        });
+      }
       return { id: input.id, status: input.decision };
     }),
 
@@ -285,7 +351,7 @@ export const proposalsRouter = router({
       }
       await ctx.tenantDb.proposal.updateMany({
         where: { id: input.id, tenantId: ctx.tenantId },
-        data: { status: "EXPIRED" },
+        data: { status: "EXPIRED", decidedAt: new Date() },
       });
       return { id: input.id, status: "EXPIRED" as const };
     }),

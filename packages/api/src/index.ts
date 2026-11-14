@@ -32,6 +32,23 @@ export {
   proposalItemInputSchema,
 } from "./routers/crm/proposal-schemas.js";
 export { proposalTotal } from "./routers/crm/proposal-total.js";
+export { opportunitiesRouter } from "./routers/crm/opportunities.js";
+export {
+  OPPORTUNITY_STAGES,
+  OPEN_STAGES,
+  ACTIVITY_TYPES,
+  opportunityStageSchema,
+  activityTypeSchema,
+  opportunityCreateSchema,
+  opportunityUpdateSchema,
+  opportunitySetStageSchema,
+  activityLogSchema,
+} from "./routers/crm/opportunity-schemas.js";
+export {
+  FOLLOW_UP_STATES,
+  followUpState,
+  type FollowUpState,
+} from "./routers/crm/follow-up.js";
 export { inspectionsRouter } from "./routers/projects/inspections.js";
 export {
   INSPECTION_STATUSES,

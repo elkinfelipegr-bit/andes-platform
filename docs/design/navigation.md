@@ -44,7 +44,7 @@ Defines the authenticated shell every Andes product renders inside, and the navi
 
 Routes are top-level segments (no `/core/...` prefix): products are one platform to the user; the monorepo package split ([ADR-004](../adr/0004-repository-structure.md)) is an implementation boundary, not a URL scheme.
 
-**In-module navigation (Sprint 4 amendment):** functional modules of a product live under that product's segment with tab navigation inside the page — the sidebar stays one-entry-per-product. Cases: Andes CRM's Proposal Generator at `/crm/proposals` (tabs: Clients | Proposals, Sprint 4) and Andes Projects' Inspection Module at `/projects/inspections` (tabs: Projects | Inspections, Sprint 5). The shell (sidebar, topbar) and in-module chrome are `print:hidden` so document views (proposal print view, inspection report) print clean.
+**In-module navigation (Sprint 4 amendment):** functional modules of a product live under that product's segment with tab navigation inside the page — the sidebar stays one-entry-per-product. Cases: Andes CRM's Proposal Generator at `/crm/proposals` (Sprint 4) and its Pipeline at `/crm/pipeline` (Sprint 15 — tabs are now Pipeline | Clients | Proposals; `/crm` itself remains the clients list) and Andes Projects' Inspection Module at `/projects/inspections` (tabs: Projects | Inspections, Sprint 5). The shell (sidebar, topbar) and in-module chrome are `print:hidden` so document views (proposal print view, inspection report) print clean.
 
 ## Access States
 
