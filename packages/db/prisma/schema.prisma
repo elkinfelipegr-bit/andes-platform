@@ -22,25 +22,27 @@ model Tenant {
   slug      String   @unique
   createdAt DateTime @default(now())
 
-  roles             Role[]
-  memberships       Membership[]
-  clients           Client[]
-  projects          Project[]
-  contacts          Contact[]
-  proposals         Proposal[]
-  proposalItems     ProposalItem[]
-  inspections       Inspection[]
-  findings          Finding[]
-  calcRecords       CalcRecord[]
-  beamFlexureChecks BeamFlexureCheck[]
-  geoRecords        GeoRecord[]
-  bearingChecks     BearingCheck[]
-  bimModels         BimModel[]
-  bimModelVersions  BimModelVersion[]
-  aiConversations   AiConversation[]
-  aiMessages        AiMessage[]
-  inspectionPhotos  InspectionPhoto[]
-  invitations       Invitation[]
+  roles                 Role[]
+  memberships           Membership[]
+  clients               Client[]
+  projects              Project[]
+  contacts              Contact[]
+  proposals             Proposal[]
+  proposalItems         ProposalItem[]
+  inspections           Inspection[]
+  findings              Finding[]
+  calcRecords           CalcRecord[]
+  beamFlexureChecks     BeamFlexureCheck[]
+  geoRecords            GeoRecord[]
+  bearingChecks         BearingCheck[]
+  bimModels             BimModel[]
+  bimModelVersions      BimModelVersion[]
+  aiConversations       AiConversation[]
+  aiMessages            AiMessage[]
+  inspectionPhotos      InspectionPhoto[]
+  invitations           Invitation[]
+  opportunities         Opportunity[]
+  opportunityActivities OpportunityActivity[]
 
   @@map("tenant")
 }
@@ -62,21 +64,24 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now()) @updatedAt
 
-  memberships         Membership[]
-  sessions            Session[]
-  accounts            Account[]
-  projectsCreated     Project[]
-  proposalsCreated    Proposal[]
-  inspectionsAssigned Inspection[]      @relation("inspectionsAssigned")
-  inspectionsCreated  Inspection[]      @relation("inspectionsCreated")
-  calcRecordsCreated  CalcRecord[]
-  geoRecordsCreated   GeoRecord[]
-  bimModelsCreated    BimModel[]
-  bimVersionsUploaded BimModelVersion[]
-  aiConversations     AiConversation[]
-  photosUploaded      InspectionPhoto[]
-  invitationsSent     Invitation[]      @relation("invitationsSent")
-  invitationsAccepted Invitation[]      @relation("invitationsAccepted")
+  memberships          Membership[]
+  sessions             Session[]
+  accounts             Account[]
+  projectsCreated      Project[]
+  proposalsCreated     Proposal[]
+  inspectionsAssigned  Inspection[]          @relation("inspectionsAssigned")
+  inspectionsCreated   Inspection[]          @relation("inspectionsCreated")
+  calcRecordsCreated   CalcRecord[]
+  geoRecordsCreated    GeoRecord[]
+  bimModelsCreated     BimModel[]
+  bimVersionsUploaded  BimModelVersion[]
+  aiConversations      AiConversation[]
+  photosUploaded       InspectionPhoto[]
+  invitationsSent      Invitation[]          @relation("invitationsSent")
+  invitationsAccepted  Invitation[]          @relation("invitationsAccepted")
+  opportunitiesOwned   Opportunity[]         @relation("opportunitiesOwned")
+  opportunitiesCreated Opportunity[]         @relation("opportunitiesCreated")
+  activitiesLogged     OpportunityActivity[]
 
   @@map("user")
 }
@@ -241,10 +246,11 @@ model Client {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @default(now()) @updatedAt
 
-  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  projects  Project[]
-  contacts  Contact[]
-  proposals Proposal[]
+  tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  projects      Project[]
+  contacts      Contact[]
+  proposals     Proposal[]
+  opportunities Opportunity[]
 
   @@index([tenantId])
   @@map("client")
@@ -267,9 +273,10 @@ model Contact {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  tenant    Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  client    Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  proposals Proposal[]
+  tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  client        Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  proposals     Proposal[]
+  opportunities Opportunity[]
 
   @@index([tenantId])
   @@index([clientId])
@@ -296,31 +303,36 @@ enum ProposalStatus {
 // saw) and proposals are never hard-deleted: they are the firm's
 // commercial record. projectId is stamped by conversion, at most once.
 model Proposal {
-  id          String         @id @default(cuid())
-  tenantId    String
-  clientId    String
-  contactId   String? // optional recipient — must belong to the client
-  projectId   String?        @unique
-  code        String // human-assigned, unique per tenant (project precedent)
-  title       String
-  scope       String?
-  currency    String         @default("COP")
-  validUntil  DateTime?
-  status      ProposalStatus @default(DRAFT)
-  createdById String // audit only — authorization flows from Membership
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @default(now()) @updatedAt
+  id            String         @id @default(cuid())
+  tenantId      String
+  clientId      String
+  contactId     String? // optional recipient — must belong to the client
+  projectId     String?        @unique
+  opportunityId String? // Sprint 15: the opportunity this quote belongs to
+  code          String // human-assigned, unique per tenant (project precedent)
+  title         String
+  scope         String?
+  currency      String         @default("COP")
+  validUntil    DateTime?
+  status        ProposalStatus @default(DRAFT)
+  sentAt        DateTime? // Sprint 15: stamped by send; null for earlier rows
+  decidedAt     DateTime? // Sprint 15: stamped by decide / markExpired
+  createdById   String // audit only — authorization flows from Membership
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now()) @updatedAt
 
-  tenant    Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  client    Client         @relation(fields: [clientId], references: [id], onDelete: Restrict)
-  contact   Contact?       @relation(fields: [contactId], references: [id], onDelete: SetNull)
-  project   Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  createdBy User           @relation(fields: [createdById], references: [id], onDelete: Restrict)
-  items     ProposalItem[]
+  tenant      Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  client      Client         @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  contact     Contact?       @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  project     Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  createdBy   User           @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  opportunity Opportunity?   @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  items       ProposalItem[]
 
   @@unique([tenantId, code])
   @@index([tenantId])
   @@index([clientId])
+  @@index([opportunityId])
   @@map("proposal")
 }
 
@@ -849,4 +861,85 @@ model NormChunk {
 
   @@index([documentId, startLine])
   @@map("norm_chunk")
+}
+
+// ── Sprint 15: CRM pipeline (sprint-15-domain-model.md) ─────────────────
+
+enum OpportunityStage {
+  LEAD
+  CONTACTED
+  QUOTED
+  NEGOTIATION
+  WON
+  LOST
+
+  @@map("opportunity_stage")
+}
+
+enum ActivityType {
+  NOTE
+  CALL
+  EMAIL
+  MEETING
+  WHATSAPP
+  VISIT
+
+  @@map("activity_type")
+}
+
+// One potential engagement with one client — the unit of commercial
+// follow-up. A prospect is a Client that has not bought yet (no separate
+// Lead entity). Stages move freely, unlike the proposal's forward-only
+// lifecycle; closedAt is stamped on WON/LOST and cleared on reopen.
+model Opportunity {
+  id             String           @id @default(cuid())
+  tenantId       String
+  clientId       String
+  contactId      String? // must belong to the client
+  title          String
+  stage          OpportunityStage @default(LEAD)
+  estimatedValue Decimal?         @db.Decimal(14, 2)
+  currency       String           @default("COP")
+  source         String?
+  ownerId        String // must be a member of the tenant
+  nextAction     String?
+  nextActionAt   DateTime?
+  lostReason     String?
+  closedAt       DateTime?
+  createdById    String // audit only
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now()) @updatedAt
+
+  tenant     Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  client     Client                @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  contact    Contact?              @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  owner      User                  @relation("opportunitiesOwned", fields: [ownerId], references: [id], onDelete: Restrict)
+  createdBy  User                  @relation("opportunitiesCreated", fields: [createdById], references: [id], onDelete: Restrict)
+  activities OpportunityActivity[]
+  proposals  Proposal[]
+
+  @@index([tenantId])
+  @@index([clientId])
+  @@map("opportunity")
+}
+
+// One logged interaction — append-only. Carries its own tenantId: RLS
+// never scopes through a join (RFC-001).
+model OpportunityActivity {
+  id            String       @id @default(cuid())
+  tenantId      String
+  opportunityId String
+  type          ActivityType @default(NOTE)
+  body          String
+  occurredAt    DateTime     @default(now())
+  createdById   String
+  createdAt     DateTime     @default(now())
+
+  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  createdBy   User        @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([opportunityId])
+  @@map("opportunity_activity")
 }
