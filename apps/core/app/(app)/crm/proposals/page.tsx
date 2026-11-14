@@ -29,7 +29,13 @@ import {
   TableRow,
 } from "@andes/ui";
 
-import { formatDate, formatMoney } from "@/lib/format";
+import {
+  daysBetween,
+  formatDate,
+  formatMoney,
+  localDay,
+  toDay,
+} from "@/lib/format";
 import { trpc } from "@/lib/trpc";
 
 import { CrmNav } from "../_components/crm-nav";
@@ -236,6 +242,7 @@ export default function ProposalsPage() {
               <TableHead>Client</TableHead>
               <TableHead className="text-right">Total</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Sent</TableHead>
               <TableHead>Valid until</TableHead>
             </TableRow>
           </TableHeader>
@@ -264,6 +271,21 @@ export default function ProposalsPage() {
                 </TableCell>
                 <TableCell>
                   <ProposalStatusBadge status={proposal.status} />
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {proposal.sentAt ? (
+                    <>
+                      {formatDate(proposal.sentAt)}
+                      {proposal.status === "SENT" && (
+                        <span className="block text-xs">
+                          waiting{" "}
+                          {daysBetween(toDay(proposal.sentAt), localDay())} d
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    "—"
+                  )}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {formatDate(proposal.validUntil)}

@@ -554,7 +554,25 @@ export default function ProposalDetailPage() {
             >
               {p.client.name}
             </Link>
+            {p.opportunity && (
+              <>
+                {" · "}
+                <Link
+                  href={`/crm/pipeline/${p.opportunity.id}`}
+                  className="underline-offset-2 hover:text-primary hover:underline"
+                >
+                  Opportunity: {p.opportunity.title}
+                </Link>
+              </>
+            )}
           </p>
+          {(p.sentAt || p.decidedAt) && (
+            <p className="text-xs text-muted-foreground">
+              {p.sentAt ? `Sent ${formatDate(p.sentAt)}` : ""}
+              {p.sentAt && p.decidedAt ? " · " : ""}
+              {p.decidedAt ? `Closed ${formatDate(p.decidedAt)}` : ""}
+            </p>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
