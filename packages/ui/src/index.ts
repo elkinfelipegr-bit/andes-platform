@@ -45,3 +45,9 @@ export {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "./components/dropdown-menu.js";
+export {
+  BarChart,
+  type BarChartProps,
+  type BarChartSeries,
+  type ChartTone,
+} from "./components/bar-chart.js";

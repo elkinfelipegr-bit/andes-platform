@@ -1,6 +1,6 @@
 # Sprint 14 — Proposal
 
-**Status:** Proposed — awaiting CTO ratification. Independent of [ADR-010](../adr/0010-numerical-service.md) and of Sprint 13: it needs no new technology and can run before or after.
+**Status:** Executed ahead of ratification — the CTO delegated design decisions on 2026-11-13 ("proceed, I validate everything at the end"). Implemented as proposed, with the deviations listed under "Implementation Notes". Closure is pending the CTO's validation of the six recommendations in the domain model.
 **Drafted:** 2026-11-13
 **Objective (proposed):** Analytics MVP — the firm's indicators over a period, read from what the platform already records.
 
@@ -33,6 +33,14 @@ Unit: every indicator definition against fixtures. Integration: each router proc
 ## Rollout Notes
 
 No migrations, secrets or infrastructure. Performance is expected to be a non-issue at one firm's data volume; the domain model records the trigger for revisiting it.
+
+## Implementation Notes (added during the build)
+
+- **Built on top of Sprint 15.** That sprint added `Proposal.sentAt` / `decidedAt`, so the "days to decision" indicator this plan had left out is included — computed only over proposals that carry both dates, never approximated from `updatedAt`.
+- **No raw SQL.** Sums are done by the indicator library over rows read with model operations, because the tenant setting RLS keys on is applied to model operations only. Same isolation guarantee, simpler to test.
+- **One chart component, not three.** `BarChart` (grouped or stacked) in `@andes/ui` covers every chart on the page; a line chart was not needed.
+- **Drill-down opens the list unfiltered.** The list screens take no filter from the URL today; passing the period into them is a follow-up.
+- **Client filter** on inspections and engineering records goes through the record's project.
 
 ## Open Decisions for the CTO
 

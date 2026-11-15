@@ -1,7 +1,7 @@
 # Sprint 14 Domain Model — Analytics: Firm Indicators
 
 **Version:** 1.0
-**Status:** Proposed — drafted for CTO ratification together with [sprint-14.md](../sprints/sprint-14.md). Nothing here is implemented or binding until accepted.
+**Status:** Proposed — implemented ahead of ratification under the CTO's delegation of 2026-11-13; see [sprint-14.md](../sprints/sprint-14.md). Not binding until the CTO accepts the six recommendations below.
 **Part of:** `docs/architecture/`, following the DDD workflow in [architecture-principles.md](../foundation/architecture-principles.md)
 
 ---

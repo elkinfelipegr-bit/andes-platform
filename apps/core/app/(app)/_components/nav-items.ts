@@ -35,7 +35,7 @@ export const moduleNav: NavItem[] = [
   { label: "BIM", href: "/bim", icon: Boxes, enabled: true },
   { label: "AI", href: "/ai", icon: Sparkles, enabled: true },
   { label: "Normas", href: "/normas", icon: BookOpen, enabled: true },
-  { label: "Analytics", href: "/analytics", icon: ChartColumn, enabled: false },
+  { label: "Analytics", href: "/analytics", icon: ChartColumn, enabled: true },
 ];
 
 export const adminNav: NavItem = {
