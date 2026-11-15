@@ -24,7 +24,7 @@ How does a request captured on the public website become an opportunity in the p
 2. **Authenticated by a shared secret,** `LEAD_INTAKE_KEY`, sent as a bearer token and compared in constant time. The website's _server action_ holds it; it never reaches a browser.
 3. **The tenant comes from server configuration,** `LEAD_INTAKE_TENANT_ID` — never from the request. Every read and write goes through `forTenant`, so both [RFC-001](../rfc/0001-multi-tenant-architecture.md) layers apply as for a signed-in member. Unknown request fields are dropped by the schema.
 4. **Closed by default.** With either variable unset the endpoint answers 503 and records nothing; a key shorter than 24 characters is treated as unset.
-5. **What a lead becomes:** a `Client` (reused when an active client of the same tenant has the same email), an `Opportunity` in `LEAD` owned by the tenant's first `OWNER_ADMIN`, with next step "Reply to the website request" due today, and the message as its first activity.
+5. **What a lead becomes:** a `Client` (reused when an active client of the same tenant has the same email), an `Opportunity` in `LEAD` owned by the tenant's first `OWNER_ADMIN`, with next step "Responder la solicitud del sitio web" due today (records are written in Spanish, the interface language), and the message as its first activity.
 6. **The email stays.** The website keeps sending its notification email; the platform call is additional and its failure must never fail the visitor's request.
 
 ## Alternatives

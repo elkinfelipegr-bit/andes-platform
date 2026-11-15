@@ -92,7 +92,7 @@ describe.skipIf(!APP_URL)("lead intake (integration)", () => {
       title: lead.subject,
       source: "Website · Lot planner",
       ownerId: owner.id,
-      nextAction: "Reply to the website request",
+      nextAction: "Responder la solicitud del sitio web",
     });
     expect(o.nextActionAt?.toISOString().slice(0, 10)).toBe(
       new Date().toISOString().slice(0, 10),

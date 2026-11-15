@@ -88,7 +88,7 @@ export async function intakeLead(
         name: input.company ?? input.name,
         email: input.email,
         phone: input.phone,
-        notes: `Created from a website request by ${input.name}.`,
+        notes: `Creado desde una solicitud del sitio web de ${input.name}.`,
       },
       select: { id: true },
     }));
@@ -99,12 +99,12 @@ export async function intakeLead(
       tenantId,
       clientId: client.id,
       title: input.subject,
-      source: input.source ?? "Website",
+      source: input.source ?? "Sitio web",
       ownerId: owner.userId,
       createdById: owner.userId,
       // A lead nobody answers is the failure this exists to prevent: it
       // enters the agenda as due today.
-      nextAction: "Reply to the website request",
+      nextAction: "Responder la solicitud del sitio web",
       nextActionAt: today,
       activities: {
         create: [
@@ -112,9 +112,9 @@ export async function intakeLead(
             tenantId,
             type: "NOTE",
             body: [
-              `Website request from ${input.name}`,
-              input.email ? `Email: ${input.email}` : null,
-              input.phone ? `Phone: ${input.phone}` : null,
+              `Solicitud del sitio web de ${input.name}`,
+              input.email ? `Correo: ${input.email}` : null,
+              input.phone ? `Teléfono: ${input.phone}` : null,
               "",
               input.message,
             ]
