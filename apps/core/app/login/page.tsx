@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button, Card, CardContent, CardHeader } from "@andes/ui";
@@ -11,9 +11,14 @@ import { authClient } from "@/lib/auth-client";
 // route may be requested (sprint-12.md scope item 3) — anything else,
 // including absolute or protocol-relative URLs, falls back to the
 // dashboard so `next` can never become an open redirect.
-function postLoginDestination(): string {
+function invitePath(): string | null {
+  if (typeof window === "undefined") return null;
   const next = new URLSearchParams(window.location.search).get("next");
-  return next && /^\/invite\/[A-Za-z0-9_-]+$/.test(next) ? next : "/dashboard";
+  return next && /^\/invite\/[A-Za-z0-9_-]+$/.test(next) ? next : null;
+}
+
+function postLoginDestination(): string {
+  return invitePath() ?? "/dashboard";
 }
 
 export default function LoginPage() {
@@ -24,6 +29,15 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Only someone arriving from an invitation link may create an account.
+  const [inviteToken, setInviteToken] = useState<string | null>(null);
+  useEffect(() => {
+    const path = invitePath();
+    if (path) {
+      setInviteToken(path.slice("/invite/".length));
+      setMode("sign-up");
+    }
+  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,7 +46,16 @@ export default function LoginPage() {
     const result =
       mode === "sign-in"
         ? await authClient.signIn.email({ email, password })
-        : await authClient.signUp.email({ email, password, name });
+        : await authClient.signUp.email({
+            email,
+            password,
+            name,
+            // Registration is by invitation only (ADR-013): the server
+            // checks this token against the email being registered.
+            fetchOptions: {
+              headers: { "x-invite-token": inviteToken ?? "" },
+            },
+          });
     setBusy(false);
     if (result.error) {
       setError(result.error.message ?? "Algo salió mal.");
@@ -107,15 +130,24 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <button
-            type="button"
-            onClick={() => setMode(mode === "sign-in" ? "sign-up" : "sign-in")}
-            className="mt-4 text-sm text-muted-foreground underline-offset-2 hover:underline"
-          >
-            {mode === "sign-in"
-              ? "¿Aún no tienes cuenta? Regístrate"
-              : "¿Ya tienes cuenta? Inicia sesión"}
-          </button>
+          {inviteToken ? (
+            <button
+              type="button"
+              onClick={() =>
+                setMode(mode === "sign-in" ? "sign-up" : "sign-in")
+              }
+              className="mt-4 text-sm text-muted-foreground underline-offset-2 hover:underline"
+            >
+              {mode === "sign-in"
+                ? "¿Aún no tienes cuenta? Regístrate"
+                : "¿Ya tienes cuenta? Inicia sesión"}
+            </button>
+          ) : (
+            <p className="mt-4 text-sm text-muted-foreground">
+              El acceso es por invitación. Si aún no tienes cuenta, pídele al
+              administrador de tu firma un enlace de invitación.
+            </p>
+          )}
         </CardContent>
       </Card>
     </main>

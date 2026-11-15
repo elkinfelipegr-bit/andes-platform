@@ -5,3 +5,8 @@ export {
   type ActiveMembership,
   type MembershipReader,
 } from "./membership.js";
+export {
+  decideSignUp,
+  parseAllowlist,
+  type SignUpDecision,
+} from "./signup-gate.js";
