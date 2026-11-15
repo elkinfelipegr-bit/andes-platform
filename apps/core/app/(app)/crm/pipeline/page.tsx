@@ -466,7 +466,7 @@ export default function PipelinePage() {
               </div>
             </div>
 
-            <div className="-mx-8 overflow-x-auto px-8 pb-2">
+            <div className="overflow-x-auto pb-2">
               <div className="grid min-w-[56rem] grid-cols-4 gap-3">
                 {OPEN_STAGES.map((stage) => {
                   const cards = filtered.filter((o) => o.stage === stage);
