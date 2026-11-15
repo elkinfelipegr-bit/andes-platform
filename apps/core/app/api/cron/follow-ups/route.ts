@@ -3,9 +3,15 @@
 // through Resend's HTTP API — no SDK dependency. Unconfigured, it does
 // nothing and says so.
 import {
+  buildFirmReport,
   buildFollowUpDigests,
   isValidCronSecret,
+  mailConfigFromEnv,
   renderDigest,
+  renderFirmReport,
+  reportHasContent,
+  reportRecipients,
+  sendMail,
 } from "@andes/api";
 import { prisma } from "@andes/db";
 
@@ -36,42 +42,40 @@ export async function GET(req: Request) {
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.DIGEST_FROM_EMAIL;
-  const baseUrl = process.env.BETTER_AUTH_URL;
-  if (tenantIds.length === 0 || !apiKey || !from || !baseUrl) {
+  const config = mailConfigFromEnv(process.env);
+  if (tenantIds.length === 0 || !config) {
     return Response.json({ status: "unconfigured", sent: 0 });
   }
 
-  const override = process.env.DIGEST_TO_EMAIL || undefined;
+  // With recipients configured, the firm gets ONE report (sprint-16);
+  // otherwise each member gets their own digest (ADR-012).
+  const recipients = reportRecipients(process.env.DIGEST_TO_EMAIL);
   const today = todayIn(process.env.DIGEST_TIME_ZONE ?? "America/Bogota");
   let sent = 0;
   let failed = 0;
+  const count = (ok: boolean) => (ok ? (sent += 1) : (failed += 1));
   for (const tenantId of tenantIds) {
+    if (recipients.length > 0) {
+      const report = await buildFirmReport(prisma, tenantId, today, new Date());
+      // Nothing pending → no email: a daily "all clear" trains people to
+      // stop opening it.
+      if (!reportHasContent(report)) continue;
+      count(
+        await sendMail(config, {
+          to: recipients,
+          ...renderFirmReport(report, config.baseUrl),
+        }),
+      );
+      continue;
+    }
     const digests = await buildFollowUpDigests(prisma, tenantId, today);
     for (const digest of digests) {
-      const { subject, text, html } = renderDigest(digest, baseUrl);
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from,
-          // DIGEST_TO_EMAIL routes every digest to one shared inbox (ADR-012,
-          // Exceptions) — the member's name then goes in the subject.
-          to: [override ?? digest.email],
-          subject: override ? `${digest.name}: ${subject}` : subject,
-          text,
-          html,
+      count(
+        await sendMail(config, {
+          to: [digest.email],
+          ...renderDigest(digest, config.baseUrl),
         }),
-      });
-      if (res.ok) sent += 1;
-      else {
-        failed += 1;
-        console.error(`[follow-up-digest] Resend answered ${res.status}`);
-      }
+      );
     }
   }
   return Response.json({ status: "ok", today, sent, failed });

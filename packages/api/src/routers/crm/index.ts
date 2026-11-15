@@ -68,10 +68,32 @@ export const clientsRouter = router({
           select: { id: true, code: true, title: true, status: true },
           orderBy: { createdAt: "desc" },
         },
+        // Sprint 16: the client's commercial history on its own page.
+        opportunities: {
+          select: {
+            id: true,
+            title: true,
+            stage: true,
+            estimatedValue: true,
+            currency: true,
+            nextAction: true,
+            nextActionAt: true,
+            closedAt: true,
+            createdAt: true,
+          },
+          orderBy: { createdAt: "desc" },
+        },
       },
     });
     if (!client) throw new TRPCError({ code: "NOT_FOUND" });
-    return client;
+    return {
+      ...client,
+      opportunities: client.opportunities.map((o) => ({
+        ...o,
+        estimatedValue:
+          o.estimatedValue === null ? null : o.estimatedValue.toNumber(),
+      })),
+    };
   }),
 
   create: tenantProcedure.input(clientCreateSchema).mutation(({ ctx, input }) =>
@@ -94,7 +116,37 @@ export const clientsRouter = router({
       });
     }),
 
-  // Never deletes: projects reference clients and history survives
+  // Hard delete, OWNER_ADMIN only (sprint-16-domain-model.md) — for a
+  // client created by mistake or as a test. Removes the client with its
+  // contacts, opportunities (and their activity) and proposals (and their
+  // items). Its projects are kept and left without a client: engineering
+  // records are never removed as a side effect. Archive stays the normal
+  // way to retire a real client.
+  delete: roleProcedure("OWNER_ADMIN")
+    .input(clientIdSchema)
+    .mutation(async ({ ctx, input }) => {
+      const where = { clientId: input.id, tenantId: ctx.tenantId };
+      const client = await ctx.tenantDb.client.findFirst({
+        where: { id: input.id, tenantId: ctx.tenantId },
+        select: { id: true },
+      });
+      if (!client) throw new TRPCError({ code: "NOT_FOUND" });
+      // Proposals first: they reference opportunities and the client.
+      const proposals = await ctx.tenantDb.proposal.deleteMany({ where });
+      const opportunities = await ctx.tenantDb.opportunity.deleteMany({
+        where,
+      });
+      await ctx.tenantDb.client.deleteMany({
+        where: { id: input.id, tenantId: ctx.tenantId },
+      });
+      return {
+        id: input.id,
+        proposals: proposals.count,
+        opportunities: opportunities.count,
+      };
+    }),
+
+  // Archive never deletes: projects reference clients and history survives
   // (ratified decision 1 — archival does not cascade to projects).
   archive: roleProcedure("OWNER_ADMIN")
     .input(clientIdSchema)

@@ -106,7 +106,7 @@ describe.skipIf(!APP_URL)("lead intake (integration)", () => {
     expect(o.activities).toHaveLength(1);
     expect(o.activities[0]).toMatchObject({
       tenantId: tenantA.id,
-      type: "NOTE",
+      type: "REQUEST",
     });
     expect(o.activities[0]?.body).toContain("Lote 8 x 20 m");
     expect(o.activities[0]?.body).toContain("300 000 0000");

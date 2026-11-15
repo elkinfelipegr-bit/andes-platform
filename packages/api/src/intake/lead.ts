@@ -110,7 +110,7 @@ export async function intakeLead(
         create: [
           {
             tenantId,
-            type: "NOTE",
+            type: "REQUEST",
             body: [
               `Solicitud del sitio web de ${input.name}`,
               input.email ? `Correo: ${input.email}` : null,

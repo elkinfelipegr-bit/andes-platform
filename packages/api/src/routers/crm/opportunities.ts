@@ -6,8 +6,9 @@
 import { TRPCError } from "@trpc/server";
 import type { Prisma } from "@andes/db";
 
-import { router, tenantProcedure } from "../../trpc.js";
-import { dayToDate, followUpState, toDay } from "./follow-up.js";
+import { roleProcedure, router, tenantProcedure } from "../../trpc.js";
+import { dayToDate, toDay } from "./follow-up.js";
+import { daysSince, effectiveProbability, weightedValue } from "./health.js";
 import { assertClientInTenant } from "./index.js";
 import {
   activityLogSchema,
@@ -18,9 +19,16 @@ import {
   opportunitySetStageSchema,
   opportunityUpdateSchema,
 } from "./opportunity-schemas.js";
+import {
+  buildFirmReport,
+  mailConfigFromEnv,
+  renderFirmReport,
+  reportRecipients,
+  sendMail,
+} from "../../reminders/report.js";
+import { readPipeline } from "./pipeline-read.js";
 import { proposalTotal } from "./proposal-total.js";
 
-const clientSummary = { select: { id: true, name: true } } as const;
 const contactSummary = {
   select: { id: true, name: true, title: true, email: true, phone: true },
 } as const;
@@ -81,30 +89,12 @@ export const opportunitiesRouter = router({
   list: tenantProcedure
     .input(opportunityListSchema)
     .query(async ({ ctx, input }) => {
-      const today = input?.today ?? toDay(new Date());
-      const rows = await ctx.tenantDb.opportunity.findMany({
-        where: { tenantId: ctx.tenantId },
-        include: {
-          client: clientSummary,
-          owner: userSummary,
-          activities: {
-            orderBy: { occurredAt: "desc" },
-            take: 1,
-            select: { type: true, occurredAt: true },
-          },
-          _count: { select: { proposals: true, activities: true } },
-        },
-        orderBy: [{ nextActionAt: "asc" }, { updatedAt: "desc" }],
-      });
-      return rows.map(({ activities, estimatedValue, ...o }) => ({
-        ...o,
-        estimatedValue: money(estimatedValue),
-        lastActivity: activities[0] ?? null,
-        followUp: followUpState(
-          { isOpen: isOpenStage(o.stage), nextActionAt: o.nextActionAt },
-          today,
-        ),
-      }));
+      return readPipeline(
+        ctx.tenantDb,
+        ctx.tenantId,
+        input?.today ?? toDay(new Date()),
+        new Date(),
+      );
     }),
 
   get: tenantProcedure
@@ -141,6 +131,14 @@ export const opportunitiesRouter = router({
       return {
         ...o,
         estimatedValue: money(o.estimatedValue),
+        probability: effectiveProbability(o.stage, o.probability),
+        probabilityIsDefault: o.probability === null,
+        weightedValue: weightedValue(
+          money(o.estimatedValue),
+          o.stage,
+          o.probability,
+        ),
+        daysInStage: daysSince(o.stageChangedAt, new Date()) ?? 0,
         proposals: o.proposals.map(({ items, ...p }) => ({
           ...p,
           total: proposalTotal(items),
@@ -151,7 +149,7 @@ export const opportunitiesRouter = router({
   create: tenantProcedure
     .input(opportunityCreateSchema)
     .mutation(async ({ ctx, input }) => {
-      const { nextActionAt, ownerId, ...fields } = input;
+      const { nextActionAt, expectedCloseAt, ownerId, ...fields } = input;
       await assertClientInTenant(ctx.tenantDb, ctx.tenantId, input.clientId);
       if (input.contactId) {
         await assertContactOfClient(
@@ -167,6 +165,9 @@ export const opportunitiesRouter = router({
         data: {
           ...fields,
           nextActionAt: nextActionAt ? dayToDate(nextActionAt) : undefined,
+          expectedCloseAt: expectedCloseAt
+            ? dayToDate(expectedCloseAt)
+            : undefined,
           ownerId: owner,
           tenantId: ctx.tenantId,
           createdById: ctx.session.userId,
@@ -178,7 +179,7 @@ export const opportunitiesRouter = router({
   update: tenantProcedure
     .input(opportunityUpdateSchema)
     .mutation(async ({ ctx, input }) => {
-      const { id, nextActionAt, ...fields } = input;
+      const { id, nextActionAt, expectedCloseAt, ...fields } = input;
       const existing = await ctx.tenantDb.opportunity.findFirst({
         where: { id, tenantId: ctx.tenantId },
         select: { clientId: true },
@@ -202,6 +203,13 @@ export const opportunitiesRouter = router({
           ...(nextActionAt !== undefined
             ? { nextActionAt: nextActionAt ? dayToDate(nextActionAt) : null }
             : {}),
+          ...(expectedCloseAt !== undefined
+            ? {
+                expectedCloseAt: expectedCloseAt
+                  ? dayToDate(expectedCloseAt)
+                  : null,
+              }
+            : {}),
         },
       });
       return { id };
@@ -219,10 +227,14 @@ export const opportunitiesRouter = router({
       });
       if (!existing) throw new TRPCError({ code: "NOT_FOUND" });
       const closing = !isOpenStage(input.stage);
+      // Same stage again is not a move: keep the time-in-stage clock.
+      const stageChangedAt =
+        existing.stage === input.stage ? undefined : new Date();
       await ctx.tenantDb.opportunity.updateMany({
         where: { id: input.id, tenantId: ctx.tenantId },
         data: closing
           ? {
+              stageChangedAt,
               stage: input.stage,
               // Keep the original close date when moving WON ↔ LOST.
               closedAt: existing.closedAt ?? new Date(),
@@ -230,9 +242,61 @@ export const opportunitiesRouter = router({
               nextAction: null,
               nextActionAt: null,
             }
-          : { stage: input.stage, closedAt: null, lostReason: null },
+          : {
+              stageChangedAt,
+              stage: input.stage,
+              closedAt: null,
+              lostReason: null,
+            },
       });
       return { id: input.id, stage: input.stage };
+    }),
+
+  // Send the firm's pipeline report now (ADR-012) — the same email the
+  // scheduler sends each morning, on demand. OWNER_ADMIN only. Goes to the
+  // configured recipients, or to the caller when none are configured.
+  sendReport: roleProcedure("OWNER_ADMIN")
+    .input(opportunityListSchema)
+    .mutation(async ({ ctx, input }) => {
+      const config = mailConfigFromEnv(process.env);
+      if (!config) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "El envío de correo no está configurado en la plataforma.",
+        });
+      }
+      const configured = reportRecipients(process.env.DIGEST_TO_EMAIL);
+      const to = configured.length > 0 ? configured : [ctx.session.email];
+      const report = await buildFirmReport(
+        ctx.db,
+        ctx.tenantId,
+        input?.today ?? toDay(new Date()),
+        new Date(),
+      );
+      const ok = await sendMail(config, {
+        to,
+        ...renderFirmReport(report, config.baseUrl),
+      });
+      if (!ok) {
+        throw new TRPCError({
+          code: "BAD_GATEWAY",
+          message: "El proveedor de correo rechazó el envío.",
+        });
+      }
+      return { sentTo: to };
+    }),
+
+  // Hard delete, OWNER_ADMIN only (sprint-16-domain-model.md: for records
+  // created by mistake or as a test). Activities go with it; its
+  // proposals survive, unlinked — a sent quote is the firm's record.
+  delete: roleProcedure("OWNER_ADMIN")
+    .input(opportunityIdSchema)
+    .mutation(async ({ ctx, input }) => {
+      const result = await ctx.tenantDb.opportunity.deleteMany({
+        where: { id: input.id, tenantId: ctx.tenantId },
+      });
+      if (result.count === 0) throw new TRPCError({ code: "NOT_FOUND" });
+      return { id: input.id };
     }),
 
   // Log an interaction and, in the same gesture, set what comes next.

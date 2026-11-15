@@ -3,6 +3,7 @@
 // where-clauses (RFC-001 layer 1) on top of ctx.tenantDb's RLS scoping
 // (layer 2).
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import { Prisma } from "@andes/db";
 
 import { roleProcedure, router, tenantProcedure } from "../../trpc.js";
@@ -129,8 +130,24 @@ export const projectsRouter = router({
       });
     }),
 
-  // Lifecycle ends at ARCHIVED — no hard delete (sprint-2-domain-model.md,
-  // process 5). OWNER_ADMIN only: the sprint's one role-gated action.
+  // Hard delete, OWNER_ADMIN only (sprint-16-domain-model.md) — for a
+  // project created by mistake or as a test. Everything recorded under it
+  // goes with it (inspections, calculation and geotechnical records, BIM
+  // model rows); a proposal converted into it survives, unlinked. Files
+  // already uploaded to object storage are not removed. Archive stays the
+  // normal way to retire a real project.
+  delete: roleProcedure("OWNER_ADMIN")
+    .input(z.object({ id: z.string().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      const result = await ctx.tenantDb.project.deleteMany({
+        where: { id: input.id, tenantId: ctx.tenantId },
+      });
+      if (result.count === 0) throw new TRPCError({ code: "NOT_FOUND" });
+      return { id: input.id };
+    }),
+
+  // The normal lifecycle ends at ARCHIVED (sprint-2-domain-model.md,
+  // process 5). OWNER_ADMIN only.
   archive: roleProcedure("OWNER_ADMIN")
     .input(projectIdSchema)
     .mutation(async ({ ctx, input }) => {

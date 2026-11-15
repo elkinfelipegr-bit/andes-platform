@@ -290,7 +290,7 @@ export const proposalsRouter = router({
             tenantId: ctx.tenantId,
             stage: { in: ["LEAD", "CONTACTED"] },
           },
-          data: { stage: "QUOTED" },
+          data: { stage: "QUOTED", stageChangedAt: new Date() },
         });
       }
       return { id: input.id, status: "SENT" as const };
@@ -326,6 +326,7 @@ export const proposalsRouter = router({
           },
           data: {
             stage: "WON",
+            stageChangedAt: new Date(),
             closedAt: new Date(),
             nextAction: null,
             nextActionAt: null,

@@ -883,6 +883,7 @@ enum ActivityType {
   MEETING
   WHATSAPP
   VISIT
+  REQUEST // arrived from outside (website intake), not logged by a member
 
   @@map("activity_type")
 }
@@ -892,23 +893,27 @@ enum ActivityType {
 // Lead entity). Stages move freely, unlike the proposal's forward-only
 // lifecycle; closedAt is stamped on WON/LOST and cleared on reopen.
 model Opportunity {
-  id             String           @id @default(cuid())
-  tenantId       String
-  clientId       String
-  contactId      String? // must belong to the client
-  title          String
-  stage          OpportunityStage @default(LEAD)
-  estimatedValue Decimal?         @db.Decimal(14, 2)
-  currency       String           @default("COP")
-  source         String?
-  ownerId        String // must be a member of the tenant
-  nextAction     String?
-  nextActionAt   DateTime?
-  lostReason     String?
-  closedAt       DateTime?
-  createdById    String // audit only
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @default(now()) @updatedAt
+  id              String           @id @default(cuid())
+  tenantId        String
+  clientId        String
+  contactId       String? // must belong to the client
+  title           String
+  stage           OpportunityStage @default(LEAD)
+  estimatedValue  Decimal?         @db.Decimal(14, 2)
+  currency        String           @default("COP")
+  source          String?
+  ownerId         String // must be a member of the tenant
+  nextAction      String?
+  nextActionAt    DateTime?
+  lostReason      String?
+  closedAt        DateTime?
+  // Sprint 16 (sprint-16-domain-model.md): forecasting and aging.
+  expectedCloseAt DateTime?
+  probability     Int? // 0–100; null = the stage's default
+  stageChangedAt  DateTime         @default(now())
+  createdById     String // audit only
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now()) @updatedAt
 
   tenant     Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   client     Client                @relation(fields: [clientId], references: [id], onDelete: Restrict)

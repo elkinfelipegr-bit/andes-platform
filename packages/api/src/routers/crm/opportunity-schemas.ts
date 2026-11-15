@@ -64,12 +64,16 @@ export const opportunityCreateSchema = z.object({
   ownerId: id.optional(),
   nextAction: nextAction.optional(),
   nextActionAt: day.optional(),
+  expectedCloseAt: day.optional(),
 });
 
 // clientId is immutable (the proposal precedent): an opportunity is one
 // client's. Stage changes go through setStage.
 export const opportunityUpdateSchema = z.object({
   id,
+  // Sprint 16: forecasting. null probability = the stage's default.
+  expectedCloseAt: day.nullable().optional(),
+  probability: z.number().int().min(0).max(100).nullable().optional(),
   contactId: id.nullable().optional(),
   title: title.optional(),
   estimatedValue: money.nullable().optional(),
