@@ -56,6 +56,7 @@ import {
   type FollowUp,
   type Stage,
 } from "../_components/pipeline-meta";
+import { ConfirmDelete } from "../../../_components/confirm-delete";
 
 type Detail = RouterOutputs["opportunities"]["get"];
 
@@ -506,6 +507,37 @@ function NextStepCard({ o, today }: { o: Detail; today: string }) {
   );
 }
 
+// ── Delete (OWNER_ADMIN) ───────────────────────────────────────────────
+function DeleteOpportunity({ o }: { o: Detail }) {
+  const router = useRouter();
+  const utils = trpc.useUtils();
+  const me = trpc.core.me.useQuery();
+  const remove = trpc.opportunities.delete.useMutation({
+    onSuccess: () => {
+      void utils.opportunities.list.invalidate();
+      router.push("/crm/pipeline");
+    },
+  });
+  if (me.data?.activeMembership?.roleKey !== "OWNER_ADMIN") return null;
+  return (
+    <ConfirmDelete
+      what="la oportunidad"
+      name={o.title}
+      busy={remove.isPending}
+      error={remove.error?.message ?? null}
+      onConfirm={() => remove.mutate({ id: o.id })}
+      consequences={
+        <p>
+          Se elimina la oportunidad con su historial de {o.activities.length}{" "}
+          actividad(es). Sus {o.proposals.length} propuesta(s) se conservan, sin
+          oportunidad asignada. Si simplemente no siguió adelante, márcala como
+          Perdida para no perder la historia.
+        </p>
+      }
+    />
+  );
+}
+
 // ── Details + edit ─────────────────────────────────────────────────────
 function EditDialog({ o }: { o: Detail }) {
   const refresh = useRefresh(o.id);
@@ -515,6 +547,12 @@ function EditDialog({ o }: { o: Detail }) {
     o.estimatedValue === null ? "" : String(o.estimatedValue),
   );
   const [source, setSource] = useState(o.source ?? "");
+  const [probability, setProbability] = useState(
+    o.probabilityIsDefault ? "" : String(o.probability),
+  );
+  const [expectedCloseAt, setExpectedCloseAt] = useState(
+    toDay(o.expectedCloseAt),
+  );
   const [ownerId, setOwnerId] = useState(o.owner.id);
   const [contactId, setContactId] = useState(o.contact?.id ?? "");
   const [error, setError] = useState<string | null>(null);
@@ -539,10 +577,19 @@ function EditDialog({ o }: { o: Detail }) {
     if (amount !== null && (!Number.isFinite(amount) || amount < 0)) {
       return setError("El valor estimado debe ser un número positivo.");
     }
+    const chance = probability === "" ? null : Number(probability);
+    if (
+      chance !== null &&
+      (!Number.isInteger(chance) || chance < 0 || chance > 100)
+    ) {
+      return setError("La probabilidad debe ser un entero entre 0 y 100.");
+    }
     update.mutate({
       id: o.id,
       title: title.trim(),
       estimatedValue: amount,
+      probability: chance,
+      expectedCloseAt: expectedCloseAt || null,
       source: source.trim() || null,
       ownerId,
       contactId: contactId || null,
@@ -598,6 +645,30 @@ function EditDialog({ o }: { o: Detail }) {
                   <option key={s} value={s} />
                 ))}
               </datalist>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-probability">Probabilidad (%)</Label>
+              <Input
+                id="edit-probability"
+                type="number"
+                min={0}
+                max={100}
+                step={1}
+                placeholder="Por defecto de la etapa"
+                value={probability}
+                onChange={(e) => setProbability(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-close">Cierre esperado</Label>
+              <Input
+                id="edit-close"
+                type="date"
+                value={expectedCloseAt}
+                onChange={(e) => setExpectedCloseAt(e.target.value)}
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -734,9 +805,26 @@ function DetailsCard({ o }: { o: Detail }) {
             "—"
           )}
         </Row>
+        <Row label="Probabilidad">
+          {o.probability}%
+          {o.probabilityIsDefault && (
+            <span className="block text-xs text-muted-foreground">
+              Valor por defecto de la etapa
+            </span>
+          )}
+        </Row>
+        <Row label="Pronóstico ponderado">
+          {o.weightedValue !== null
+            ? formatMoney(o.weightedValue, o.currency)
+            : "—"}
+        </Row>
+        <Row label="Cierre esperado">{formatDate(o.expectedCloseAt)}</Row>
+        <Row label="En esta etapa">
+          {o.daysInStage === 1 ? "1 día" : `${o.daysInStage} días`}
+        </Row>
         <Row label="Origen">{o.source ?? "—"}</Row>
         <Row label="Responsable">{o.owner.name}</Row>
-        <Row label="Creadas">{formatDate(o.createdAt)}</Row>
+        <Row label="Creada">{formatDate(o.createdAt)}</Row>
       </dl>
     </section>
   );
@@ -888,12 +976,15 @@ export default function OpportunityPage() {
         </p>
       ) : (
         <>
-          <header>
-            <h1 className="text-2xl font-semibold">{o.title}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {o.client.name}
-              {o.contact ? ` · ${o.contact.name}` : ""}
-            </p>
+          <header className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-semibold">{o.title}</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {o.client.name}
+                {o.contact ? ` · ${o.contact.name}` : ""}
+              </p>
+            </div>
+            <DeleteOpportunity o={o} />
           </header>
 
           <StageStepper o={o} />

@@ -4,7 +4,7 @@
 // only (the API enforces it; the UI mirrors it by hiding the action).
 import { Archive, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import {
   Button,
@@ -26,6 +26,7 @@ import { InspectionStatusBadge } from "../inspections/_components/inspection-bad
 import { CalcRecordStatusBadge } from "../../structures/_components/structures-badges";
 import { GeoRecordStatusBadge } from "../../geo/_components/geo-badges";
 import { DisciplineBadge } from "../../bim/_components/bim-badges";
+import { ConfirmDelete } from "../../_components/confirm-delete";
 
 function toDateInput(value: Date | string | null): string {
   if (!value) return "";
@@ -52,6 +53,13 @@ export default function ProjectDetailPage() {
     },
   });
 
+  const router = useRouter();
+  const remove = trpc.projects.delete.useMutation({
+    onSuccess: () => {
+      void utils.projects.list.invalidate();
+      router.push("/projects");
+    },
+  });
   const isOwnerAdmin = me.data?.activeMembership?.roleKey === "OWNER_ADMIN";
 
   if (project.isLoading) {
@@ -111,19 +119,44 @@ export default function ProjectDetailPage() {
           </div>
           <p className="text-sm text-muted-foreground">{p.name}</p>
         </div>
-        {isOwnerAdmin && !archived && (
-          <Button
-            variant="destructive"
-            disabled={archive.isPending}
-            onClick={() => {
-              if (window.confirm(`¿Archivar el proyecto ${p.code}?`)) {
-                archive.mutate({ id });
+        {isOwnerAdmin && (
+          <div className="flex flex-wrap gap-2">
+            {!archived && (
+              <Button
+                variant="outline"
+                disabled={archive.isPending}
+                onClick={() => {
+                  if (window.confirm(`¿Archivar el proyecto ${p.code}?`)) {
+                    archive.mutate({ id });
+                  }
+                }}
+              >
+                <Archive aria-hidden="true" />
+                {archive.isPending ? "…" : "Archivar"}
+              </Button>
+            )}
+            <ConfirmDelete
+              what="el proyecto"
+              name={p.code}
+              busy={remove.isPending}
+              error={remove.error?.message ?? null}
+              onConfirm={() => remove.mutate({ id })}
+              consequences={
+                <>
+                  <p>
+                    Se elimina el proyecto <strong>{p.name}</strong> con todo lo
+                    registrado en él: inspecciones y sus hallazgos, memorias de
+                    cálculo, registros geotécnicos y modelos BIM.
+                  </p>
+                  <p className="mt-2">
+                    Si vino de una propuesta, la propuesta se conserva. Para
+                    retirar un proyecto real sin perder su historia, usa
+                    Archivar.
+                  </p>
+                </>
               }
-            }}
-          >
-            <Archive aria-hidden="true" />
-            {archive.isPending ? "…" : "Archivar"}
-          </Button>
+            />
+          </div>
         )}
       </div>
 

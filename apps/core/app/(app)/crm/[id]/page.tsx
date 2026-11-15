@@ -5,7 +5,7 @@
 // only (API enforces; UI mirrors), and never touches projects.
 import { Archive, ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import {
   Badge,
@@ -18,12 +18,16 @@ import {
   Separator,
 } from "@andes/ui";
 
+import { formatDate, formatMoney } from "@/lib/format";
 import { trpc } from "@/lib/trpc";
 
 import { StatusBadge } from "../../projects/_components/status-badge";
 import { ClientForm, type ClientFormPayload } from "../_components/client-form";
 import { ContactDialog } from "../_components/contact-dialog";
+import { NewOpportunityDialog } from "../pipeline/_components/opportunity-dialog";
+import { STAGE_LABEL } from "../pipeline/_components/pipeline-meta";
 import { ProposalStatusBadge } from "../proposals/_components/proposal-status-badge";
+import { ConfirmDelete } from "../../_components/confirm-delete";
 
 export default function ClientDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -40,6 +44,15 @@ export default function ClientDetailPage() {
     onSuccess: () => {
       void utils.clients.get.invalidate({ id });
       void utils.clients.list.invalidate();
+    },
+  });
+  const router = useRouter();
+  const remove = trpc.clients.delete.useMutation({
+    onSuccess: () => {
+      void utils.clients.list.invalidate();
+      void utils.opportunities.list.invalidate();
+      void utils.proposals.list.invalidate();
+      router.push("/crm");
     },
   });
   const deleteContact = trpc.contacts.delete.useMutation({
@@ -91,19 +104,47 @@ export default function ClientDetailPage() {
             <p className="font-mono text-sm text-muted-foreground">{c.taxId}</p>
           )}
         </div>
-        {isOwnerAdmin && !archived && (
-          <Button
-            variant="destructive"
-            disabled={archive.isPending}
-            onClick={() => {
-              if (window.confirm(`¿Archivar el cliente ${c.name}?`)) {
-                archive.mutate({ id });
+        {isOwnerAdmin && (
+          <div className="flex flex-wrap gap-2">
+            {!archived && (
+              <Button
+                variant="outline"
+                disabled={archive.isPending}
+                onClick={() => {
+                  if (window.confirm(`¿Archivar el cliente ${c.name}?`)) {
+                    archive.mutate({ id });
+                  }
+                }}
+              >
+                <Archive aria-hidden="true" />
+                {archive.isPending ? "…" : "Archivar"}
+              </Button>
+            )}
+            <ConfirmDelete
+              what="el cliente"
+              name={c.name}
+              busy={remove.isPending}
+              error={remove.error?.message ?? null}
+              onConfirm={() => remove.mutate({ id })}
+              consequences={
+                <>
+                  <p>Se eliminan junto con el cliente:</p>
+                  <ul className="mt-1 list-disc pl-5">
+                    <li>{c.contacts.length} contacto(s)</li>
+                    <li>
+                      {c.opportunities.length} oportunidad(es) con su historial
+                    </li>
+                    <li>{c.proposals.length} propuesta(s) con sus ítems</li>
+                  </ul>
+                  <p className="mt-2">
+                    Sus {c.projects.length} proyecto(s) se conservan, sin
+                    cliente asignado. Para retirar un cliente real sin perder su
+                    historia, usa Archivar.
+                  </p>
+                </>
               }
-            }}
-          >
-            <Archive aria-hidden="true" />
-            {archive.isPending ? "…" : "Archivar"}
-          </Button>
+            />
+          </div>
         )}
       </div>
 
@@ -226,6 +267,70 @@ export default function ClientDetailPage() {
                       </Button>
                     </div>
                   </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <CardTitle className="text-base">Oportunidades</CardTitle>
+              <CardDescription>
+                La historia comercial con {c.name}: lo que está en curso y lo
+                que se ganó o se perdió.
+              </CardDescription>
+            </div>
+            {!archived && <NewOpportunityDialog clientId={c.id} />}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {c.opportunities.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Aún no hay oportunidades con este cliente.
+            </p>
+          ) : (
+            <ul className="divide-y divide-border">
+              {c.opportunities.map((o) => (
+                <li key={o.id} className="py-2">
+                  <Link
+                    href={`/crm/pipeline/${o.id}`}
+                    className="group flex items-center justify-between gap-4"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium group-hover:text-primary">
+                        {o.title}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {o.closedAt
+                          ? `Cerrada ${formatDate(o.closedAt)}`
+                          : o.nextAction
+                            ? `Próximo paso: ${o.nextAction}${o.nextActionAt ? ` · ${formatDate(o.nextActionAt)}` : ""}`
+                            : "Sin próximo paso"}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-3">
+                      <span className="text-sm tabular-nums">
+                        {o.estimatedValue !== null
+                          ? formatMoney(o.estimatedValue, o.currency)
+                          : ""}
+                      </span>
+                      <Badge
+                        variant={
+                          o.stage === "WON"
+                            ? "success"
+                            : o.stage === "LOST"
+                              ? "outline"
+                              : "secondary"
+                        }
+                      >
+                        {STAGE_LABEL[o.stage]}
+                      </Badge>
+                    </div>
+                  </Link>
                 </li>
               ))}
             </ul>
