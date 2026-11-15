@@ -131,13 +131,13 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle className="text-base">No tenant membership</CardTitle>
             <CardDescription>
-              You are signed in but not a member of any tenant yet. Ask an
-              operator to run:
+              You are signed in but not a member of any tenant yet. Ask your
+              firm&apos;s administrator for an invitation link issued to:
             </CardDescription>
           </CardHeader>
           <CardContent>
             <code className="rounded bg-muted px-2 py-1 font-mono text-xs">
-              pnpm --filter @andes/db link-member {session.user.email}
+              {session.user.email}
             </code>
           </CardContent>
         </Card>

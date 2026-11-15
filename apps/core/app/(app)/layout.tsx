@@ -21,7 +21,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <NavToggleState />
-      <Sidebar navDisabled={!membership} />
+      <Sidebar
+        navDisabled={!membership}
+        showAdmin={membership?.roleKey === "OWNER_ADMIN"}
+      />
       <NavBackdrop />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar

@@ -47,7 +47,16 @@ function NavEntry({
   );
 }
 
-export function Sidebar({ navDisabled = false }: { navDisabled?: boolean }) {
+export function Sidebar({
+  navDisabled = false,
+  showAdmin = false,
+}: {
+  navDisabled?: boolean;
+  // Role-based visibility (docs/design/navigation.md): Administration is
+  // rendered for OWNER_ADMIN only. Hiding is UX — the admin router's
+  // roleProcedure is the actual gate.
+  showAdmin?: boolean;
+}) {
   const pathname = usePathname();
   return (
     <aside className="fixed inset-y-0 left-0 z-40 flex w-60 shrink-0 -translate-x-full flex-col overflow-y-auto border-r border-border bg-card transition-transform peer-checked:translate-x-0 max-lg:invisible max-lg:peer-checked:visible lg:static lg:translate-x-0 print:hidden">
@@ -67,14 +76,16 @@ export function Sidebar({ navDisabled = false }: { navDisabled?: boolean }) {
             disabled={navDisabled}
           />
         ))}
-        <div className="mt-auto">
-          <Separator className="my-2" />
-          <NavEntry
-            item={adminNav}
-            active={pathname.startsWith(adminNav.href)}
-            disabled={navDisabled}
-          />
-        </div>
+        {showAdmin && (
+          <div className="mt-auto">
+            <Separator className="my-2" />
+            <NavEntry
+              item={adminNav}
+              active={pathname.startsWith(adminNav.href)}
+              disabled={navDisabled}
+            />
+          </div>
+        )}
       </nav>
     </aside>
   );
