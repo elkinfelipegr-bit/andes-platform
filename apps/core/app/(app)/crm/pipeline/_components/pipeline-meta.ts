@@ -2,6 +2,7 @@
 // and keys mirror the OpportunityStage / ActivityType enums.
 import {
   Building2,
+  Inbox,
   Mail,
   MessageCircle,
   Phone,
@@ -48,7 +49,7 @@ export function isOpen(stage: Stage) {
 }
 
 export const ACTIVITY_TYPES: {
-  key: ActivityType;
+  key: Exclude<ActivityType, "REQUEST">;
   label: string;
   icon: LucideIcon;
 }[] = [
@@ -60,7 +61,17 @@ export const ACTIVITY_TYPES: {
   { key: "NOTE", label: "Nota", icon: StickyNote },
 ];
 
+// Activity types a member can log. REQUEST is written by the website
+// intake only (sprint-16-domain-model.md) and is shown, never chosen.
+export type LoggableActivityType = Exclude<ActivityType, "REQUEST">;
+const REQUEST_META = {
+  key: "REQUEST",
+  label: "Solicitud",
+  icon: Inbox,
+} as const;
+
 export function activityMeta(type: ActivityType) {
+  if (type === "REQUEST") return REQUEST_META;
   return ACTIVITY_TYPES.find((t) => t.key === type) ?? ACTIVITY_TYPES[5]!;
 }
 

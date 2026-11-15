@@ -52,7 +52,7 @@ import {
   STAGE_LABEL,
   activityMeta,
   isOpen,
-  type ActivityType,
+  type LoggableActivityType,
   type FollowUp,
   type Stage,
 } from "../_components/pipeline-meta";
@@ -237,7 +237,7 @@ function NextStepFields({
 // ── Activity composer ──────────────────────────────────────────────────
 function ActivityComposer({ o }: { o: Detail }) {
   const refresh = useRefresh(o.id);
-  const [type, setType] = useState<ActivityType>("CALL");
+  const [type, setType] = useState<LoggableActivityType>("CALL");
   const [body, setBody] = useState("");
   const [action, setAction] = useState("");
   const [date, setDate] = useState("");

@@ -22,6 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
+  Select,
   cn,
 } from "@andes/ui";
 
@@ -41,6 +42,15 @@ import { FollowUpChip } from "./_components/follow-up-chip";
 import { LostDialog } from "./_components/lost-dialog";
 import { NewOpportunityDialog } from "./_components/opportunity-dialog";
 import {
+  PipelineList,
+  RISK_LABEL,
+  RequestsPanel,
+  RiskBadges,
+  RiskPanel,
+  SendReportButton,
+  type Risk,
+} from "./_components/pipeline-extras";
+import {
   OPEN_STAGES,
   STAGE_HINT,
   STAGE_LABEL,
@@ -59,6 +69,18 @@ function moneyTotals(rows: Opportunity[], compact = true) {
         ? formatMoneyCompact(t.value, t.currency)
         : formatMoney(t.value, t.currency),
     )
+    .join(" · ");
+}
+
+function weightedTotals(rows: Opportunity[]) {
+  const totals = new Map<string, number>();
+  for (const r of rows) {
+    if (r.weightedValue === null) continue;
+    totals.set(r.currency, (totals.get(r.currency) ?? 0) + r.weightedValue);
+  }
+  if (totals.size === 0) return "—";
+  return [...totals.entries()]
+    .map(([currency, value]) => formatMoneyCompact(value, currency))
     .join(" · ");
 }
 
@@ -172,14 +194,24 @@ function OpportunityCard({
             : ""}
         </span>
       </div>
-      {o._count.proposals > 0 && (
-        <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-          <FileText aria-hidden="true" className="size-3" />
-          {o._count.proposals === 1
-            ? "1 propuesta"
-            : `${o._count.proposals} propuestas`}
-        </p>
-      )}
+      <div className="mt-2 empty:hidden">
+        <RiskBadges opportunity={o} />
+      </div>
+      <p className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+        <span>
+          {o.daysInStage === 0
+            ? "Hoy en esta etapa"
+            : o.daysInStage === 1
+              ? "1 día en esta etapa"
+              : `${o.daysInStage} días en esta etapa`}
+        </span>
+        {o._count.proposals > 0 && (
+          <span className="ml-auto inline-flex items-center gap-1">
+            <FileText aria-hidden="true" className="size-3" />
+            {o._count.proposals}
+          </span>
+        )}
+      </p>
     </article>
   );
 }
@@ -194,6 +226,11 @@ export default function PipelinePage() {
   const [over, setOver] = useState<Stage | null>(null);
   const [losing, setLosing] = useState<Opportunity | null>(null);
   const [showClosed, setShowClosed] = useState(false);
+  const [view, setView] = useState<"board" | "list">("board");
+  const [ownerId, setOwnerId] = useState("");
+  const [risk, setRisk] = useState<"" | Risk>("");
+  const me = trpc.core.me.useQuery();
+  const isAdmin = me.data?.activeMembership?.roleKey === "OWNER_ADMIN";
 
   const setStage = trpc.opportunities.setStage.useMutation({
     // Optimistic: the card lands where it was dropped at once.
@@ -219,13 +256,20 @@ export default function PipelinePage() {
   const all = useMemo(() => list.data ?? [], [list.data]);
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return all;
-    return all.filter((o) =>
-      `${o.title} ${o.client.name} ${o.nextAction ?? ""} ${o.owner.name}`
-        .toLowerCase()
-        .includes(q),
+    return all.filter(
+      (o) =>
+        (!ownerId || o.owner.id === ownerId) &&
+        (!risk || o.risks.includes(risk)) &&
+        (!q ||
+          `${o.title} ${o.client.name} ${o.nextAction ?? ""} ${o.owner.name} ${o.source ?? ""}`
+            .toLowerCase()
+            .includes(q)),
     );
-  }, [all, query]);
+  }, [all, query, ownerId, risk]);
+  const owners = useMemo(
+    () => [...new Map(all.map((o) => [o.owner.id, o.owner.name])).entries()],
+    [all],
+  );
 
   const open = all.filter((o) => isOpen(o.stage));
   const due = open.filter(
@@ -276,7 +320,10 @@ export default function PipelinePage() {
             Cada prospecto, lo último que se habló y lo que sigue.
           </p>
         </div>
-        <NewOpportunityDialog />
+        <div className="flex flex-wrap items-start gap-2">
+          {isAdmin && all.length > 0 && <SendReportButton today={today} />}
+          <NewOpportunityDialog />
+        </div>
       </div>
 
       {list.isLoading ? (
@@ -311,7 +358,7 @@ export default function PipelinePage() {
             <Tile
               label="Valor abierto en seguimiento"
               value={moneyTotals(open)}
-              hint="Suma de valores estimados"
+              hint={`Pronóstico ponderado: ${weightedTotals(open)}`}
             />
             <Tile
               label="Seguimientos pendientes"
@@ -449,108 +496,177 @@ export default function PipelinePage() {
             </div>
           </section>
 
-          <section aria-label="Tablero" className="space-y-3">
+          <section className="grid gap-4 lg:grid-cols-2">
+            <RequestsPanel rows={open} />
+            <RiskPanel rows={open} />
+          </section>
+
+          <section aria-label="Oportunidades" className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="font-semibold">Tablero</h2>
-              <div className="relative w-full max-w-xs">
-                <Search
-                  aria-hidden="true"
-                  className="pointer-events-none absolute top-2.5 left-2.5 size-4 text-muted-foreground"
-                />
-                <Input
-                  type="search"
-                  aria-label="Buscar oportunidades"
-                  placeholder="Buscar cliente, necesidad o próximo paso"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="pl-8"
-                />
+              <div
+                role="tablist"
+                aria-label="Vista"
+                className="inline-flex rounded-lg border border-border bg-card p-0.5"
+              >
+                {(
+                  [
+                    ["board", "Tablero"],
+                    ["list", "Lista"],
+                  ] as const
+                ).map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    role="tab"
+                    aria-selected={view === key}
+                    onClick={() => setView(key)}
+                    className={cn(
+                      "rounded-md px-3 py-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                      view === key
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex flex-1 flex-wrap items-center justify-end gap-2">
+                <Select
+                  aria-label="Filtrar por responsable"
+                  value={ownerId}
+                  onChange={(e) => setOwnerId(e.target.value)}
+                  className="w-44"
+                >
+                  <option value="">Todos los responsables</option>
+                  {owners.map(([id, name]) => (
+                    <option key={id} value={id}>
+                      {name}
+                    </option>
+                  ))}
+                </Select>
+                <Select
+                  aria-label="Filtrar por alerta"
+                  value={risk}
+                  onChange={(e) => setRisk(e.target.value as "" | Risk)}
+                  className="w-52"
+                >
+                  <option value="">Todas las alertas</option>
+                  {(Object.keys(RISK_LABEL) as Risk[]).map((r) => (
+                    <option key={r} value={r}>
+                      {RISK_LABEL[r]}
+                    </option>
+                  ))}
+                </Select>
+                <div className="relative w-full max-w-xs">
+                  <Search
+                    aria-hidden="true"
+                    className="pointer-events-none absolute top-2.5 left-2.5 size-4 text-muted-foreground"
+                  />
+                  <Input
+                    type="search"
+                    aria-label="Buscar oportunidades"
+                    placeholder="Buscar cliente, necesidad o próximo paso"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    className="pl-8"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="overflow-x-auto pb-2">
-              <div className="grid min-w-[56rem] grid-cols-4 gap-3">
-                {OPEN_STAGES.map((stage) => {
-                  const cards = filtered.filter((o) => o.stage === stage);
-                  return (
+            {view === "list" ? (
+              <PipelineList rows={filtered} today={today} />
+            ) : (
+              <>
+                <div className="overflow-x-auto pb-2">
+                  <div className="grid min-w-[56rem] grid-cols-4 gap-3">
+                    {OPEN_STAGES.map((stage) => {
+                      const cards = filtered.filter((o) => o.stage === stage);
+                      return (
+                        <div
+                          key={stage}
+                          {...dropOn(stage)}
+                          className={cn(
+                            "flex min-h-48 flex-col rounded-xl bg-muted/70 p-2 transition-colors",
+                            over === stage &&
+                              "bg-primary/10 ring-2 ring-primary",
+                          )}
+                        >
+                          <header
+                            className="px-1.5 pt-1 pb-2"
+                            title={STAGE_HINT[stage]}
+                          >
+                            <div className="flex items-baseline justify-between">
+                              <h3 className="text-sm font-semibold">
+                                {STAGE_LABEL[stage]}
+                                <span className="ml-1.5 font-normal text-muted-foreground">
+                                  {cards.length}
+                                </span>
+                              </h3>
+                              <span className="text-xs text-muted-foreground tabular-nums">
+                                {moneyTotals(cards)}
+                              </span>
+                            </div>
+                          </header>
+                          <div className="flex flex-1 flex-col gap-2">
+                            {cards.map((o) => (
+                              <OpportunityCard
+                                key={o.id}
+                                opportunity={o}
+                                today={today}
+                                onMove={(s) => move(o, s)}
+                                onDragStart={() => setDragging(true)}
+                                onDragEnd={() => {
+                                  setDragging(false);
+                                  setOver(null);
+                                }}
+                              />
+                            ))}
+                            {cards.length === 0 && (
+                              <p className="px-1.5 py-4 text-xs text-muted-foreground">
+                                {query
+                                  ? "Sin coincidencias"
+                                  : STAGE_HINT[stage]}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div
+                  className={cn(
+                    "grid grid-cols-2 gap-3 transition-opacity",
+                    dragging ? "opacity-100" : "opacity-70",
+                  )}
+                >
+                  {(["WON", "LOST"] as const).map((stage) => (
                     <div
                       key={stage}
                       {...dropOn(stage)}
                       className={cn(
-                        "flex min-h-48 flex-col rounded-xl bg-muted/70 p-2 transition-colors",
-                        over === stage && "bg-primary/10 ring-2 ring-primary",
+                        "flex items-center justify-center gap-2 rounded-xl border border-dashed border-border px-4 py-3 text-sm text-muted-foreground",
+                        over === stage &&
+                          (stage === "WON"
+                            ? "border-success bg-success/10 text-foreground"
+                            : "border-destructive bg-destructive/10 text-foreground"),
                       )}
                     >
-                      <header
-                        className="px-1.5 pt-1 pb-2"
-                        title={STAGE_HINT[stage]}
-                      >
-                        <div className="flex items-baseline justify-between">
-                          <h3 className="text-sm font-semibold">
-                            {STAGE_LABEL[stage]}
-                            <span className="ml-1.5 font-normal text-muted-foreground">
-                              {cards.length}
-                            </span>
-                          </h3>
-                          <span className="text-xs text-muted-foreground tabular-nums">
-                            {moneyTotals(cards)}
-                          </span>
-                        </div>
-                      </header>
-                      <div className="flex flex-1 flex-col gap-2">
-                        {cards.map((o) => (
-                          <OpportunityCard
-                            key={o.id}
-                            opportunity={o}
-                            today={today}
-                            onMove={(s) => move(o, s)}
-                            onDragStart={() => setDragging(true)}
-                            onDragEnd={() => {
-                              setDragging(false);
-                              setOver(null);
-                            }}
-                          />
-                        ))}
-                        {cards.length === 0 && (
-                          <p className="px-1.5 py-4 text-xs text-muted-foreground">
-                            {query ? "Sin coincidencias" : STAGE_HINT[stage]}
-                          </p>
-                        )}
-                      </div>
+                      {stage === "WON" ? (
+                        <CircleCheck aria-hidden="true" className="size-4" />
+                      ) : (
+                        <CircleX aria-hidden="true" className="size-4" />
+                      )}
+                      Suelta aquí para marcar como{" "}
+                      {STAGE_LABEL[stage].toLowerCase()}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div
-              className={cn(
-                "grid grid-cols-2 gap-3 transition-opacity",
-                dragging ? "opacity-100" : "opacity-70",
-              )}
-            >
-              {(["WON", "LOST"] as const).map((stage) => (
-                <div
-                  key={stage}
-                  {...dropOn(stage)}
-                  className={cn(
-                    "flex items-center justify-center gap-2 rounded-xl border border-dashed border-border px-4 py-3 text-sm text-muted-foreground",
-                    over === stage &&
-                      (stage === "WON"
-                        ? "border-success bg-success/10 text-foreground"
-                        : "border-destructive bg-destructive/10 text-foreground"),
-                  )}
-                >
-                  {stage === "WON" ? (
-                    <CircleCheck aria-hidden="true" className="size-4" />
-                  ) : (
-                    <CircleX aria-hidden="true" className="size-4" />
-                  )}
-                  Suelta aquí para marcar como{" "}
-                  {STAGE_LABEL[stage].toLowerCase()}
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
             {setStage.error && (
               <p role="alert" className="text-sm text-destructive">
                 {setStage.error.message}
