@@ -30,9 +30,9 @@ export function FollowUpChip({
   const Icon = state === "NONE" ? CalendarX2 : CalendarClock;
   const label =
     state === "NONE" || !nextActionAt
-      ? "No next step"
+      ? "Sin próximo paso"
       : state === "OVERDUE"
-        ? `Overdue · ${relativeDay(toDay(nextActionAt), today).toLowerCase()}`
+        ? `Vencido · ${relativeDay(toDay(nextActionAt), today).toLowerCase()}`
         : relativeDay(toDay(nextActionAt), today);
   return (
     <span

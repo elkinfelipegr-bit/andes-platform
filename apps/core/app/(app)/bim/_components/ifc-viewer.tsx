@@ -40,7 +40,7 @@ export default function IfcViewer({ url }: { url: string }) {
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
-  const [message, setMessage] = useState("Preparing viewer…");
+  const [message, setMessage] = useState("Preparando visor…");
   const [selected, setSelected] = useState<SelectedElement | null>(null);
 
   useEffect(() => {
@@ -65,15 +65,15 @@ export default function IfcViewer({ url }: { url: string }) {
         world.scene.setup();
         components.get(OBC.Grids).create(world);
 
-        setMessage("Downloading model from storage…");
+        setMessage("Descargando el modelo del almacenamiento…");
         const response = await fetch(url);
         if (!response.ok) {
-          throw new Error("The model could not be downloaded from storage.");
+          throw new Error("No se pudo descargar el modelo del almacenamiento.");
         }
         const buffer = new Uint8Array(await response.arrayBuffer());
         if (disposed) return;
 
-        setMessage("Parsing IFC (runs entirely in your browser)…");
+        setMessage("Procesando IFC (todo ocurre en tu navegador)…");
         const ifcLoader = components.get(OBC.IfcLoader);
         ifcLoader.settings.autoSetWasm = false;
         ifcLoader.settings.wasm = { path: "/wasm/", absolute: true };
@@ -117,7 +117,7 @@ export default function IfcViewer({ url }: { url: string }) {
         if (!disposed) {
           setStatus("error");
           setMessage(
-            e instanceof Error ? e.message : "The model could not be loaded.",
+            e instanceof Error ? e.message : "No se pudo cargar el modelo.",
           );
         }
       }
@@ -149,7 +149,7 @@ export default function IfcViewer({ url }: { url: string }) {
       {selected && (
         <aside className="absolute right-3 top-3 z-10 max-h-[60%] w-72 overflow-y-auto rounded-lg border border-border bg-background/95 p-3 shadow-md">
           <p className="mb-2 font-mono text-xs text-muted-foreground">
-            Element #{selected.expressID}
+            Elemento #{selected.expressID}
           </p>
           <dl className="space-y-1">
             {selected.attributes.map(([key, value]) => (

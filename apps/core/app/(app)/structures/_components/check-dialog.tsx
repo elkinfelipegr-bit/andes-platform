@@ -26,7 +26,7 @@ const positive = (max: number, message: string) =>
   z.string().refine((v) => Number(v) > 0 && Number(v) <= max, { message });
 
 const formSchema = z.object({
-  label: z.string().trim().min(1, "Required").max(200),
+  label: z.string().trim().min(1, "Obligatorio").max(200),
   b: positive(10_000, "> 0 mm"),
   h: positive(10_000, "> 0 mm"),
   cover: positive(1_000, "> 0 mm"),
@@ -105,16 +105,18 @@ export function CheckDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {check ? "Edit beam check" : "New beam flexure check"}
+            {check
+              ? "Editar verificación de viga"
+              : "Nueva verificación de viga a flexión"}
           </DialogTitle>
           <DialogDescription>
-            Rectangular RC section per NSR-10 C.10 — the server computes the
-            required steel when you save.
+            Sección rectangular de concreto reforzado según NSR-10 C.10; el
+            servidor calcula el acero requerido al guardar.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="chk-label">Element</Label>
+            <Label htmlFor="chk-label">Elemento</Label>
             <Input
               id="chk-label"
               placeholder="Viga eje 3, luz 2"
@@ -126,7 +128,7 @@ export function CheckDialog({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="chk-b">b — width (mm)</Label>
+              <Label htmlFor="chk-b">b — ancho (mm)</Label>
               <Input
                 id="chk-b"
                 type="number"
@@ -139,7 +141,7 @@ export function CheckDialog({
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="chk-h">h — height (mm)</Label>
+              <Label htmlFor="chk-h">h — altura (mm)</Label>
               <Input
                 id="chk-h"
                 type="number"
@@ -154,7 +156,7 @@ export function CheckDialog({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="chk-cover">Cover to steel (mm)</Label>
+              <Label htmlFor="chk-cover">Recubrimiento al acero (mm)</Label>
               <Input
                 id="chk-cover"
                 type="number"
@@ -189,7 +191,11 @@ export function CheckDialog({
 
           <div className="flex justify-end">
             <Button type="submit" disabled={busy}>
-              {busy ? "…" : check ? "Recompute & save" : "Compute & add"}
+              {busy
+                ? "…"
+                : check
+                  ? "Recalcular y guardar"
+                  : "Calcular y agregar"}
             </Button>
           </div>
         </form>

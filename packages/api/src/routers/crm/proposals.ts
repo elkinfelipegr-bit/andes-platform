@@ -45,7 +45,7 @@ async function assertOpportunityOfClient(
   if (!opportunity) {
     throw new TRPCError({
       code: "BAD_REQUEST",
-      message: "Opportunity not found for this client.",
+      message: "La oportunidad no pertenece a este cliente.",
     });
   }
 }
@@ -89,7 +89,7 @@ async function assertContactOfClient(
   if (!contact) {
     throw new TRPCError({
       code: "BAD_REQUEST",
-      message: "Contact not found for this client.",
+      message: "El contacto no pertenece a este cliente.",
     });
   }
 }
@@ -182,7 +182,7 @@ export const proposalsRouter = router({
         if (isUniqueViolation(e)) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: `A proposal with code "${input.code}" already exists.`,
+            message: `Ya existe una propuesta con el código "${input.code}".`,
           });
         }
         throw e;
@@ -203,7 +203,7 @@ export const proposalsRouter = router({
       if (existing.status !== "DRAFT") {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Only draft proposals can be edited.",
+          message: "Solo se pueden editar propuestas en borrador.",
         });
       }
       if (contactId) {
@@ -246,7 +246,7 @@ export const proposalsRouter = router({
         if (isUniqueViolation(e)) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: `A proposal with code "${fields.code}" already exists.`,
+            message: `Ya existe una propuesta con el código "${fields.code}".`,
           });
         }
         throw e;
@@ -268,13 +268,13 @@ export const proposalsRouter = router({
       if (existing.status !== "DRAFT") {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Only draft proposals can be sent.",
+          message: "Solo se pueden enviar propuestas en borrador.",
         });
       }
       if (existing._count.items === 0) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "A proposal needs at least one item before sending.",
+          message: "Una propuesta necesita al menos un ítem antes de enviarse.",
         });
       }
       await ctx.tenantDb.proposal.updateMany({
@@ -307,7 +307,7 @@ export const proposalsRouter = router({
       if (existing.status !== "SENT") {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Only sent proposals can be decided.",
+          message: "Solo se puede decidir sobre propuestas enviadas.",
         });
       }
       await ctx.tenantDb.proposal.updateMany({
@@ -346,7 +346,7 @@ export const proposalsRouter = router({
       if (existing.status !== "SENT") {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Only sent proposals can expire.",
+          message: "Solo pueden vencer propuestas enviadas.",
         });
       }
       await ctx.tenantDb.proposal.updateMany({
@@ -369,13 +369,13 @@ export const proposalsRouter = router({
       if (existing.status !== "ACCEPTED") {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Only accepted proposals can be converted.",
+          message: "Solo se pueden convertir propuestas aceptadas.",
         });
       }
       if (existing.projectId) {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "This proposal was already converted to a project.",
+          message: "Esta propuesta ya fue convertida en proyecto.",
         });
       }
       try {
@@ -399,7 +399,7 @@ export const proposalsRouter = router({
         if (isUniqueViolation(e)) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: `A project with code "${input.projectCode}" already exists.`,
+            message: `Ya existe un proyecto con el código "${input.projectCode}".`,
           });
         }
         throw e;

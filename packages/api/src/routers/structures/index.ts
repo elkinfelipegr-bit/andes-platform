@@ -111,7 +111,7 @@ async function getDraftRecord(
   if (record.status !== "DRAFT") {
     throw new TRPCError({
       code: "CONFLICT",
-      message: "Only draft calculation records can be edited.",
+      message: "Solo se pueden editar memorias de cálculo en borrador.",
     });
   }
   return record;
@@ -181,7 +181,7 @@ export const calcRecordsRouter = router({
         if (isUniqueViolation(e)) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: `A calculation record with code "${input.code}" already exists.`,
+            message: `Ya existe una memoria de cálculo con el código "${input.code}".`,
           });
         }
         throw e;
@@ -211,7 +211,7 @@ export const calcRecordsRouter = router({
         if (isUniqueViolation(e)) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: `A calculation record with code "${fields.code}" already exists.`,
+            message: `Ya existe una memoria de cálculo con el código "${fields.code}".`,
           });
         }
         throw e;
@@ -267,13 +267,14 @@ export const calcRecordsRouter = router({
       if (existing.status !== "DRAFT") {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Only draft records can be issued.",
+          message: "Solo se pueden emitir registros en borrador.",
         });
       }
       if (existing._count.checks === 0) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "A record needs at least one check before issuing.",
+          message:
+            "Un registro necesita al menos una verificación antes de emitirse.",
         });
       }
       const issuedAt = new Date();

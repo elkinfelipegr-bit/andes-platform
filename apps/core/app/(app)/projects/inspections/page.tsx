@@ -29,27 +29,27 @@ import {
   TableRow,
 } from "@andes/ui";
 
-import { formatDate } from "@/lib/format";
+import { formatDate, roleLabel } from "@/lib/format";
 import { trpc } from "@/lib/trpc";
 
 import { ProjectsNav } from "../_components/projects-nav";
 import { InspectionStatusBadge } from "./_components/inspection-badges";
 
 const STATUS_FILTERS = [
-  ["ALL", "All statuses"],
-  ["SCHEDULED", "Scheduled"],
-  ["COMPLETED", "Completed"],
-  ["CANCELLED", "Cancelled"],
+  ["ALL", "Todos los estados"],
+  ["SCHEDULED", "Programada"],
+  ["COMPLETED", "Completado"],
+  ["CANCELLED", "Cancelada"],
 ] as const;
 
 type StatusFilter = (typeof STATUS_FILTERS)[number][0];
 
 const createFormSchema = z.object({
-  projectId: z.string().min(1, "Pick a project"),
-  inspectorId: z.string().min(1, "Pick an inspector"),
-  code: z.string().trim().min(1, "Required").max(32),
-  title: z.string().trim().min(1, "Required").max(200),
-  scheduledFor: z.string().min(1, "Required"),
+  projectId: z.string().min(1, "Elige un proyecto"),
+  inspectorId: z.string().min(1, "Elige un inspector"),
+  code: z.string().trim().min(1, "Obligatorio").max(32),
+  title: z.string().trim().min(1, "Obligatorio").max(200),
+  scheduledFor: z.string().min(1, "Obligatorio"),
 });
 
 type CreateFormValues = z.infer<typeof createFormSchema>;
@@ -88,14 +88,15 @@ function NewInspectionDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus aria-hidden="true" />
-          New inspection
+          Nueva inspección
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Schedule inspection</DialogTitle>
+          <DialogTitle>Programar inspección</DialogTitle>
           <DialogDescription>
-            Findings are recorded on the next screen, while it stays scheduled.
+            Los hallazgos se registran en la siguiente pantalla, mientras está
+            programada.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -103,9 +104,9 @@ function NewInspectionDialog() {
           className="space-y-4"
         >
           <div className="space-y-1.5">
-            <Label htmlFor="ins-project">Project</Label>
+            <Label htmlFor="ins-project">Proyecto</Label>
             <Select id="ins-project" {...form.register("projectId")}>
-              <option value="">— Pick a project —</option>
+              <option value="">— Elige un proyecto —</option>
               {activeProjects.map((project) => (
                 <option key={project.id} value={project.id}>
                   {project.code} — {project.name}
@@ -121,10 +122,10 @@ function NewInspectionDialog() {
           <div className="space-y-1.5">
             <Label htmlFor="ins-inspector">Inspector</Label>
             <Select id="ins-inspector" {...form.register("inspectorId")}>
-              <option value="">— Pick an inspector —</option>
+              <option value="">— Elige un inspector —</option>
               {(members.data ?? []).map((m) => (
                 <option key={m.user.id} value={m.user.id}>
-                  {m.user.name} ({m.role.label})
+                  {m.user.name} ({roleLabel(m.role.label)})
                 </option>
               ))}
             </Select>
@@ -136,7 +137,7 @@ function NewInspectionDialog() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="ins-code">Code</Label>
+              <Label htmlFor="ins-code">Código</Label>
               <Input
                 id="ins-code"
                 placeholder="INS-2026-001"
@@ -150,7 +151,7 @@ function NewInspectionDialog() {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="ins-date">Scheduled for</Label>
+              <Label htmlFor="ins-date">Programada para</Label>
               <Input
                 id="ins-date"
                 type="date"
@@ -164,7 +165,7 @@ function NewInspectionDialog() {
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="ins-title">Purpose / title</Label>
+            <Label htmlFor="ins-title">Objeto / título</Label>
             <Input
               id="ins-title"
               placeholder="Interventoría estructural"
@@ -181,7 +182,7 @@ function NewInspectionDialog() {
 
           <div className="flex justify-end">
             <Button type="submit" disabled={create.isPending}>
-              {create.isPending ? "…" : "Schedule"}
+              {create.isPending ? "…" : "Programar"}
             </Button>
           </div>
         </form>
@@ -201,16 +202,16 @@ export default function InspectionsPage() {
       <ProjectsNav />
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Inspections</h1>
+          <h1 className="text-2xl font-semibold">Inspecciones</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Site visits and their findings, inside each project.
+            Visitas de obra y sus hallazgos, dentro de cada proyecto.
           </p>
         </div>
         <NewInspectionDialog />
       </div>
 
       <Select
-        aria-label="Filter by status"
+        aria-label="Filtrar por estado"
         className="w-44"
         value={status}
         onChange={(e) => setStatus(e.target.value as StatusFilter)}
@@ -223,18 +224,18 @@ export default function InspectionsPage() {
       </Select>
 
       {inspections.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading inspections…</p>
+        <p className="text-sm text-muted-foreground">Cargando inspecciones…</p>
       ) : inspections.data && inspections.data.length > 0 ? (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Code</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Project</TableHead>
+              <TableHead>Código</TableHead>
+              <TableHead>Título</TableHead>
+              <TableHead>Proyecto</TableHead>
               <TableHead>Inspector</TableHead>
-              <TableHead>Scheduled</TableHead>
-              <TableHead className="text-right">Findings</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Programada</TableHead>
+              <TableHead className="text-right">Hallazgos</TableHead>
+              <TableHead>Estado</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -277,8 +278,9 @@ export default function InspectionsPage() {
         </Table>
       ) : (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-          No inspections{status !== "ALL" ? " with this status" : " yet"}.
-          Schedule the first one.
+          No hay inspecciones
+          {status !== "ALL" ? " con este estado" : " todavía"}. Programa la
+          primera.
         </div>
       )}
     </div>

@@ -32,12 +32,12 @@ import { ProjectsNav } from "./_components/projects-nav";
 import { StatusBadge } from "./_components/status-badge";
 
 const STATUS_FILTERS = [
-  ["ALL", "All statuses"],
-  ["DRAFT", "Draft"],
-  ["ACTIVE", "Active"],
-  ["ON_HOLD", "On hold"],
-  ["COMPLETED", "Completed"],
-  ["ARCHIVED", "Archived"],
+  ["ALL", "Todos los estados"],
+  ["DRAFT", "Borrador"],
+  ["ACTIVE", "Activo"],
+  ["ON_HOLD", "En pausa"],
+  ["COMPLETED", "Completado"],
+  ["ARCHIVED", "Archivado"],
 ] as const;
 
 type StatusFilter = (typeof STATUS_FILTERS)[number][0];
@@ -46,7 +46,7 @@ function formatDate(value: Date | string | null) {
   if (!value) return "—";
   // Date-only values are stored at UTC midnight; format in UTC so the day
   // doesn't shift in western timezones.
-  return new Date(value).toLocaleDateString(undefined, { timeZone: "UTC" });
+  return new Date(value).toLocaleDateString("es-CO", { timeZone: "UTC" });
 }
 
 function NewProjectDialog() {
@@ -89,18 +89,18 @@ function NewProjectDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus aria-hidden="true" />
-          New project
+          Nuevo proyecto
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New project</DialogTitle>
+          <DialogTitle>Nuevo proyecto</DialogTitle>
           <DialogDescription>
-            Register a project for your firm. The code must be unique.
+            Registra un proyecto de tu firma. El código debe ser único.
           </DialogDescription>
         </DialogHeader>
         <ProjectForm
-          submitLabel="Create project"
+          submitLabel="Crear proyecto"
           busy={busy}
           errorMessage={errorMessage}
           onSubmit={(payload) => void handleSubmit(payload)}
@@ -121,9 +121,9 @@ export default function ProjectsPage() {
       <ProjectsNav />
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Projects</h1>
+          <h1 className="text-2xl font-semibold">Proyectos</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Every engineering engagement your firm runs.
+            Todos los encargos de ingeniería de tu firma.
           </p>
         </div>
         <NewProjectDialog />
@@ -131,7 +131,7 @@ export default function ProjectsPage() {
 
       <div className="flex items-center gap-2">
         <Select
-          aria-label="Filter by status"
+          aria-label="Filtrar por estado"
           className="w-44"
           value={status}
           onChange={(e) => setStatus(e.target.value as StatusFilter)}
@@ -145,17 +145,17 @@ export default function ProjectsPage() {
       </div>
 
       {projects.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading projects…</p>
+        <p className="text-sm text-muted-foreground">Cargando proyectos…</p>
       ) : projects.data && projects.data.length > 0 ? (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Code</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Client</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Start</TableHead>
-              <TableHead>End</TableHead>
+              <TableHead>Código</TableHead>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Cliente</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Inicio</TableHead>
+              <TableHead>Fin</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -197,8 +197,8 @@ export default function ProjectsPage() {
         </Table>
       ) : (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-          No projects{status !== "ALL" ? " with this status" : " yet"}. Create
-          the first one.
+          No hay proyectos{status !== "ALL" ? " con este estado" : " todavía"}.
+          Crea el primero.
         </div>
       )}
     </div>

@@ -26,21 +26,21 @@ export const OPEN_STAGES = [
 ] as const satisfies readonly Stage[];
 
 export const STAGE_LABEL: Record<Stage, string> = {
-  LEAD: "New lead",
-  CONTACTED: "Contacted",
-  QUOTED: "Quoted",
-  NEGOTIATION: "Negotiation",
-  WON: "Won",
-  LOST: "Lost",
+  LEAD: "Nuevo prospecto",
+  CONTACTED: "Contactado",
+  QUOTED: "Cotizado",
+  NEGOTIATION: "Negociación",
+  WON: "Ganada",
+  LOST: "Perdida",
 };
 
 export const STAGE_HINT: Record<Stage, string> = {
-  LEAD: "Just arrived — nobody has answered yet",
-  CONTACTED: "In conversation, no quote sent",
-  QUOTED: "Quote sent, waiting for an answer",
-  NEGOTIATION: "Adjusting scope or price",
-  WON: "The client said yes",
-  LOST: "Did not go ahead",
+  LEAD: "Acaba de llegar; nadie ha respondido",
+  CONTACTED: "En conversación, sin cotización enviada",
+  QUOTED: "Cotización enviada, esperando respuesta",
+  NEGOTIATION: "Ajustando alcance o precio",
+  WON: "El cliente dijo que sí",
+  LOST: "No siguió adelante",
 };
 
 export function isOpen(stage: Stage) {
@@ -52,12 +52,12 @@ export const ACTIVITY_TYPES: {
   label: string;
   icon: LucideIcon;
 }[] = [
-  { key: "CALL", label: "Call", icon: Phone },
+  { key: "CALL", label: "Llamada", icon: Phone },
   { key: "WHATSAPP", label: "WhatsApp", icon: MessageCircle },
-  { key: "EMAIL", label: "Email", icon: Mail },
-  { key: "MEETING", label: "Meeting", icon: Users },
-  { key: "VISIT", label: "Site visit", icon: Building2 },
-  { key: "NOTE", label: "Note", icon: StickyNote },
+  { key: "EMAIL", label: "Correo", icon: Mail },
+  { key: "MEETING", label: "Reunión", icon: Users },
+  { key: "VISIT", label: "Visita a obra", icon: Building2 },
+  { key: "NOTE", label: "Nota", icon: StickyNote },
 ];
 
 export function activityMeta(type: ActivityType) {
@@ -65,12 +65,12 @@ export function activityMeta(type: ActivityType) {
 }
 
 export const SOURCE_SUGGESTIONS = [
-  "Website",
-  "Referral",
+  "Sitio web",
+  "Referido",
   "WhatsApp",
-  "Phone call",
-  "Returning client",
-  "Tender",
+  "Llamada telefónica",
+  "Cliente recurrente",
+  "Licitación",
 ];
 
 // Sum estimated values per currency — amounts in different currencies

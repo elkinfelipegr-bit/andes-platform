@@ -35,7 +35,7 @@ export default function LoginPage() {
         : await authClient.signUp.email({ email, password, name });
     setBusy(false);
     if (result.error) {
-      setError(result.error.message ?? "Something went wrong.");
+      setError(result.error.message ?? "Algo salió mal.");
       return;
     }
     router.push(postLoginDestination());
@@ -57,15 +57,15 @@ export default function LoginPage() {
           </div>
           <p className="text-sm text-muted-foreground">
             {mode === "sign-in"
-              ? "Sign in to your account"
-              : "Create your account"}
+              ? "Inicia sesión en tu cuenta"
+              : "Crea tu cuenta"}
           </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={submit} className="space-y-4">
             {mode === "sign-up" && (
               <label className="block text-sm">
-                <span className="text-foreground">Name</span>
+                <span className="text-foreground">Nombre</span>
                 <input
                   required
                   value={name}
@@ -75,7 +75,7 @@ export default function LoginPage() {
               </label>
             )}
             <label className="block text-sm">
-              <span className="text-foreground">Email</span>
+              <span className="text-foreground">Correo</span>
               <input
                 required
                 type="email"
@@ -85,7 +85,7 @@ export default function LoginPage() {
               />
             </label>
             <label className="block text-sm">
-              <span className="text-foreground">Password</span>
+              <span className="text-foreground">Contraseña</span>
               <input
                 required
                 type="password"
@@ -99,7 +99,11 @@ export default function LoginPage() {
             {error && <p className="text-sm text-destructive">{error}</p>}
 
             <Button type="submit" disabled={busy} className="w-full">
-              {busy ? "…" : mode === "sign-in" ? "Sign in" : "Sign up"}
+              {busy
+                ? "…"
+                : mode === "sign-in"
+                  ? "Iniciar sesión"
+                  : "Registrarse"}
             </Button>
           </form>
 
@@ -109,8 +113,8 @@ export default function LoginPage() {
             className="mt-4 text-sm text-muted-foreground underline-offset-2 hover:underline"
           >
             {mode === "sign-in"
-              ? "No account yet? Sign up"
-              : "Already have an account? Sign in"}
+              ? "¿Aún no tienes cuenta? Regístrate"
+              : "¿Ya tienes cuenta? Inicia sesión"}
           </button>
         </CardContent>
       </Card>

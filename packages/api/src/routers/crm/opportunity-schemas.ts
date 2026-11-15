@@ -48,8 +48,8 @@ const money = z.number().min(0).max(999_999_999_999);
 // on the server's timezone.
 const day = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "Expected a date as YYYY-MM-DD")
-  .refine((s) => !Number.isNaN(Date.parse(`${s}T00:00:00Z`)), "Invalid date");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Se esperaba una fecha con formato AAAA-MM-DD")
+  .refine((s) => !Number.isNaN(Date.parse(`${s}T00:00:00Z`)), "Fecha inválida");
 
 export const daySchema = day;
 
@@ -99,7 +99,7 @@ export const opportunitySetStageSchema = z
     lostReason: z.string().trim().min(1).max(500).optional(),
   })
   .refine((v) => v.stage !== "LOST" || !!v.lostReason, {
-    message: "A reason is required to mark an opportunity as lost.",
+    message: "Se necesita un motivo para marcar una oportunidad como perdida.",
     path: ["lostReason"],
   });
 

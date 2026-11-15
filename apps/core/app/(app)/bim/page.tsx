@@ -40,9 +40,9 @@ import {
 type DisciplineFilter = "ALL" | BimDiscipline;
 
 const createFormSchema = z.object({
-  projectId: z.string().min(1, "Pick a project"),
-  code: z.string().trim().min(1, "Required").max(32),
-  title: z.string().trim().min(1, "Required").max(200),
+  projectId: z.string().min(1, "Elige un proyecto"),
+  code: z.string().trim().min(1, "Obligatorio").max(32),
+  title: z.string().trim().min(1, "Obligatorio").max(200),
   discipline: z.enum([
     "ARCHITECTURE",
     "STRUCTURAL",
@@ -86,15 +86,15 @@ function NewBimModelDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus aria-hidden="true" />
-          New model
+          Nuevo modelo
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New BIM model</DialogTitle>
+          <DialogTitle>Nuevo modelo BIM</DialogTitle>
           <DialogDescription>
-            IFC versions are uploaded on the next screen. Only .ifc files are
-            accepted.
+            Las versiones IFC se suben en la siguiente pantalla. Solo se aceptan
+            archivos .ifc.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -102,9 +102,9 @@ function NewBimModelDialog() {
           className="space-y-4"
         >
           <div className="space-y-1.5">
-            <Label htmlFor="bim-project">Project</Label>
+            <Label htmlFor="bim-project">Proyecto</Label>
             <Select id="bim-project" {...form.register("projectId")}>
-              <option value="">— Pick a project —</option>
+              <option value="">— Elige un proyecto —</option>
               {activeProjects.map((project) => (
                 <option key={project.id} value={project.id}>
                   {project.code} — {project.name}
@@ -119,7 +119,7 @@ function NewBimModelDialog() {
           </div>
           <div className="grid grid-cols-[140px_1fr] gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="bim-code">Code</Label>
+              <Label htmlFor="bim-code">Código</Label>
               <Input
                 id="bim-code"
                 placeholder="BIM-2026-001"
@@ -133,7 +133,7 @@ function NewBimModelDialog() {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="bim-title">Title</Label>
+              <Label htmlFor="bim-title">Título</Label>
               <Input
                 id="bim-title"
                 placeholder="Modelo estructural — Torre A"
@@ -147,7 +147,7 @@ function NewBimModelDialog() {
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="bim-discipline">Discipline</Label>
+            <Label htmlFor="bim-discipline">Disciplina</Label>
             <Select id="bim-discipline" {...form.register("discipline")}>
               {DISCIPLINE_OPTIONS.map(([value, label]) => (
                 <option key={value} value={value}>
@@ -163,7 +163,7 @@ function NewBimModelDialog() {
 
           <div className="flex justify-end">
             <Button type="submit" disabled={create.isPending}>
-              {create.isPending ? "…" : "Create model"}
+              {create.isPending ? "…" : "Crear modelo"}
             </Button>
           </div>
         </form>
@@ -182,22 +182,22 @@ export default function BimPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">BIM models</h1>
+          <h1 className="text-2xl font-semibold">Modelos BIM</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Project models as immutable IFC versions — reviewable in the
-            browser, no desktop viewer required.
+            Modelos del proyecto como versiones IFC inmutables: se revisan en el
+            navegador, sin visor de escritorio.
           </p>
         </div>
         <NewBimModelDialog />
       </div>
 
       <Select
-        aria-label="Filter by discipline"
+        aria-label="Filtrar por disciplina"
         className="w-44"
         value={discipline}
         onChange={(e) => setDiscipline(e.target.value as DisciplineFilter)}
       >
-        <option value="ALL">All disciplines</option>
+        <option value="ALL">Todas las disciplinas</option>
         {DISCIPLINE_OPTIONS.map(([value, label]) => (
           <option key={value} value={value}>
             {label}
@@ -206,16 +206,16 @@ export default function BimPage() {
       </Select>
 
       {models.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading models…</p>
+        <p className="text-sm text-muted-foreground">Cargando modelos…</p>
       ) : models.data && models.data.length > 0 ? (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Code</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Discipline</TableHead>
-              <TableHead>Project</TableHead>
-              <TableHead className="text-right">Versions</TableHead>
+              <TableHead>Código</TableHead>
+              <TableHead>Título</TableHead>
+              <TableHead>Disciplina</TableHead>
+              <TableHead>Proyecto</TableHead>
+              <TableHead className="text-right">Versiones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -250,9 +250,9 @@ export default function BimPage() {
         </Table>
       ) : (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-          No BIM models
-          {discipline !== "ALL" ? " in this discipline" : " yet"}. Create the
-          first one.
+          No hay modelos BIM
+          {discipline !== "ALL" ? " en esta disciplina" : " todavía"}. Crea el
+          primero.
         </div>
       )}
     </div>

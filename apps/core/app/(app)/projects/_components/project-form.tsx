@@ -13,8 +13,8 @@ import { trpc } from "@/lib/trpc";
 
 const formSchema = z
   .object({
-    code: z.string().trim().min(1, "Required").max(32),
-    name: z.string().trim().min(1, "Required").max(200),
+    code: z.string().trim().min(1, "Obligatorio").max(32),
+    name: z.string().trim().min(1, "Obligatorio").max(200),
     description: z.string().trim().max(2000),
     clientId: z.string(), // "" = no client
     newClientName: z.string().trim().max(200),
@@ -23,7 +23,7 @@ const formSchema = z
     endDate: z.string(),
   })
   .refine((v) => !v.startDate || !v.endDate || v.startDate <= v.endDate, {
-    message: "End date must not precede start date",
+    message: "La fecha de fin no puede ser anterior a la de inicio",
     path: ["endDate"],
   });
 
@@ -90,7 +90,7 @@ export function ProjectForm({
     <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="project-code">Code</Label>
+          <Label htmlFor="project-code">Código</Label>
           <Input
             id="project-code"
             placeholder="P-2026-001"
@@ -102,18 +102,18 @@ export function ProjectForm({
           )}
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="project-status">Status</Label>
+          <Label htmlFor="project-status">Estado</Label>
           <Select id="project-status" {...form.register("status")}>
-            <option value="DRAFT">Draft</option>
-            <option value="ACTIVE">Active</option>
-            <option value="ON_HOLD">On hold</option>
-            <option value="COMPLETED">Completed</option>
+            <option value="DRAFT">Borrador</option>
+            <option value="ACTIVE">Activo</option>
+            <option value="ON_HOLD">En pausa</option>
+            <option value="COMPLETED">Completado</option>
           </Select>
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="project-name">Name</Label>
+        <Label htmlFor="project-name">Nombre</Label>
         <Input id="project-name" {...form.register("name")} />
         {errors.name && (
           <p className="text-xs text-destructive">{errors.name.message}</p>
@@ -121,15 +121,15 @@ export function ProjectForm({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="project-description">Description</Label>
+        <Label htmlFor="project-description">Descripción</Label>
         <Input id="project-description" {...form.register("description")} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="project-client">Client</Label>
+          <Label htmlFor="project-client">Cliente</Label>
           <Select id="project-client" {...form.register("clientId")}>
-            <option value="">— No client —</option>
+            <option value="">— Sin cliente —</option>
             {(clients.data ?? []).map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -138,10 +138,10 @@ export function ProjectForm({
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="project-new-client">…or create client</Label>
+          <Label htmlFor="project-new-client">…o crea un cliente</Label>
           <Input
             id="project-new-client"
-            placeholder="New client name"
+            placeholder="Nombre del nuevo cliente"
             {...form.register("newClientName")}
           />
         </div>
@@ -149,7 +149,7 @@ export function ProjectForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="project-start">Start date</Label>
+          <Label htmlFor="project-start">Fecha de inicio</Label>
           <Input
             id="project-start"
             type="date"
@@ -157,7 +157,7 @@ export function ProjectForm({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="project-end">End date</Label>
+          <Label htmlFor="project-end">Fecha de fin</Label>
           <Input id="project-end" type="date" {...form.register("endDate")} />
           {errors.endDate && (
             <p className="text-xs text-destructive">{errors.endDate.message}</p>

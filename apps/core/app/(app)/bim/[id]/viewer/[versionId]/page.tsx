@@ -15,7 +15,7 @@ const IfcViewer = dynamic(() => import("../../../_components/ifc-viewer"), {
   ssr: false,
   loading: () => (
     <div className="flex h-[70vh] items-center justify-center rounded-xl border border-border">
-      <p className="text-sm text-muted-foreground">Loading viewer…</p>
+      <p className="text-sm text-muted-foreground">Cargando visor…</p>
     </div>
   ),
 });
@@ -36,10 +36,10 @@ export default function BimViewerPage() {
             className="inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-2 hover:underline"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
-            {model.data?.code ?? "Model"}
+            {model.data?.code ?? "Modelo"}
           </Link>
           <h1 className="text-xl font-semibold">
-            {model.data?.title ?? "Viewer"}
+            {model.data?.title ?? "Visor"}
             {version && (
               <span className="ml-2 font-mono text-sm text-muted-foreground">
                 v{version.versionNumber} · {version.fileName}
@@ -47,19 +47,19 @@ export default function BimViewerPage() {
             )}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Click an element to read its IFC attributes. Orbit: drag · Pan:
-            right-drag · Zoom: scroll.
+            Haz clic en un elemento para leer sus atributos IFC. Orbitar:
+            arrastrar · Desplazar: arrastrar con clic derecho · Zoom: rueda.
           </p>
         </div>
         <Button asChild variant="outline">
-          <Link href={`/bim/${id}`}>Back to versions</Link>
+          <Link href={`/bim/${id}`}>Volver a versiones</Link>
         </Button>
       </div>
 
       {download.error ? (
         <div className="flex h-[70vh] items-center justify-center rounded-xl border border-border">
           <p className="text-sm text-destructive">
-            This version is not available: {download.error.message}
+            Esta versión no está disponible: {download.error.message}
           </p>
         </div>
       ) : download.data ? (
@@ -67,7 +67,7 @@ export default function BimViewerPage() {
       ) : (
         <div className="flex h-[70vh] items-center justify-center rounded-xl border border-border">
           <p className="text-sm text-muted-foreground">
-            Requesting access to the model…
+            Solicitando acceso al modelo…
           </p>
         </div>
       )}

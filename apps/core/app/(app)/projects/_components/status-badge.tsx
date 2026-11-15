@@ -13,11 +13,11 @@ const variantByStatus = {
 } as const;
 
 const labelByStatus: Record<ProjectStatus, string> = {
-  DRAFT: "Draft",
-  ACTIVE: "Active",
-  ON_HOLD: "On hold",
-  COMPLETED: "Completed",
-  ARCHIVED: "Archived",
+  DRAFT: "Borrador",
+  ACTIVE: "Activo",
+  ON_HOLD: "En pausa",
+  COMPLETED: "Completado",
+  ARCHIVED: "Archivado",
 };
 
 export function StatusBadge({ status }: { status: ProjectStatus }) {

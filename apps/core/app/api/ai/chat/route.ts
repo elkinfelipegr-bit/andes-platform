@@ -53,16 +53,19 @@ export async function POST(req: Request) {
     new Request("http://internal", { headers: req.headers }),
   );
   if (!ctx.session) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+    return Response.json({ error: "No autorizado" }, { status: 401 });
   }
   const membership = ctx.session.activeMembership;
   if (!membership) {
-    return Response.json({ error: "No tenant membership" }, { status: 403 });
+    return Response.json(
+      { error: "Sin membresía en una firma" },
+      { status: 403 },
+    );
   }
 
   const parsed = bodySchema.safeParse(await req.json());
   if (!parsed.success) {
-    return Response.json({ error: "Invalid request" }, { status: 400 });
+    return Response.json({ error: "Solicitud inválida" }, { status: 400 });
   }
   const { conversationId, messages } = parsed.data;
 
@@ -75,12 +78,18 @@ export async function POST(req: Request) {
   // is a 404 before the model ever runs.
   const conversation = await loadOwnConversation(sessionCtx, conversationId);
   if (!conversation) {
-    return Response.json({ error: "Conversation not found" }, { status: 404 });
+    return Response.json(
+      { error: "Conversación no encontrada" },
+      { status: 404 },
+    );
   }
 
   const userText = lastUserText(messages);
   if (!userText) {
-    return Response.json({ error: "No user message" }, { status: 400 });
+    return Response.json(
+      { error: "Falta el mensaje del usuario" },
+      { status: 400 },
+    );
   }
 
   // The read-only tool set (RFC-003), executed through the caller built

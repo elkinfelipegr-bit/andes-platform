@@ -52,7 +52,7 @@ export const uploadRequestSchema = z.object({
     .trim()
     .min(1)
     .max(200)
-    .regex(/\.ifc$/i, "Only .ifc files are accepted (RFC-002)"),
+    .regex(/\.ifc$/i, "Solo se aceptan archivos .ifc (RFC-002)"),
   fileSize: z.number().int().positive().max(MAX_UPLOAD_BYTES),
 });
 

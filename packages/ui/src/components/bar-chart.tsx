@@ -164,7 +164,7 @@ export function BarChart({
         <caption>{title}</caption>
         <thead>
           <tr>
-            <th scope="col">Period</th>
+            <th scope="col">Periodo</th>
             {series.map((s) => (
               <th key={s.key} scope="col">
                 {s.label}

@@ -37,7 +37,8 @@ async function getScheduledInspection(
   if (inspection.status !== "SCHEDULED") {
     throw new TRPCError({
       code: "CONFLICT",
-      message: "Photos can only change while the inspection is scheduled.",
+      message:
+        "Las fotos solo se pueden cambiar mientras la inspección está programada.",
     });
   }
   return inspection;
@@ -56,7 +57,7 @@ async function assertFindingInInspection(
   if (!finding) {
     throw new TRPCError({
       code: "BAD_REQUEST",
-      message: "Finding does not belong to this inspection.",
+      message: "El hallazgo no pertenece a esta inspección.",
     });
   }
 }
@@ -124,7 +125,7 @@ export const inspectionPhotoProcedures = {
       if (photo.status !== "PENDING") {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "This photo was already confirmed.",
+          message: "Esta foto ya fue confirmada.",
         });
       }
       assertKeyInTenant(photo.storageKey, ctx.tenantId);
@@ -133,13 +134,14 @@ export const inspectionPhotoProcedures = {
       if (!head) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "The photo has not arrived in storage — upload it first.",
+          message: "La foto no ha llegado al almacenamiento: súbela primero.",
         });
       }
       if (head.size <= 0 || head.size > MAX_PHOTO_BYTES) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "The stored photo size is outside the accepted range.",
+          message:
+            "El tamaño de la foto almacenada está fuera del rango aceptado.",
         });
       }
 

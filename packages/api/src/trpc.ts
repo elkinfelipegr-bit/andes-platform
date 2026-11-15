@@ -32,7 +32,7 @@ export const tenantProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (!membership) {
     throw new TRPCError({
       code: "FORBIDDEN",
-      message: "No active tenant membership.",
+      message: "No tienes una membresía activa en ninguna firma.",
     });
   }
   return next({
@@ -51,7 +51,7 @@ export function roleProcedure(...allowedRoleKeys: string[]) {
     if (!allowedRoleKeys.includes(ctx.roleKey)) {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: `Requires one of roles: ${allowedRoleKeys.join(", ")}.`,
+        message: `Requiere uno de estos roles: ${allowedRoleKeys.join(", ")}.`,
       });
     }
     return next();

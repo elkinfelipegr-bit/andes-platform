@@ -59,7 +59,7 @@ async function assertInspectorIsMember(
   if (!membership) {
     throw new TRPCError({
       code: "BAD_REQUEST",
-      message: "Inspector is not a member of this tenant.",
+      message: "El inspector no es miembro de esta firma.",
     });
   }
 }
@@ -79,7 +79,7 @@ export async function assertActiveProject(
   if (!project) {
     throw new TRPCError({
       code: "BAD_REQUEST",
-      message: "Project not found or archived.",
+      message: "El proyecto no existe o está archivado.",
     });
   }
 }
@@ -139,7 +139,7 @@ export const inspectionsRouter = router({
         if (isUniqueViolation(e)) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: `An inspection with code "${input.code}" already exists.`,
+            message: `Ya existe una inspección con el código "${input.code}".`,
           });
         }
         throw e;
@@ -160,7 +160,7 @@ export const inspectionsRouter = router({
       if (existing.status !== "SCHEDULED") {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Only scheduled inspections can be edited.",
+          message: "Solo se pueden editar inspecciones programadas.",
         });
       }
       if (inspectorId) {
@@ -250,7 +250,7 @@ export const inspectionsRouter = router({
         if (isUniqueViolation(e)) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: `An inspection with code "${fields.code}" already exists.`,
+            message: `Ya existe una inspección con el código "${fields.code}".`,
           });
         }
         throw e;
@@ -270,7 +270,7 @@ export const inspectionsRouter = router({
       if (existing.status !== "SCHEDULED") {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Only scheduled inspections can be completed.",
+          message: "Solo se pueden completar inspecciones programadas.",
         });
       }
       const performedAt = new Date();
@@ -293,7 +293,7 @@ export const inspectionsRouter = router({
       if (existing.status !== "SCHEDULED") {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Only scheduled inspections can be cancelled.",
+          message: "Solo se pueden cancelar inspecciones programadas.",
         });
       }
       await ctx.tenantDb.inspection.updateMany({

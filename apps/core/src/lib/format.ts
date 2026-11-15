@@ -13,7 +13,7 @@ export function formatDate(value: Date | string | null) {
   if (!value) return "—";
   // Date-only values live at UTC midnight; format in UTC so the day
   // doesn't shift in western timezones.
-  return new Date(value).toLocaleDateString(undefined, { timeZone: "UTC" });
+  return new Date(value).toLocaleDateString("es-CO", { timeZone: "UTC" });
 }
 
 // The user's own calendar day as YYYY-MM-DD — what "today" means on the
@@ -41,14 +41,14 @@ export function daysBetween(fromDay: string, toDayValue: string) {
 // "Today", "Tomorrow", "3 days ago", "in 5 days" — for due dates.
 export function relativeDay(day: string, today: string) {
   const delta = daysBetween(today, day);
-  if (delta === 0) return "Today";
-  if (delta === 1) return "Tomorrow";
-  if (delta === -1) return "Yesterday";
-  return delta < 0 ? `${-delta} days ago` : `In ${delta} days`;
+  if (delta === 0) return "Hoy";
+  if (delta === 1) return "Mañana";
+  if (delta === -1) return "Ayer";
+  return delta < 0 ? `Hace ${-delta} días` : `En ${delta} días`;
 }
 
 export function formatDateTime(value: Date | string) {
-  return new Date(value).toLocaleString(undefined, {
+  return new Date(value).toLocaleString("es-CO", {
     dateStyle: "medium",
     timeStyle: "short",
   });
@@ -62,4 +62,16 @@ export function formatMoneyCompact(value: number, currency: string) {
     notation: "compact",
     maximumFractionDigits: 1,
   }).format(value);
+}
+
+// Role labels are tenant data (Sprint 0: roles are rows, not an enum) and
+// the two seed roles were created with English labels. Shown in Spanish
+// per design-system.md; a label a firm wrote itself passes through as is.
+const SEED_ROLE_LABELS: Record<string, string> = {
+  "Owner / Admin": "Propietario / Admin",
+  Engineer: "Ingeniero",
+};
+
+export function roleLabel(label: string) {
+  return SEED_ROLE_LABELS[label] ?? label;
 }

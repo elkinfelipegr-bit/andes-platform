@@ -30,7 +30,7 @@ export async function assertClientInTenant(
   if (!client) {
     throw new TRPCError({
       code: "BAD_REQUEST",
-      message: "Client not found in this tenant.",
+      message: "El cliente no existe en esta firma.",
     });
   }
 }

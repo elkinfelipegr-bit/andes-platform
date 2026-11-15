@@ -46,7 +46,7 @@ async function assertContactOfClient(
   if (!contact) {
     throw new TRPCError({
       code: "BAD_REQUEST",
-      message: "Contact not found for this client.",
+      message: "El contacto no pertenece a este cliente.",
     });
   }
 }
@@ -65,7 +65,7 @@ async function assertOwnerIsMember(
   if (!membership) {
     throw new TRPCError({
       code: "BAD_REQUEST",
-      message: "Owner is not a member of this tenant.",
+      message: "El responsable no es miembro de esta firma.",
     });
   }
 }

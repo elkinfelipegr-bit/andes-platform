@@ -9,15 +9,15 @@ import { usePathname } from "next/navigation";
 import { cn } from "@andes/ui";
 
 const tabs = [
-  { label: "Projects", href: "/projects" },
-  { label: "Inspections", href: "/projects/inspections" },
+  { label: "Proyectos", href: "/projects" },
+  { label: "Inspecciones", href: "/projects/inspections" },
 ];
 
 export function ProjectsNav() {
   const pathname = usePathname();
   return (
     <nav
-      aria-label="Projects sections"
+      aria-label="Secciones de Proyectos"
       className="flex gap-1 border-b border-border print:hidden"
     >
       {tabs.map((tab) => {

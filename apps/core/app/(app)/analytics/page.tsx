@@ -14,11 +14,11 @@ import { formatMoney, localDay } from "@/lib/format";
 import { trpc } from "@/lib/trpc";
 
 const PRESETS = [
-  { key: "month", label: "This month" },
-  { key: "3m", label: "Last 3 months" },
-  { key: "6m", label: "Last 6 months" },
-  { key: "12m", label: "Last 12 months" },
-  { key: "custom", label: "Custom" },
+  { key: "month", label: "Este mes" },
+  { key: "3m", label: "Últimos 3 meses" },
+  { key: "6m", label: "Últimos 6 meses" },
+  { key: "12m", label: "Últimos 12 meses" },
+  { key: "custom", label: "Personalizado" },
 ] as const;
 type PresetKey = (typeof PRESETS)[number]["key"];
 
@@ -31,7 +31,7 @@ function presetRange(key: Exclude<PresetKey, "custom">) {
 }
 
 function monthLabel(month: string) {
-  return new Date(`${month}-01T00:00:00Z`).toLocaleDateString(undefined, {
+  return new Date(`${month}-01T00:00:00Z`).toLocaleDateString("es-CO", {
     month: "short",
     year: "2-digit",
     timeZone: "UTC",
@@ -107,7 +107,7 @@ function Area({
       </header>
       <div className="mt-4">
         {loading ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
+          <p className="text-sm text-muted-foreground">Cargando…</p>
         ) : error ? (
           <p role="alert" className="text-sm text-destructive">
             {error}
@@ -214,14 +214,14 @@ export default function AnalyticsPage() {
     <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Analytics</h1>
+          <h1 className="text-2xl font-semibold">Analítica</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            The firm&apos;s indicators for a period, read from what every module
-            already records.
+            Los indicadores de la firma en un periodo, leídos de lo que cada
+            módulo ya registra.
           </p>
           <p className="mt-2 hidden text-sm print:block">
-            Period {range.from} to {range.to}
-            {clientName ? ` · Client: ${clientName}` : ""}
+            Periodo {range.from} a {range.to}
+            {clientName ? ` · Cliente: ${clientName}` : ""}
             {me.data?.activeMembership
               ? ` · ${me.data.activeMembership.tenantSlug}`
               : ""}
@@ -233,13 +233,13 @@ export default function AnalyticsPage() {
           onClick={() => window.print()}
         >
           <Printer aria-hidden="true" />
-          Print report
+          Imprimir informe
         </Button>
       </div>
 
       <div className="flex flex-wrap items-end gap-4 rounded-xl border border-border bg-card p-4 print:hidden">
         <div className="space-y-1.5">
-          <Label htmlFor="an-period">Period</Label>
+          <Label htmlFor="an-period">Periodo</Label>
           <Select
             id="an-period"
             value={preset}
@@ -258,7 +258,7 @@ export default function AnalyticsPage() {
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="an-from">From</Label>
+          <Label htmlFor="an-from">Desde</Label>
           <Input
             id="an-from"
             type="date"
@@ -270,7 +270,7 @@ export default function AnalyticsPage() {
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="an-to">To</Label>
+          <Label htmlFor="an-to">Hasta</Label>
           <Input
             id="an-to"
             type="date"
@@ -280,13 +280,13 @@ export default function AnalyticsPage() {
           />
         </div>
         <div className="min-w-48 flex-1 space-y-1.5">
-          <Label htmlFor="an-client">Client</Label>
+          <Label htmlFor="an-client">Cliente</Label>
           <Select
             id="an-client"
             value={clientId}
             onChange={(ev) => setClientId(ev.target.value)}
           >
-            <option value="">All clients</option>
+            <option value="">Todos los clientes</option>
             {clients.data?.map((cl) => (
               <option key={cl.id} value={cl.id}>
                 {cl.name}
@@ -298,15 +298,15 @@ export default function AnalyticsPage() {
 
       {!valid ? (
         <p role="alert" className="text-sm text-destructive">
-          The period must start before it ends.
+          El periodo debe empezar antes de terminar.
         </p>
       ) : (
         <>
           <Area
-            title="Commercial"
-            definition="Proposals created in the period. Win rate = accepted ÷ (accepted + rejected + expired). Value quoted excludes drafts; amounts are never added across currencies."
+            title="Comercial"
+            definition="Propuestas creadas en el periodo. Tasa de éxito = aceptadas ÷ (aceptadas + rechazadas + vencidas). El valor cotizado excluye borradores; nunca se suman montos de monedas distintas."
             href="/crm/proposals"
-            hrefLabel="Proposals"
+            hrefLabel="Propuestas"
             loading={commercial.isLoading}
             error={commercial.error?.message}
             onExport={
@@ -314,7 +314,7 @@ export default function AnalyticsPage() {
               (() =>
                 downloadCsv(
                   `commercial_${suffix}.csv`,
-                  ["Month", "Proposals created", "Accepted"],
+                  ["Mes", "Propuestas creadas", "Aceptada"],
                   c.monthly.map((m) => [m.month, m.created, m.accepted]),
                 ))
             }
@@ -323,21 +323,21 @@ export default function AnalyticsPage() {
               <div className="space-y-5">
                 <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
                   <Figure
-                    label="Proposals created"
+                    label="Propuestas creadas"
                     value={String(c.created)}
-                    hint={`${c.byStatus.SENT} awaiting answer`}
+                    hint={`${c.byStatus.SENT} esperando respuesta`}
                   />
                   <Figure
-                    label="Win rate"
+                    label="Tasa de éxito"
                     value={percent(c.winRate)}
                     hint={
                       c.decided > 0
-                        ? `${c.byStatus.ACCEPTED} of ${c.decided} decided`
-                        : "Nothing decided yet"
+                        ? `${c.byStatus.ACCEPTED} de ${c.decided} decididas`
+                        : "Aún no hay decisiones"
                     }
                   />
                   <Figure
-                    label="Days to decision"
+                    label="Días hasta la decisión"
                     value={
                       c.avgDaysToDecision === null
                         ? "—"
@@ -345,30 +345,30 @@ export default function AnalyticsPage() {
                     }
                     hint={
                       c.decisionSample > 0
-                        ? `Average over ${c.decisionSample} with dates`
-                        : "No sent and decided dates recorded"
+                        ? `Promedio de ${c.decisionSample} con fechas`
+                        : "No hay fechas de envío y decisión registradas"
                     }
                   />
                   {c.money === null ? (
                     <Figure
-                      label="Value quoted / won"
+                      label="Valor cotizado / ganado"
                       value="—"
-                      hint="Visible to Owner / Admin"
+                      hint="Visible para Propietario / Admin"
                     />
                   ) : c.money.length === 0 ? (
                     <Figure
-                      label="Value quoted / won"
+                      label="Valor cotizado / ganado"
                       value="—"
-                      hint="No proposals sent"
+                      hint="No hay propuestas enviadas"
                     />
                   ) : (
                     <div className="space-y-2">
                       {c.money.map((m) => (
                         <Figure
                           key={m.currency}
-                          label={`Value won (${m.currency})`}
+                          label={`Valor ganado (${m.currency})`}
                           value={formatMoney(m.won, m.currency)}
-                          hint={`of ${formatMoney(m.quoted, m.currency)} quoted`}
+                          hint={`de ${formatMoney(m.quoted, m.currency)} cotizado`}
                         />
                       ))}
                     </div>
@@ -377,27 +377,27 @@ export default function AnalyticsPage() {
                 <Breakdown
                   parts={[
                     {
-                      label: "Draft",
+                      label: "Borrador",
                       value: c.byStatus.DRAFT,
                       tone: "bg-muted-foreground/40",
                     },
                     {
-                      label: "Sent",
+                      label: "Enviada",
                       value: c.byStatus.SENT,
                       tone: "bg-primary",
                     },
                     {
-                      label: "Accepted",
+                      label: "Aceptada",
                       value: c.byStatus.ACCEPTED,
                       tone: "bg-success",
                     },
                     {
-                      label: "Rejected",
+                      label: "Rechazada",
                       value: c.byStatus.REJECTED,
                       tone: "bg-destructive",
                     },
                     {
-                      label: "Expired",
+                      label: "Vencida",
                       value: c.byStatus.EXPIRED,
                       tone: "bg-warning",
                     },
@@ -405,11 +405,11 @@ export default function AnalyticsPage() {
                 />
                 <BarChart
                   className="max-w-3xl"
-                  title="Proposals created and accepted per month"
+                  title="Propuestas creadas y aceptadas por mes"
                   categories={c.monthly.map((m) => monthLabel(m.month))}
                   series={[
-                    { key: "created", label: "Created", tone: "primary" },
-                    { key: "accepted", label: "Accepted", tone: "success" },
+                    { key: "created", label: "Creadas", tone: "primary" },
+                    { key: "accepted", label: "Aceptada", tone: "success" },
                   ]}
                   values={{
                     created: c.monthly.map((m) => m.created),
@@ -421,10 +421,10 @@ export default function AnalyticsPage() {
           </Area>
 
           <Area
-            title="Projects"
-            definition="Status and active projects per client are today's snapshot. Started and completed are counted by each project's start and end date within the period."
+            title="Proyectos"
+            definition="El estado y los proyectos activos por cliente son la foto de hoy. Iniciados y terminados se cuentan por la fecha de inicio y de fin de cada proyecto dentro del periodo."
             href="/projects"
-            hrefLabel="Projects"
+            hrefLabel="Proyectos"
             loading={projects.isLoading}
             error={projects.error?.message}
             onExport={
@@ -432,7 +432,7 @@ export default function AnalyticsPage() {
               (() =>
                 downloadCsv(
                   `projects_${suffix}.csv`,
-                  ["Month", "Started", "Completed"],
+                  ["Mes", "Iniciados", "Completado"],
                   p.monthly.map((m) => [m.month, m.started, m.completed]),
                 ))
             }
@@ -441,50 +441,50 @@ export default function AnalyticsPage() {
               <div className="space-y-5">
                 <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
                   <Figure
-                    label="Projects"
+                    label="Proyectos"
                     value={String(p.total)}
-                    hint="All, today"
+                    hint="Todos, hoy"
                   />
                   <Figure
-                    label="Active"
+                    label="Activo"
                     value={String(p.byStatus.ACTIVE)}
-                    hint="Today"
+                    hint="Hoy"
                   />
                   <Figure
-                    label="Started"
+                    label="Iniciados"
                     value={String(p.started)}
-                    hint="In the period"
+                    hint="En el periodo"
                   />
                   <Figure
-                    label="Completed"
+                    label="Completado"
                     value={String(p.completed)}
-                    hint="In the period"
+                    hint="En el periodo"
                   />
                 </div>
                 <Breakdown
                   parts={[
                     {
-                      label: "Draft",
+                      label: "Borrador",
                       value: p.byStatus.DRAFT,
                       tone: "bg-muted-foreground/40",
                     },
                     {
-                      label: "Active",
+                      label: "Activo",
                       value: p.byStatus.ACTIVE,
                       tone: "bg-primary",
                     },
                     {
-                      label: "On hold",
+                      label: "En pausa",
                       value: p.byStatus.ON_HOLD,
                       tone: "bg-warning",
                     },
                     {
-                      label: "Completed",
+                      label: "Completado",
                       value: p.byStatus.COMPLETED,
                       tone: "bg-success",
                     },
                     {
-                      label: "Archived",
+                      label: "Archivado",
                       value: p.byStatus.ARCHIVED,
                       tone: "bg-border",
                     },
@@ -492,11 +492,15 @@ export default function AnalyticsPage() {
                 />
                 <div className="grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
                   <BarChart
-                    title="Projects started and completed per month"
+                    title="Proyectos iniciados y terminados por mes"
                     categories={p.monthly.map((m) => monthLabel(m.month))}
                     series={[
-                      { key: "started", label: "Started", tone: "primary" },
-                      { key: "completed", label: "Completed", tone: "success" },
+                      { key: "started", label: "Iniciados", tone: "primary" },
+                      {
+                        key: "completed",
+                        label: "Completado",
+                        tone: "success",
+                      },
                     ]}
                     values={{
                       started: p.monthly.map((m) => m.started),
@@ -505,12 +509,12 @@ export default function AnalyticsPage() {
                   />
                   <div>
                     <h3 className="text-sm font-semibold">
-                      Active projects per client
+                      Proyectos activos por cliente
                     </h3>
                     {p.activeByClient.length === 0 &&
                     p.activeWithoutClient === 0 ? (
                       <p className="mt-2 text-sm text-muted-foreground">
-                        No active projects.
+                        No hay proyectos activos.
                       </p>
                     ) : (
                       <ul className="mt-2 divide-y divide-border text-sm">
@@ -532,7 +536,7 @@ export default function AnalyticsPage() {
                         ))}
                         {p.activeWithoutClient > 0 && (
                           <li className="flex justify-between gap-3 py-1.5 text-muted-foreground">
-                            <span>No client (internal)</span>
+                            <span>Sin cliente (interno)</span>
                             <span className="tabular-nums">
                               {p.activeWithoutClient}
                             </span>
@@ -547,10 +551,10 @@ export default function AnalyticsPage() {
           </Area>
 
           <Area
-            title="Inspections"
-            definition="Visits are counted by their scheduled date within the period; findings by the date the visit was performed. Overdue is today's snapshot: still scheduled, with a date in the past."
+            title="Inspecciones"
+            definition="Las visitas se cuentan por su fecha programada dentro del periodo; los hallazgos, por la fecha en que se realizó la visita. Vencidas es la foto de hoy: siguen programadas con fecha pasada."
             href="/projects/inspections"
-            hrefLabel="Inspections"
+            hrefLabel="Inspecciones"
             loading={inspections.isLoading}
             error={inspections.error?.message}
             onExport={
@@ -558,7 +562,7 @@ export default function AnalyticsPage() {
               (() =>
                 downloadCsv(
                   `inspections_${suffix}.csv`,
-                  ["Month", "Scheduled", "Completed", "Cancelled"],
+                  ["Mes", "Programada", "Completado", "Cancelada"],
                   i.monthly.map((m) => [
                     m.month,
                     m.SCHEDULED,
@@ -572,35 +576,43 @@ export default function AnalyticsPage() {
               <div className="space-y-5">
                 <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
                   <Figure
-                    label="Visits"
+                    label="Visitas"
                     value={String(i.total)}
-                    hint="Scheduled in the period"
+                    hint="Programadas en el periodo"
                   />
                   <Figure
-                    label="Completed"
+                    label="Completado"
                     value={String(i.byStatus.COMPLETED)}
                   />
                   <Figure
-                    label="Overdue"
+                    label="Vencidas"
                     value={String(i.overdue)}
                     tone={i.overdue > 0 ? "alert" : undefined}
-                    hint="Today, any period"
+                    hint="Hoy, cualquier periodo"
                   />
                   <Figure
-                    label="Findings"
+                    label="Hallazgos"
                     value={String(i.findings)}
-                    hint="From visits performed"
+                    hint="De visitas realizadas"
                   />
                 </div>
                 <div className="grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
                   <BarChart
-                    title="Inspections per month by status"
+                    title="Inspecciones por mes y estado"
                     stacked
                     categories={i.monthly.map((m) => monthLabel(m.month))}
                     series={[
-                      { key: "COMPLETED", label: "Completed", tone: "success" },
-                      { key: "SCHEDULED", label: "Scheduled", tone: "primary" },
-                      { key: "CANCELLED", label: "Cancelled", tone: "muted" },
+                      {
+                        key: "COMPLETED",
+                        label: "Completado",
+                        tone: "success",
+                      },
+                      {
+                        key: "SCHEDULED",
+                        label: "Programada",
+                        tone: "primary",
+                      },
+                      { key: "CANCELLED", label: "Cancelada", tone: "muted" },
                     ]}
                     values={{
                       COMPLETED: i.monthly.map((m) => m.COMPLETED),
@@ -610,27 +622,27 @@ export default function AnalyticsPage() {
                   />
                   <div>
                     <h3 className="mb-2 text-sm font-semibold">
-                      Findings by severity
+                      Hallazgos por severidad
                     </h3>
                     <Breakdown
                       parts={[
                         {
-                          label: "Critical",
+                          label: "Crítica",
                           value: i.findingsBySeverity.CRITICAL,
                           tone: "bg-destructive",
                         },
                         {
-                          label: "High",
+                          label: "Alta",
                           value: i.findingsBySeverity.HIGH,
                           tone: "bg-warning",
                         },
                         {
-                          label: "Medium",
+                          label: "Media",
                           value: i.findingsBySeverity.MEDIUM,
                           tone: "bg-primary",
                         },
                         {
-                          label: "Low",
+                          label: "Baja",
                           value: i.findingsBySeverity.LOW,
                           tone: "bg-muted-foreground/40",
                         },
@@ -643,10 +655,10 @@ export default function AnalyticsPage() {
           </Area>
 
           <Area
-            title="Engineering records"
-            definition="Calculation and geotechnical records created in the period, draft versus issued."
+            title="Registros de ingeniería"
+            definition="Memorias de cálculo y registros geotécnicos creados en el periodo, borrador frente a emitidos."
             href="/structures"
-            hrefLabel="Structures"
+            hrefLabel="Estructuras"
             loading={engineering.isLoading}
             error={engineering.error?.message}
             onExport={
@@ -654,16 +666,16 @@ export default function AnalyticsPage() {
               (() =>
                 downloadCsv(
                   `engineering_${suffix}.csv`,
-                  ["Record type", "Draft", "Issued", "Total"],
+                  ["Tipo de registro", "Borrador", "Emitido", "Total"],
                   [
                     [
-                      "Calculation",
+                      "Cálculo",
                       e.calc.byStatus.DRAFT,
                       e.calc.byStatus.ISSUED,
                       e.calc.total,
                     ],
                     [
-                      "Geotechnical",
+                      "Geotecnia",
                       e.geo.byStatus.DRAFT,
                       e.geo.byStatus.ISSUED,
                       e.geo.total,
@@ -676,8 +688,8 @@ export default function AnalyticsPage() {
               <div className="grid gap-6 md:grid-cols-2">
                 {(
                   [
-                    ["Calculation records", e.calc],
-                    ["Geotechnical records", e.geo],
+                    ["Memorias de cálculo", e.calc],
+                    ["Registros geotécnicos", e.geo],
                   ] as const
                 ).map(([label, r]) => (
                   <div key={label} className="space-y-3">
@@ -685,12 +697,12 @@ export default function AnalyticsPage() {
                     <Breakdown
                       parts={[
                         {
-                          label: "Draft",
+                          label: "Borrador",
                           value: r.byStatus.DRAFT,
                           tone: "bg-muted-foreground/40",
                         },
                         {
-                          label: "Issued",
+                          label: "Emitido",
                           value: r.byStatus.ISSUED,
                           tone: "bg-success",
                         },

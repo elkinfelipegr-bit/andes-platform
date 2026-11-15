@@ -16,5 +16,5 @@ export const normsRangeSchema = z
     to: z.number().int().min(1),
   })
   .refine((r) => r.to >= r.from && r.to - r.from <= 200, {
-    message: "Range must be ascending and at most 200 lines.",
+    message: "El rango debe ser ascendente y de máximo 200 líneas.",
   });

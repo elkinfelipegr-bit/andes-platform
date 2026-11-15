@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@andes/ui";
 
-import { formatDate } from "@/lib/format";
+import { formatDate, roleLabel } from "@/lib/format";
 import { trpc } from "@/lib/trpc";
 
 export function MembersSection({ currentUserId }: { currentUserId: string }) {
@@ -35,9 +35,9 @@ export function MembersSection({ currentUserId }: { currentUserId: string }) {
   return (
     <section className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold">Members</h2>
+        <h2 className="text-lg font-semibold">Miembros</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          A firm always keeps at least one owner-admin.
+          Una firma siempre conserva al menos un propietario-administrador.
         </p>
       </div>
 
@@ -48,19 +48,19 @@ export function MembersSection({ currentUserId }: { currentUserId: string }) {
       )}
 
       {members.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading members…</p>
+        <p className="text-sm text-muted-foreground">Cargando miembros…</p>
       ) : members.error ? (
         <p className="text-sm text-destructive">{members.error.message}</p>
       ) : (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Member since</TableHead>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Correo</TableHead>
+              <TableHead>Rol</TableHead>
+              <TableHead>Miembro desde</TableHead>
               <TableHead className="w-12">
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">Acciones</span>
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -73,7 +73,7 @@ export function MembersSection({ currentUserId }: { currentUserId: string }) {
                     {member.user.name}
                     {isSelf && (
                       <Badge variant="muted" className="ml-2">
-                        You
+                        Tú
                       </Badge>
                     )}
                   </TableCell>
@@ -82,7 +82,7 @@ export function MembersSection({ currentUserId }: { currentUserId: string }) {
                   </TableCell>
                   <TableCell>
                     <Select
-                      aria-label={`Role of ${member.user.name}`}
+                      aria-label={`Rol de ${member.user.name}`}
                       className="w-44"
                       value={member.role.id}
                       disabled={busy || !roles.data}
@@ -97,7 +97,7 @@ export function MembersSection({ currentUserId }: { currentUserId: string }) {
                     >
                       {(roles.data ?? [member.role]).map((role) => (
                         <option key={role.id} value={role.id}>
-                          {role.label}
+                          {roleLabel(role.label)}
                         </option>
                       ))}
                     </Select>
@@ -111,11 +111,11 @@ export function MembersSection({ currentUserId }: { currentUserId: string }) {
                         variant="ghost"
                         size="sm"
                         disabled={busy}
-                        aria-label={`Remove ${member.user.name}`}
+                        aria-label={`Quitar a ${member.user.name}`}
                         onClick={() => {
                           if (
                             window.confirm(
-                              `Remove ${member.user.name} from your firm? They lose access immediately.`,
+                              `¿Quitar a ${member.user.name} de tu firma? Pierde el acceso de inmediato.`,
                             )
                           ) {
                             changeRole.reset();

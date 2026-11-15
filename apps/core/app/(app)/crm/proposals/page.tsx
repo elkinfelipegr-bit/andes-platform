@@ -42,21 +42,21 @@ import { CrmNav } from "../_components/crm-nav";
 import { ProposalStatusBadge } from "./_components/proposal-status-badge";
 
 const STATUS_FILTERS = [
-  ["ALL", "All statuses"],
-  ["DRAFT", "Draft"],
-  ["SENT", "Sent"],
-  ["ACCEPTED", "Accepted"],
-  ["REJECTED", "Rejected"],
-  ["EXPIRED", "Expired"],
+  ["ALL", "Todos los estados"],
+  ["DRAFT", "Borrador"],
+  ["SENT", "Enviada"],
+  ["ACCEPTED", "Aceptada"],
+  ["REJECTED", "Rechazada"],
+  ["EXPIRED", "Vencida"],
 ] as const;
 
 type StatusFilter = (typeof STATUS_FILTERS)[number][0];
 
 const createFormSchema = z.object({
-  clientId: z.string().min(1, "Pick a client"),
+  clientId: z.string().min(1, "Elige un cliente"),
   contactId: z.string(),
-  code: z.string().trim().min(1, "Required").max(32),
-  title: z.string().trim().min(1, "Required").max(200),
+  code: z.string().trim().min(1, "Obligatorio").max(32),
+  title: z.string().trim().min(1, "Obligatorio").max(200),
   validUntil: z.string(),
 });
 
@@ -107,23 +107,23 @@ function NewProposalDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus aria-hidden="true" />
-          New proposal
+          Nueva propuesta
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New proposal</DialogTitle>
+          <DialogTitle>Nueva propuesta</DialogTitle>
           <DialogDescription>
-            Basic data first — you add the priced items on the next screen,
-            while it is a draft.
+            Primero los datos básicos; los ítems con precio se agregan en la
+            siguiente pantalla, mientras es borrador.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="proposal-client">Client</Label>
+              <Label htmlFor="proposal-client">Cliente</Label>
               <Select id="proposal-client" {...form.register("clientId")}>
-                <option value="">— Pick a client —</option>
+                <option value="">— Elige un cliente —</option>
                 {(clients.data ?? []).map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -137,13 +137,13 @@ function NewProposalDialog() {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="proposal-contact">Recipient (optional)</Label>
+              <Label htmlFor="proposal-contact">Destinatario (opcional)</Label>
               <Select
                 id="proposal-contact"
                 disabled={!clientId}
                 {...form.register("contactId")}
               >
-                <option value="">— No specific contact —</option>
+                <option value="">— Sin contacto específico —</option>
                 {(clientDetail.data?.contacts ?? []).map((contact) => (
                   <option key={contact.id} value={contact.id}>
                     {contact.name}
@@ -154,7 +154,7 @@ function NewProposalDialog() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="proposal-code">Code</Label>
+              <Label htmlFor="proposal-code">Código</Label>
               <Input
                 id="proposal-code"
                 placeholder="PR-2026-001"
@@ -168,7 +168,7 @@ function NewProposalDialog() {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="proposal-valid">Valid until</Label>
+              <Label htmlFor="proposal-valid">Válida hasta</Label>
               <Input
                 id="proposal-valid"
                 type="date"
@@ -177,7 +177,7 @@ function NewProposalDialog() {
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="proposal-title">Title</Label>
+            <Label htmlFor="proposal-title">Título</Label>
             <Input id="proposal-title" {...form.register("title")} />
             {errors.title && (
               <p className="text-xs text-destructive">{errors.title.message}</p>
@@ -190,7 +190,7 @@ function NewProposalDialog() {
 
           <div className="flex justify-end">
             <Button type="submit" disabled={create.isPending}>
-              {create.isPending ? "…" : "Create draft"}
+              {create.isPending ? "…" : "Crear borrador"}
             </Button>
           </div>
         </form>
@@ -210,16 +210,16 @@ export default function ProposalsPage() {
       <CrmNav />
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Proposals</h1>
+          <h1 className="text-2xl font-semibold">Propuestas</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Commercial offers — accepted ones become projects.
+            Ofertas comerciales; las aceptadas se convierten en proyectos.
           </p>
         </div>
         <NewProposalDialog />
       </div>
 
       <Select
-        aria-label="Filter by status"
+        aria-label="Filtrar por estado"
         className="w-44"
         value={status}
         onChange={(e) => setStatus(e.target.value as StatusFilter)}
@@ -232,18 +232,18 @@ export default function ProposalsPage() {
       </Select>
 
       {proposals.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading proposals…</p>
+        <p className="text-sm text-muted-foreground">Cargando propuestas…</p>
       ) : proposals.data && proposals.data.length > 0 ? (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Code</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Client</TableHead>
+              <TableHead>Código</TableHead>
+              <TableHead>Título</TableHead>
+              <TableHead>Cliente</TableHead>
               <TableHead className="text-right">Total</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Sent</TableHead>
-              <TableHead>Valid until</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Enviada</TableHead>
+              <TableHead>Válida hasta</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -278,7 +278,7 @@ export default function ProposalsPage() {
                       {formatDate(proposal.sentAt)}
                       {proposal.status === "SENT" && (
                         <span className="block text-xs">
-                          waiting{" "}
+                          esperando{" "}
                           {daysBetween(toDay(proposal.sentAt), localDay())} d
                         </span>
                       )}
@@ -296,8 +296,8 @@ export default function ProposalsPage() {
         </Table>
       ) : (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-          No proposals{status !== "ALL" ? " with this status" : " yet"}. Create
-          the first one.
+          No hay propuestas{status !== "ALL" ? " con este estado" : " todavía"}.
+          Crea el primero.
         </div>
       )}
     </div>

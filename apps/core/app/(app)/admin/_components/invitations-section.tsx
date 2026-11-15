@@ -31,7 +31,7 @@ import {
   type BadgeProps,
 } from "@andes/ui";
 
-import { formatDate } from "@/lib/format";
+import { formatDate, roleLabel } from "@/lib/format";
 import { trpc } from "@/lib/trpc";
 
 type InvitationStatus = "PENDING" | "ACCEPTED" | "REVOKED" | "EXPIRED";
@@ -40,10 +40,10 @@ const statusBadge: Record<
   InvitationStatus,
   { label: string; variant: BadgeProps["variant"] }
 > = {
-  PENDING: { label: "Pending", variant: "warning" },
-  ACCEPTED: { label: "Accepted", variant: "success" },
-  REVOKED: { label: "Revoked", variant: "outline" },
-  EXPIRED: { label: "Expired", variant: "muted" },
+  PENDING: { label: "Pendiente", variant: "warning" },
+  ACCEPTED: { label: "Aceptada", variant: "success" },
+  REVOKED: { label: "Revocada", variant: "outline" },
+  EXPIRED: { label: "Vencida", variant: "muted" },
 };
 
 function inviteUrl(token: string) {
@@ -63,14 +63,14 @@ function CopyLinkButton({ token }: { token: string }) {
       }}
     >
       {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
-      {copied ? "Copied" : "Copy link"}
+      {copied ? "Copiado" : "Copiar enlace"}
     </Button>
   );
 }
 
 const formSchema = z.object({
-  email: z.string().trim().email("Invalid email").max(200),
-  roleId: z.string().min(1, "Required"),
+  email: z.string().trim().email("Correo inválido").max(200),
+  roleId: z.string().min(1, "Obligatorio"),
 });
 
 type InviteFormValues = z.infer<typeof formSchema>;
@@ -112,36 +112,39 @@ function InviteDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus aria-hidden="true" />
-          Invite member
+          Invitar miembro
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Invite member</DialogTitle>
+          <DialogTitle>Invitar miembro</DialogTitle>
           <DialogDescription>
-            Creates a single-use link, valid for 7 days, that only the invited
-            email can accept. Share it yourself — no email is sent.
+            Crea un enlace de un solo uso, válido por 7 días, que solo el correo
+            invitado puede aceptar. Compártelo tú mismo: no se envía ningún
+            correo.
           </DialogDescription>
         </DialogHeader>
 
         {created ? (
           <div className="space-y-4">
             <p className="text-sm">
-              Invitation for{" "}
-              <span className="font-mono text-xs">{created.email}</span> as{" "}
-              <span className="font-medium">{created.role.label}</span> is
-              ready.
+              La invitación para{" "}
+              <span className="font-mono text-xs">{created.email}</span> como{" "}
+              <span className="font-medium">
+                {roleLabel(created.role.label)}
+              </span>{" "}
+              está lista.
             </p>
             <Input
               readOnly
-              aria-label="Invitation link"
+              aria-label="Enlace de invitación"
               className="font-mono text-xs"
               value={inviteUrl(created.token)}
               onFocus={(e) => e.target.select()}
             />
             <div className="flex justify-end gap-2">
               <CopyLinkButton token={created.token} />
-              <Button onClick={() => setOpen(false)}>Done</Button>
+              <Button onClick={() => setOpen(false)}>Listo</Button>
             </div>
           </div>
         ) : (
@@ -150,7 +153,7 @@ function InviteDialog() {
             className="space-y-4"
           >
             <div className="space-y-1.5">
-              <Label htmlFor="invite-email">Email</Label>
+              <Label htmlFor="invite-email">Correo</Label>
               <Input
                 id="invite-email"
                 type="email"
@@ -164,11 +167,11 @@ function InviteDialog() {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="invite-role">Role</Label>
+              <Label htmlFor="invite-role">Rol</Label>
               <Select id="invite-role" {...form.register("roleId")}>
                 {(roles.data ?? []).map((role) => (
                   <option key={role.id} value={role.id}>
-                    {role.label}
+                    {roleLabel(role.label)}
                   </option>
                 ))}
               </Select>
@@ -187,7 +190,7 @@ function InviteDialog() {
 
             <div className="flex justify-end">
               <Button type="submit" disabled={create.isPending || !roles.data}>
-                {create.isPending ? "…" : "Create invitation"}
+                {create.isPending ? "…" : "Crear invitación"}
               </Button>
             </div>
           </form>
@@ -208,9 +211,10 @@ export function InvitationsSection() {
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Invitations</h2>
+          <h2 className="text-lg font-semibold">Invitaciones</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Re-inviting an email replaces its previous pending invitation.
+            Volver a invitar un correo reemplaza su invitación pendiente
+            anterior.
           </p>
         </div>
         <InviteDialog />
@@ -223,20 +227,20 @@ export function InvitationsSection() {
       )}
 
       {invitations.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading invitations…</p>
+        <p className="text-sm text-muted-foreground">Cargando invitaciones…</p>
       ) : invitations.error ? (
         <p className="text-sm text-destructive">{invitations.error.message}</p>
       ) : invitations.data && invitations.data.length > 0 ? (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Expires</TableHead>
-              <TableHead>Invited by</TableHead>
+              <TableHead>Correo</TableHead>
+              <TableHead>Rol</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Vence</TableHead>
+              <TableHead>Invitado por</TableHead>
               <TableHead>
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">Acciones</span>
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -249,7 +253,7 @@ export function InvitationsSection() {
                   <TableCell className="font-mono text-xs">
                     {invitation.email}
                   </TableCell>
-                  <TableCell>{invitation.role.label}</TableCell>
+                  <TableCell>{roleLabel(invitation.role.label)}</TableCell>
                   <TableCell>
                     <Badge variant={badge.variant}>{badge.label}</Badge>
                   </TableCell>
@@ -270,14 +274,14 @@ export function InvitationsSection() {
                           onClick={() => {
                             if (
                               window.confirm(
-                                `Revoke the invitation for ${invitation.email}? Its link stops working.`,
+                                `¿Revocar la invitación de ${invitation.email}? Su enlace dejará de funcionar.`,
                               )
                             ) {
                               revoke.mutate({ id: invitation.id });
                             }
                           }}
                         >
-                          Revoke
+                          Revocar
                         </Button>
                       </div>
                     )}
@@ -289,7 +293,7 @@ export function InvitationsSection() {
         </Table>
       ) : (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-          No invitations yet. Invite the first member of your team.
+          Aún no hay invitaciones. Invita al primer miembro de tu equipo.
         </div>
       )}
     </section>

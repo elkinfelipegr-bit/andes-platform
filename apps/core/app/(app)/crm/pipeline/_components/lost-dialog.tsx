@@ -16,11 +16,11 @@ import {
 } from "@andes/ui";
 
 const REASONS = [
-  "Price",
-  "Chose another firm",
-  "Project cancelled",
-  "No response",
-  "Out of our scope",
+  "Precio",
+  "Eligió otra firma",
+  "Proyecto cancelado",
+  "Sin respuesta",
+  "Fuera de nuestro alcance",
 ];
 
 export function LostDialog({
@@ -49,10 +49,10 @@ export function LostDialog({
     <Dialog open={open} onOpenChange={(o) => !o && onCancel()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Mark as lost</DialogTitle>
+          <DialogTitle>Marcar como perdida</DialogTitle>
           <DialogDescription>
-            “{title}” — why did it not go ahead? You can reopen it later if the
-            client comes back.
+            “{title}”: ¿por qué no siguió adelante? Puedes reabrirla después si
+            el cliente vuelve.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
@@ -74,12 +74,12 @@ export function LostDialog({
             ))}
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="lost-reason">Reason</Label>
+            <Label htmlFor="lost-reason">Motivo</Label>
             <Input
               id="lost-reason"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Pick one above or write your own"
+              placeholder="Elige uno arriba o escribe el tuyo"
             />
           </div>
           {error && (
@@ -89,10 +89,10 @@ export function LostDialog({
           )}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onCancel}>
-              Cancel
+              Cancelar
             </Button>
             <Button type="submit" disabled={busy || !reason.trim()}>
-              {busy ? "Saving…" : "Mark as lost"}
+              {busy ? "Guardando…" : "Marcar como perdida"}
             </Button>
           </DialogFooter>
         </form>

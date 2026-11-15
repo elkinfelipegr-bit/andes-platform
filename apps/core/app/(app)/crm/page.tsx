@@ -55,18 +55,18 @@ function NewClientDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus aria-hidden="true" />
-          New client
+          Nuevo cliente
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New client</DialogTitle>
+          <DialogTitle>Nuevo cliente</DialogTitle>
           <DialogDescription>
-            Register a customer of your firm — never a tenant.
+            Registra un cliente de tu firma.
           </DialogDescription>
         </DialogHeader>
         <ClientForm
-          submitLabel="Create client"
+          submitLabel="Crear cliente"
           busy={create.isPending}
           errorMessage={create.error?.message ?? null}
           onSubmit={handleSubmit}
@@ -87,9 +87,9 @@ export default function CrmPage() {
       <CrmNav />
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Clients</h1>
+          <h1 className="text-2xl font-semibold">Clientes</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            The firms and entities you do engineering work for.
+            Las empresas y entidades para las que haces trabajo de ingeniería.
           </p>
         </div>
         <NewClientDialog />
@@ -102,21 +102,21 @@ export default function CrmPage() {
           onChange={(e) => setIncludeArchived(e.target.checked)}
           className="size-4 accent-primary"
         />
-        Show archived
+        Mostrar archivados
       </label>
 
       {clients.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading clients…</p>
+        <p className="text-sm text-muted-foreground">Cargando clientes…</p>
       ) : clients.data && clients.data.length > 0 ? (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Tax ID</TableHead>
-              <TableHead>City</TableHead>
-              <TableHead>Contacts</TableHead>
-              <TableHead>Projects</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Nombre</TableHead>
+              <TableHead>NIT</TableHead>
+              <TableHead>Ciudad</TableHead>
+              <TableHead>Contactos</TableHead>
+              <TableHead>Proyectos</TableHead>
+              <TableHead>Estado</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -140,9 +140,9 @@ export default function CrmPage() {
                 <TableCell>{client._count.projects}</TableCell>
                 <TableCell>
                   {client.archivedAt ? (
-                    <Badge variant="outline">Archived</Badge>
+                    <Badge variant="outline">Archivado</Badge>
                   ) : (
-                    <Badge variant="success">Active</Badge>
+                    <Badge variant="success">Activo</Badge>
                   )}
                 </TableCell>
               </TableRow>
@@ -151,7 +151,7 @@ export default function CrmPage() {
         </Table>
       ) : (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-          No clients yet. Create the first one.
+          Aún no hay clientes. Crea el primero.
         </div>
       )}
     </div>

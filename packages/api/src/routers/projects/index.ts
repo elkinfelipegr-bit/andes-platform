@@ -92,7 +92,7 @@ export const projectsRouter = router({
         if (isUniqueViolation(e)) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: `A project with code "${input.code}" already exists.`,
+            message: `Ya existe un proyecto con el código "${input.code}".`,
           });
         }
         throw e;
@@ -118,7 +118,7 @@ export const projectsRouter = router({
         if (isUniqueViolation(e)) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: `A project with code "${data.code}" already exists.`,
+            message: `Ya existe un proyecto con el código "${data.code}".`,
           });
         }
         throw e;

@@ -18,6 +18,7 @@ import { authClient } from "@/lib/auth-client";
 
 import { adminNav, moduleNav } from "./nav-items";
 import { NavMenuButton } from "./nav-toggle";
+import { roleLabel } from "@/lib/format";
 
 export interface TopbarProps {
   user: { name: string; email: string };
@@ -47,10 +48,10 @@ export function Topbar({ user, membership }: TopbarProps) {
             <span className="hidden font-mono text-xs text-muted-foreground sm:inline">
               {membership.tenantSlug}
             </span>
-            <Badge variant="secondary">{membership.roleLabel}</Badge>
+            <Badge variant="secondary">{roleLabel(membership.roleLabel)}</Badge>
           </div>
         ) : (
-          <Badge variant="warning">No tenant</Badge>
+          <Badge variant="warning">Sin firma</Badge>
         )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -72,7 +73,7 @@ export function Topbar({ user, membership }: TopbarProps) {
               }}
             >
               <LogOut aria-hidden="true" />
-              Sign out
+              Cerrar sesión
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -10,8 +10,8 @@ const statusVariant = {
 } as const;
 
 const statusLabel: Record<GeoRecordStatus, string> = {
-  DRAFT: "Draft",
-  ISSUED: "Issued",
+  DRAFT: "Borrador",
+  ISSUED: "Emitido",
 };
 
 export function GeoRecordStatusBadge({ status }: { status: GeoRecordStatus }) {
@@ -20,6 +20,8 @@ export function GeoRecordStatusBadge({ status }: { status: GeoRecordStatus }) {
 
 export function ShapeBadge({ shape }: { shape: "STRIP" | "SQUARE" }) {
   return (
-    <Badge variant="outline">{shape === "STRIP" ? "Strip" : "Square"}</Badge>
+    <Badge variant="outline">
+      {shape === "STRIP" ? "Corrida" : "Cuadrada"}
+    </Badge>
   );
 }

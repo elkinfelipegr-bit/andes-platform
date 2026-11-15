@@ -56,20 +56,20 @@ import { ProposalStatusBadge } from "../_components/proposal-status-badge";
 type ProposalDetail = RouterOutputs["proposals"]["get"];
 
 const draftSchema = z.object({
-  code: z.string().trim().min(1, "Required").max(32),
-  title: z.string().trim().min(1, "Required").max(200),
+  code: z.string().trim().min(1, "Obligatorio").max(32),
+  title: z.string().trim().min(1, "Obligatorio").max(200),
   scope: z.string().trim().max(5000),
   contactId: z.string(),
-  currency: z.string().trim().length(3, "3-letter code"),
+  currency: z.string().trim().length(3, "Código de 3 letras"),
   validUntil: z.string(),
   // Numeric fields stay strings in the form (RHF-friendly types) and are
   // converted on submit; the API re-validates as numbers.
   items: z
     .array(
       z.object({
-        description: z.string().trim().min(1, "Required").max(500),
+        description: z.string().trim().min(1, "Obligatorio").max(500),
         quantity: z.string().refine((v) => Number(v) > 0, { message: "> 0" }),
-        unit: z.string().trim().min(1, "Req.").max(50),
+        unit: z.string().trim().min(1, "Oblig.").max(50),
         unitPrice: z
           .string()
           .refine(
@@ -148,15 +148,17 @@ function DraftEditor({ proposal }: { proposal: ProposalDetail }) {
     <form onSubmit={form.handleSubmit(submit)} className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Proposal data</CardTitle>
+          <CardTitle className="text-base">Datos de la propuesta</CardTitle>
           {update.isSuccess && (
-            <CardDescription className="text-success">Saved.</CardDescription>
+            <CardDescription className="text-success">
+              Guardado.
+            </CardDescription>
           )}
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="p-code">Code</Label>
+              <Label htmlFor="p-code">Código</Label>
               <Input
                 id="p-code"
                 className="font-mono"
@@ -169,7 +171,7 @@ function DraftEditor({ proposal }: { proposal: ProposalDetail }) {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="p-currency">Currency</Label>
+              <Label htmlFor="p-currency">Moneda</Label>
               <Input
                 id="p-currency"
                 className="font-mono uppercase"
@@ -182,7 +184,7 @@ function DraftEditor({ proposal }: { proposal: ProposalDetail }) {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="p-valid">Valid until</Label>
+              <Label htmlFor="p-valid">Válida hasta</Label>
               <Input
                 id="p-valid"
                 type="date"
@@ -191,16 +193,16 @@ function DraftEditor({ proposal }: { proposal: ProposalDetail }) {
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="p-title">Title</Label>
+            <Label htmlFor="p-title">Título</Label>
             <Input id="p-title" {...form.register("title")} />
             {errors.title && (
               <p className="text-xs text-destructive">{errors.title.message}</p>
             )}
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="p-contact">Recipient</Label>
+            <Label htmlFor="p-contact">Destinatario</Label>
             <Select id="p-contact" {...form.register("contactId")}>
-              <option value="">— No specific contact —</option>
+              <option value="">— Sin contacto específico —</option>
               {(clientDetail.data?.contacts ?? []).map((contact) => (
                 <option key={contact.id} value={contact.id}>
                   {contact.name}
@@ -209,7 +211,7 @@ function DraftEditor({ proposal }: { proposal: ProposalDetail }) {
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="p-scope">Scope</Label>
+            <Label htmlFor="p-scope">Alcance</Label>
             <Textarea
               id="p-scope"
               rows={4}
@@ -224,9 +226,9 @@ function DraftEditor({ proposal }: { proposal: ProposalDetail }) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-base">Items</CardTitle>
+              <CardTitle className="text-base">Ítems</CardTitle>
               <CardDescription>
-                Live total:{" "}
+                Total actual:{" "}
                 <span className="font-mono font-medium text-foreground">
                   {formatMoney(liveTotal, form.watch("currency") || "COP")}
                 </span>
@@ -246,15 +248,15 @@ function DraftEditor({ proposal }: { proposal: ProposalDetail }) {
               }
             >
               <Plus aria-hidden="true" />
-              Add item
+              Agregar ítem
             </Button>
           </div>
         </CardHeader>
         <CardContent>
           {items.fields.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No items yet — a proposal needs at least one before it can be
-              sent.
+              Aún no hay ítems: una propuesta necesita al menos uno para poder
+              enviarse.
             </p>
           ) : (
             <div className="space-y-2">
@@ -265,7 +267,7 @@ function DraftEditor({ proposal }: { proposal: ProposalDetail }) {
                 >
                   <div>
                     <Input
-                      aria-label={`Item ${index + 1} description`}
+                      aria-label={`Descripción del ítem ${index + 1}`}
                       placeholder="Descripción"
                       {...form.register(`items.${index}.description`)}
                     />
@@ -276,19 +278,19 @@ function DraftEditor({ proposal }: { proposal: ProposalDetail }) {
                     )}
                   </div>
                   <Input
-                    aria-label={`Item ${index + 1} quantity`}
+                    aria-label={`Cantidad del ítem ${index + 1}`}
                     type="number"
                     step="any"
                     placeholder="Cant."
                     {...form.register(`items.${index}.quantity`)}
                   />
                   <Input
-                    aria-label={`Item ${index + 1} unit`}
+                    aria-label={`Unidad del ítem ${index + 1}`}
                     placeholder="un"
                     {...form.register(`items.${index}.unit`)}
                   />
                   <Input
-                    aria-label={`Item ${index + 1} unit price`}
+                    aria-label={`Precio unitario del ítem ${index + 1}`}
                     type="number"
                     step="any"
                     placeholder="Precio unit."
@@ -299,7 +301,7 @@ function DraftEditor({ proposal }: { proposal: ProposalDetail }) {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    aria-label={`Remove item ${index + 1}`}
+                    aria-label={`Quitar ítem ${index + 1}`}
                     onClick={() => items.remove(index)}
                   >
                     <Trash2 aria-hidden="true" />
@@ -316,7 +318,7 @@ function DraftEditor({ proposal }: { proposal: ProposalDetail }) {
       )}
       <div className="flex justify-end">
         <Button type="submit" disabled={update.isPending}>
-          {update.isPending ? "…" : "Save draft"}
+          {update.isPending ? "…" : "Guardar borrador"}
         </Button>
       </div>
     </form>
@@ -340,8 +342,8 @@ function ProposalDocument({ proposal }: { proposal: ProposalDetail }) {
           </p>
         </div>
         <div className="text-right text-sm text-muted-foreground">
-          <p>Date: {formatDate(proposal.createdAt)}</p>
-          <p>Valid until: {formatDate(proposal.validUntil)}</p>
+          <p>Fecha: {formatDate(proposal.createdAt)}</p>
+          <p>Válida hasta: {formatDate(proposal.validUntil)}</p>
         </div>
       </div>
 
@@ -350,14 +352,14 @@ function ProposalDocument({ proposal }: { proposal: ProposalDetail }) {
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Client
+            Cliente
           </p>
           <p className="mt-1 font-medium">{proposal.client.name}</p>
         </div>
         {proposal.contact && (
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Attention
+              Atención
             </p>
             <p className="mt-1 font-medium">
               {proposal.contact.name}
@@ -375,7 +377,7 @@ function ProposalDocument({ proposal }: { proposal: ProposalDetail }) {
       {proposal.scope && (
         <>
           <p className="mt-6 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Scope
+            Alcance
           </p>
           <p className="mt-1 whitespace-pre-wrap text-sm">{proposal.scope}</p>
         </>
@@ -385,10 +387,10 @@ function ProposalDocument({ proposal }: { proposal: ProposalDetail }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Description</TableHead>
-              <TableHead className="text-right">Qty</TableHead>
-              <TableHead>Unit</TableHead>
-              <TableHead className="text-right">Unit price</TableHead>
+              <TableHead>Descripción</TableHead>
+              <TableHead className="text-right">Cant.</TableHead>
+              <TableHead>Unidad</TableHead>
+              <TableHead className="text-right">Precio unitario</TableHead>
               <TableHead className="text-right">Subtotal</TableHead>
             </TableRow>
           </TableHeader>
@@ -446,20 +448,20 @@ function ConvertDialog({ proposal }: { proposal: ProposalDetail }) {
       <DialogTrigger asChild>
         <Button>
           <FolderKanban aria-hidden="true" />
-          Convert to project
+          Convertir en proyecto
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Convert to project</DialogTitle>
+          <DialogTitle>Convertir en proyecto</DialogTitle>
           <DialogDescription>
-            Creates a draft project for {proposal.client.name}, permanently
-            linked to this proposal. Pick the project code.
+            Crea un proyecto en borrador para {proposal.client.name}, ligado de
+            forma permanente a esta propuesta. Elige el código del proyecto.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="convert-code">Project code</Label>
+            <Label htmlFor="convert-code">Código del proyecto</Label>
             <Input
               id="convert-code"
               placeholder="P-2026-014"
@@ -481,7 +483,7 @@ function ConvertDialog({ proposal }: { proposal: ProposalDetail }) {
                 })
               }
             >
-              {convert.isPending ? "…" : "Create project"}
+              {convert.isPending ? "…" : "Crear proyecto"}
             </Button>
           </div>
         </div>
@@ -505,16 +507,16 @@ export default function ProposalDetailPage() {
   });
 
   if (proposal.isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading proposal…</p>;
+    return <p className="text-sm text-muted-foreground">Cargando propuesta…</p>;
   }
   if (!proposal.data) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-destructive">Proposal not found.</p>
+        <p className="text-sm text-destructive">Propuesta no encontrada.</p>
         <Button asChild variant="outline">
           <Link href="/crm/proposals">
             <ArrowLeft aria-hidden="true" />
-            Back to proposals
+            Volver a propuestas
           </Link>
         </Button>
       </div>
@@ -540,7 +542,7 @@ export default function ProposalDetailPage() {
             className="inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-2 hover:underline"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
-            Proposals
+            Propuestas
           </Link>
           <div className="flex items-center gap-3">
             <h1 className="font-mono text-2xl font-semibold">{p.code}</h1>
@@ -561,16 +563,16 @@ export default function ProposalDetailPage() {
                   href={`/crm/pipeline/${p.opportunity.id}`}
                   className="underline-offset-2 hover:text-primary hover:underline"
                 >
-                  Opportunity: {p.opportunity.title}
+                  Oportunidad: {p.opportunity.title}
                 </Link>
               </>
             )}
           </p>
           {(p.sentAt || p.decidedAt) && (
             <p className="text-xs text-muted-foreground">
-              {p.sentAt ? `Sent ${formatDate(p.sentAt)}` : ""}
+              {p.sentAt ? `Enviada ${formatDate(p.sentAt)}` : ""}
               {p.sentAt && p.decidedAt ? " · " : ""}
-              {p.decidedAt ? `Closed ${formatDate(p.decidedAt)}` : ""}
+              {p.decidedAt ? `Cerrada ${formatDate(p.decidedAt)}` : ""}
             </p>
           )}
         </div>
@@ -579,7 +581,7 @@ export default function ProposalDetailPage() {
           {p.status !== "DRAFT" && (
             <Button variant="outline" onClick={() => window.print()}>
               <Printer aria-hidden="true" />
-              Print
+              Imprimir
             </Button>
           )}
           {p.status === "DRAFT" && (
@@ -588,7 +590,7 @@ export default function ProposalDetailPage() {
               onClick={() => {
                 if (
                   window.confirm(
-                    `Send proposal ${p.code}? It becomes read-only.`,
+                    `¿Enviar la propuesta ${p.code}? Quedará de solo lectura.`,
                   )
                 ) {
                   send.mutate({ id });
@@ -596,7 +598,7 @@ export default function ProposalDetailPage() {
               }}
             >
               <Send aria-hidden="true" />
-              {send.isPending ? "…" : "Send"}
+              {send.isPending ? "…" : "Enviar"}
             </Button>
           )}
           {p.status === "SENT" && (
@@ -607,7 +609,7 @@ export default function ProposalDetailPage() {
                 onClick={() => decide.mutate({ id, decision: "ACCEPTED" })}
               >
                 <Check aria-hidden="true" />
-                Accepted
+                Aceptada
               </Button>
               <Button
                 variant="outline"
@@ -615,14 +617,14 @@ export default function ProposalDetailPage() {
                 onClick={() => decide.mutate({ id, decision: "REJECTED" })}
               >
                 <X aria-hidden="true" />
-                Rejected
+                Rechazada
               </Button>
               <Button
                 variant="ghost"
                 disabled={markExpired.isPending}
                 onClick={() => markExpired.mutate({ id })}
               >
-                Expired
+                Vencida
               </Button>
             </>
           )}

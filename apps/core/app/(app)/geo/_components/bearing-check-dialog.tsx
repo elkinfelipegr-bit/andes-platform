@@ -33,7 +33,7 @@ const inRange = (min: number, max: number, message: string) =>
   );
 
 const formSchema = z.object({
-  label: z.string().trim().min(1, "Required").max(200),
+  label: z.string().trim().min(1, "Obligatorio").max(200),
   b: inRange(0.01, 100, "> 0 m"),
   df: inRange(0, 100, "≥ 0 m"),
   gamma: inRange(5, 30, "5–30 kN/m³"),
@@ -143,16 +143,18 @@ export function BearingCheckDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {check ? "Edit bearing check" : "New bearing capacity check"}
+            {check
+              ? "Editar verificación de capacidad portante"
+              : "Nueva verificación de capacidad portante"}
           </DialogTitle>
           <DialogDescription>
-            General bearing capacity equation (Vesic factors) — the server
-            computes q_ult and q_adm when you save.
+            Ecuación general de capacidad portante (factores de Vesic); el
+            servidor calcula q_ult y q_adm al guardar.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="bc-label">Footing</Label>
+            <Label htmlFor="bc-label">Zapata</Label>
             <Input
               id="bc-label"
               placeholder="Zapata Z-1"
@@ -163,13 +165,13 @@ export function BearingCheckDialog({
             )}
           </div>
           <div className="grid grid-cols-3 gap-4">
-            {numberField("b", "B — width (m)")}
-            {numberField("df", "Df — depth (m)")}
+            {numberField("b", "B — ancho (m)")}
+            {numberField("df", "Df — profundidad (m)")}
             <div className="space-y-1.5">
-              <Label htmlFor="bc-shape">Shape</Label>
+              <Label htmlFor="bc-shape">Forma</Label>
               <Select id="bc-shape" {...form.register("shape")}>
-                <option value="SQUARE">Square</option>
-                <option value="STRIP">Strip</option>
+                <option value="SQUARE">Cuadrada</option>
+                <option value="STRIP">Corrida</option>
               </Select>
             </div>
           </div>
@@ -178,7 +180,7 @@ export function BearingCheckDialog({
             {numberField("c", "c (kPa)")}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {numberField("phi", "φ (degrees)")}
+            {numberField("phi", "φ (grados)")}
             {numberField("fs", "FS")}
           </div>
 
@@ -188,7 +190,11 @@ export function BearingCheckDialog({
 
           <div className="flex justify-end">
             <Button type="submit" disabled={busy}>
-              {busy ? "…" : check ? "Recompute & save" : "Compute & add"}
+              {busy
+                ? "…"
+                : check
+                  ? "Recalcular y guardar"
+                  : "Calcular y agregar"}
             </Button>
           </div>
         </form>

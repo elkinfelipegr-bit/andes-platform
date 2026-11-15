@@ -52,7 +52,7 @@ export function NavMenuButton() {
   return (
     <button
       type="button"
-      aria-label="Open navigation"
+      aria-label="Abrir navegación"
       onClick={() => setOpen(true)}
       className="-ml-2 rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none lg:hidden"
     >

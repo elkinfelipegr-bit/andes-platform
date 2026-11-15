@@ -19,9 +19,9 @@ export default async function AdminPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-10">
       <div>
-        <h1 className="text-2xl font-semibold">Administration</h1>
+        <h1 className="text-2xl font-semibold">Administración</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Who belongs to your firm on the platform, and with which role.
+          Quién pertenece a tu firma en la plataforma y con qué rol.
         </p>
       </div>
       <MembersSection currentUserId={session.user.id} />

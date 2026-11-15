@@ -60,10 +60,10 @@ import {
 type Detail = RouterOutputs["opportunities"]["get"];
 
 const QUICK_DATES = [
-  { label: "Tomorrow", days: 1 },
-  { label: "In 3 days", days: 3 },
-  { label: "In a week", days: 7 },
-  { label: "In 2 weeks", days: 14 },
+  { label: "Mañana", days: 1 },
+  { label: "En 3 días", days: 3 },
+  { label: "En una semana", days: 7 },
+  { label: "En 2 semanas", days: 14 },
 ];
 
 function followUpOf(o: Detail, today: string): FollowUp | null {
@@ -142,7 +142,7 @@ function StageStepper({ o }: { o: Detail }) {
           )}
         >
           <CircleCheck aria-hidden="true" />
-          Won
+          Ganada
         </Button>
         <Button
           variant={o.stage === "LOST" ? "destructive" : "outline"}
@@ -151,7 +151,7 @@ function StageStepper({ o }: { o: Detail }) {
           onClick={() => o.stage !== "LOST" && setLosing(true)}
         >
           <CircleX aria-hidden="true" />
-          Lost
+          Perdida
         </Button>
       </div>
       {setStage.error && !losing && (
@@ -191,16 +191,16 @@ function NextStepFields({
     <div className="space-y-2">
       <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
         <div className="space-y-1.5">
-          <Label htmlFor={`${idPrefix}-action`}>Next step</Label>
+          <Label htmlFor={`${idPrefix}-action`}>Próximo paso</Label>
           <Input
             id={`${idPrefix}-action`}
-            placeholder="e.g. Call to confirm they received the quote"
+            placeholder="p. ej. Llamar para confirmar que recibió la cotización"
             value={action}
             onChange={(e) => onAction(e.target.value)}
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor={`${idPrefix}-date`}>When</Label>
+          <Label htmlFor={`${idPrefix}-date`}>Cuándo</Label>
           <Input
             id={`${idPrefix}-date`}
             type="date"
@@ -261,7 +261,7 @@ function ActivityComposer({ o }: { o: Detail }) {
       body: body.trim(),
       ...(schedules
         ? {
-            nextAction: action.trim() || o.nextAction || "Follow up",
+            nextAction: action.trim() || o.nextAction || "Hacer seguimiento",
             nextActionAt: date || null,
           }
         : {}),
@@ -275,7 +275,7 @@ function ActivityComposer({ o }: { o: Detail }) {
     >
       <div
         role="radiogroup"
-        aria-label="Type of interaction"
+        aria-label="Tipo de interacción"
         className="flex flex-wrap gap-1.5"
       >
         {ACTIVITY_TYPES.map(({ key, label, icon: Icon }) => (
@@ -299,12 +299,12 @@ function ActivityComposer({ o }: { o: Detail }) {
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="activity-body" className="sr-only">
-          What happened
+          Qué pasó
         </Label>
         <Textarea
           id="activity-body"
           rows={3}
-          placeholder="What happened? What did they say?"
+          placeholder="¿Qué pasó? ¿Qué dijeron?"
           value={body}
           onChange={(e) => setBody(e.target.value)}
         />
@@ -319,7 +319,7 @@ function ActivityComposer({ o }: { o: Detail }) {
             onDate={setDate}
           />
           <p className="mt-2 text-xs text-muted-foreground">
-            Optional — replaces the current next step when filled in.
+            Opcional: reemplaza el próximo paso actual si lo llenas.
           </p>
         </div>
       )}
@@ -330,7 +330,7 @@ function ActivityComposer({ o }: { o: Detail }) {
       )}
       <div className="flex justify-end">
         <Button type="submit" disabled={log.isPending || !body.trim()}>
-          {log.isPending ? "Saving…" : "Log activity"}
+          {log.isPending ? "Guardando…" : "Registrar actividad"}
         </Button>
       </div>
     </form>
@@ -341,8 +341,8 @@ function Timeline({ o }: { o: Detail }) {
   if (o.activities.length === 0) {
     return (
       <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        Nothing logged yet. Record the first contact above — it becomes the
-        history of this opportunity.
+        Aún no hay nada registrado. Anota el primer contacto arriba: será la
+        historia de esta oportunidad.
       </p>
     );
   }
@@ -406,7 +406,7 @@ function NextStepCard({ o, today }: { o: Detail; today: string }) {
       )}
     >
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold">Next step</h2>
+        <h2 className="text-sm font-semibold">Próximo paso</h2>
         {state && (
           <FollowUpChip
             state={state}
@@ -446,10 +446,10 @@ function NextStepCard({ o, today }: { o: Detail; today: string }) {
               size="sm"
               onClick={() => setEditing(false)}
             >
-              Cancel
+              Cancelar
             </Button>
             <Button type="submit" size="sm" disabled={update.isPending}>
-              Save
+              Guardar
             </Button>
           </div>
         </form>
@@ -458,8 +458,8 @@ function NextStepCard({ o, today }: { o: Detail; today: string }) {
           <p className="mt-2 text-sm">
             {o.nextAction ?? (
               <span className="text-muted-foreground">
-                Nothing scheduled. Opportunities without a next step are the
-                ones that get forgotten.
+                Nada programado. Las oportunidades sin próximo paso son las que
+                se olvidan.
               </span>
             )}
           </p>
@@ -478,7 +478,9 @@ function NextStepCard({ o, today }: { o: Detail; today: string }) {
                 setEditing(true);
               }}
             >
-              {o.nextAction || o.nextActionAt ? "Reschedule" : "Set next step"}
+              {o.nextAction || o.nextActionAt
+                ? "Reprogramar"
+                : "Definir próximo paso"}
             </Button>
             {(o.nextAction || o.nextActionAt) && (
               <Button
@@ -494,7 +496,7 @@ function NextStepCard({ o, today }: { o: Detail; today: string }) {
                 }
               >
                 <Check aria-hidden="true" />
-                Done
+                Listo
               </Button>
             )}
           </div>
@@ -533,9 +535,9 @@ function EditDialog({ o }: { o: Detail }) {
     e.preventDefault();
     setError(null);
     const amount = value === "" ? null : Number(value);
-    if (!title.trim()) return setError("The title is required.");
+    if (!title.trim()) return setError("El título es obligatorio.");
     if (amount !== null && (!Number.isFinite(amount) || amount < 0)) {
-      return setError("The estimated value must be a positive number.");
+      return setError("El valor estimado debe ser un número positivo.");
     }
     update.mutate({
       id: o.id,
@@ -552,19 +554,19 @@ function EditDialog({ o }: { o: Detail }) {
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm">
           <Pencil aria-hidden="true" />
-          Edit
+          Editar
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit opportunity</DialogTitle>
+          <DialogTitle>Editar oportunidad</DialogTitle>
           <DialogDescription>
-            {o.client.name} — the client cannot be changed.
+            {o.client.name} : el cliente no se puede cambiar.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="edit-title">What do they need?</Label>
+            <Label htmlFor="edit-title">¿Qué necesita?</Label>
             <Input
               id="edit-title"
               value={title}
@@ -573,7 +575,7 @@ function EditDialog({ o }: { o: Detail }) {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="edit-value">Estimated value ({o.currency})</Label>
+              <Label htmlFor="edit-value">Valor estimado ({o.currency})</Label>
               <Input
                 id="edit-value"
                 type="number"
@@ -584,7 +586,7 @@ function EditDialog({ o }: { o: Detail }) {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="edit-source">Source</Label>
+              <Label htmlFor="edit-source">Origen</Label>
               <Input
                 id="edit-source"
                 list="edit-sources"
@@ -600,7 +602,7 @@ function EditDialog({ o }: { o: Detail }) {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="edit-owner">Owner</Label>
+              <Label htmlFor="edit-owner">Responsable</Label>
               <Select
                 id="edit-owner"
                 value={ownerId}
@@ -617,13 +619,13 @@ function EditDialog({ o }: { o: Detail }) {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="edit-contact">Contact</Label>
+              <Label htmlFor="edit-contact">Contacto</Label>
               <Select
                 id="edit-contact"
                 value={contactId}
                 onChange={(e) => setContactId(e.target.value)}
               >
-                <option value="">— None —</option>
+                <option value="">— Ninguno —</option>
                 {!client.data && o.contact && (
                   <option value={o.contact.id}>{o.contact.name}</option>
                 )}
@@ -642,7 +644,7 @@ function EditDialog({ o }: { o: Detail }) {
           )}
           <DialogFooter>
             <Button type="submit" disabled={update.isPending}>
-              {update.isPending ? "Saving…" : "Save changes"}
+              {update.isPending ? "Guardando…" : "Guardar cambios"}
             </Button>
           </DialogFooter>
         </form>
@@ -673,11 +675,11 @@ function DetailsCard({ o }: { o: Detail }) {
   return (
     <section className="rounded-xl border border-border bg-card p-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold">Details</h2>
+        <h2 className="text-sm font-semibold">Detalles</h2>
         <EditDialog o={o} />
       </div>
       <dl className="mt-1 divide-y divide-border">
-        <Row label="Estimated value">
+        <Row label="Valor estimado">
           {o.estimatedValue !== null ? (
             <span className="font-medium tabular-nums">
               {formatMoney(o.estimatedValue, o.currency)}
@@ -686,7 +688,7 @@ function DetailsCard({ o }: { o: Detail }) {
             "—"
           )}
         </Row>
-        <Row label="Client">
+        <Row label="Cliente">
           <Link
             href={`/crm/${o.client.id}`}
             className="text-primary underline-offset-2 hover:underline"
@@ -694,7 +696,7 @@ function DetailsCard({ o }: { o: Detail }) {
             {o.client.name}
           </Link>
         </Row>
-        <Row label="Contact">
+        <Row label="Contacto">
           {person ? (
             <>
               {person.name}
@@ -708,7 +710,7 @@ function DetailsCard({ o }: { o: Detail }) {
             "—"
           )}
         </Row>
-        <Row label="Phone">
+        <Row label="Teléfono">
           {phone ? (
             <a
               href={`tel:${phone}`}
@@ -720,7 +722,7 @@ function DetailsCard({ o }: { o: Detail }) {
             "—"
           )}
         </Row>
-        <Row label="Email">
+        <Row label="Correo">
           {email ? (
             <a
               href={`mailto:${email}`}
@@ -732,9 +734,9 @@ function DetailsCard({ o }: { o: Detail }) {
             "—"
           )}
         </Row>
-        <Row label="Source">{o.source ?? "—"}</Row>
-        <Row label="Owner">{o.owner.name}</Row>
-        <Row label="Created">{formatDate(o.createdAt)}</Row>
+        <Row label="Origen">{o.source ?? "—"}</Row>
+        <Row label="Responsable">{o.owner.name}</Row>
+        <Row label="Creadas">{formatDate(o.createdAt)}</Row>
       </dl>
     </section>
   );
@@ -755,15 +757,15 @@ function NewProposalDialog({ o }: { o: Detail }) {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Plus aria-hidden="true" />
-          New proposal
+          Nueva propuesta
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New proposal for {o.client.name}</DialogTitle>
+          <DialogTitle>Nueva propuesta para {o.client.name}</DialogTitle>
           <DialogDescription>
-            Linked to this opportunity. You add the priced items on the next
-            screen; sending it moves the opportunity to Quoted.
+            Queda ligada a esta oportunidad. Los ítems con precio se agregan en
+            la siguiente pantalla; al enviarla, la oportunidad pasa a Cotizada.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -782,7 +784,7 @@ function NewProposalDialog({ o }: { o: Detail }) {
         >
           <div className="grid grid-cols-[8rem_1fr] gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="np-code">Code</Label>
+              <Label htmlFor="np-code">Código</Label>
               <Input
                 id="np-code"
                 placeholder="COT-001"
@@ -791,7 +793,7 @@ function NewProposalDialog({ o }: { o: Detail }) {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="np-title">Title</Label>
+              <Label htmlFor="np-title">Título</Label>
               <Input
                 id="np-title"
                 value={title}
@@ -809,7 +811,7 @@ function NewProposalDialog({ o }: { o: Detail }) {
               type="submit"
               disabled={create.isPending || !code.trim() || !title.trim()}
             >
-              {create.isPending ? "Creating…" : "Create and add items"}
+              {create.isPending ? "Creando…" : "Crear y agregar ítems"}
             </Button>
           </DialogFooter>
         </form>
@@ -822,12 +824,12 @@ function ProposalsCard({ o }: { o: Detail }) {
   return (
     <section className="rounded-xl border border-border bg-card p-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold">Proposals</h2>
+        <h2 className="text-sm font-semibold">Propuestas</h2>
         <NewProposalDialog o={o} />
       </div>
       {o.proposals.length === 0 ? (
         <p className="mt-2 text-sm text-muted-foreground">
-          No quote prepared yet.
+          Aún no hay cotización preparada.
         </p>
       ) : (
         <ul className="mt-2 divide-y divide-border">
@@ -846,7 +848,7 @@ function ProposalsCard({ o }: { o: Detail }) {
                   </p>
                   <p className="text-xs text-muted-foreground tabular-nums">
                     {formatMoney(p.total, p.currency)}
-                    {p.sentAt ? ` · sent ${formatDate(p.sentAt)}` : ""}
+                    {p.sentAt ? ` · enviada ${formatDate(p.sentAt)}` : ""}
                   </p>
                 </div>
                 <ProposalStatusBadge status={p.status} />
@@ -873,16 +875,16 @@ export default function OpportunityPage() {
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        Pipeline
+        Seguimiento
       </Link>
 
       {query.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading…</p>
+        <p className="text-sm text-muted-foreground">Cargando…</p>
       ) : !o ? (
         <p role="alert" className="text-sm text-destructive">
           {query.error?.data?.code === "NOT_FOUND"
-            ? "This opportunity does not exist."
-            : (query.error?.message ?? "Could not load the opportunity.")}
+            ? "Esta oportunidad no existe."
+            : (query.error?.message ?? "No se pudo cargar la oportunidad.")}
         </p>
       ) : (
         <>
@@ -898,17 +900,17 @@ export default function OpportunityPage() {
 
           {o.stage === "LOST" && (
             <p className="rounded-lg border border-border bg-muted/60 px-4 py-3 text-sm">
-              <span className="font-medium">Lost</span> on{" "}
+              <span className="font-medium">Perdida</span> el{" "}
               {formatDate(o.closedAt)}
-              {o.lostReason ? ` — ${o.lostReason}` : ""}. Pick a stage above to
-              reopen it.
+              {o.lostReason ? ` — ${o.lostReason}` : ""}. Elige una etapa arriba
+              para reabrirla.
             </p>
           )}
           {o.stage === "WON" && (
             <p className="rounded-lg border border-success/40 bg-success/10 px-4 py-3 text-sm">
-              <span className="font-medium">Won</span> on{" "}
-              {formatDate(o.closedAt)}. Convert the accepted proposal into a
-              project from the proposal page.
+              <span className="font-medium">Ganada</span> el{" "}
+              {formatDate(o.closedAt)}. Convierte la propuesta aceptada en
+              proyecto desde la página de la propuesta.
             </p>
           )}
 
@@ -916,7 +918,7 @@ export default function OpportunityPage() {
             <div className="space-y-5">
               <ActivityComposer o={o} />
               <div>
-                <h2 className="mb-3 text-sm font-semibold">History</h2>
+                <h2 className="mb-3 text-sm font-semibold">Historial</h2>
                 <Timeline o={o} />
               </div>
             </div>

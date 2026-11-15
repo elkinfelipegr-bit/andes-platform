@@ -26,7 +26,7 @@ function NavEntry({
       >
         <item.icon className="size-5" aria-hidden="true" />
         <span className="flex-1">{item.label}</span>
-        {!item.enabled && <Badge variant="muted">Soon</Badge>}
+        {!item.enabled && <Badge variant="muted">Pronto</Badge>}
       </div>
     );
   }
@@ -67,7 +67,7 @@ export function Sidebar({
         </span>
       </div>
       <Separator />
-      <nav className="flex flex-1 flex-col gap-1 p-3" aria-label="Modules">
+      <nav className="flex flex-1 flex-col gap-1 p-3" aria-label="Módulos">
         {moduleNav.map((item) => (
           <NavEntry
             key={item.href}

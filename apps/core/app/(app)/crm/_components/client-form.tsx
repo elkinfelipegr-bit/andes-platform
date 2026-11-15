@@ -9,7 +9,7 @@ import { z } from "zod";
 import { Button, Input, Label, Textarea } from "@andes/ui";
 
 const formSchema = z.object({
-  name: z.string().trim().min(1, "Required").max(200),
+  name: z.string().trim().min(1, "Obligatorio").max(200),
   taxId: z.string().trim().max(200),
   industry: z.string().trim().max(200),
   address: z.string().trim().max(200),
@@ -20,7 +20,7 @@ const formSchema = z.object({
     .trim()
     .max(200)
     .refine((v) => v === "" || z.string().email().safeParse(v).success, {
-      message: "Invalid email",
+      message: "Correo inválido",
     }),
   notes: z.string().trim().max(2000),
 });
@@ -81,14 +81,14 @@ export function ClientForm({
     <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="client-name">Name</Label>
+          <Label htmlFor="client-name">Nombre</Label>
           <Input id="client-name" {...form.register("name")} />
           {errors.name && (
             <p className="text-xs text-destructive">{errors.name.message}</p>
           )}
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="client-taxid">Tax ID (NIT)</Label>
+          <Label htmlFor="client-taxid">NIT</Label>
           <Input
             id="client-taxid"
             placeholder="900.123.456-7"
@@ -100,27 +100,27 @@ export function ClientForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="client-industry">Industry</Label>
+          <Label htmlFor="client-industry">Sector</Label>
           <Input id="client-industry" {...form.register("industry")} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="client-city">City</Label>
+          <Label htmlFor="client-city">Ciudad</Label>
           <Input id="client-city" {...form.register("city")} />
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="client-address">Address</Label>
+        <Label htmlFor="client-address">Dirección</Label>
         <Input id="client-address" {...form.register("address")} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="client-phone">Phone</Label>
+          <Label htmlFor="client-phone">Teléfono</Label>
           <Input id="client-phone" {...form.register("phone")} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="client-email">Email</Label>
+          <Label htmlFor="client-email">Correo</Label>
           <Input id="client-email" {...form.register("email")} />
           {errors.email && (
             <p className="text-xs text-destructive">{errors.email.message}</p>
@@ -129,7 +129,7 @@ export function ClientForm({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="client-notes">Notes</Label>
+        <Label htmlFor="client-notes">Notas</Label>
         <Textarea id="client-notes" {...form.register("notes")} />
       </div>
 

@@ -55,16 +55,16 @@ export default function ProjectDetailPage() {
   const isOwnerAdmin = me.data?.activeMembership?.roleKey === "OWNER_ADMIN";
 
   if (project.isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading project…</p>;
+    return <p className="text-sm text-muted-foreground">Cargando proyecto…</p>;
   }
   if (!project.data) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-destructive">Project not found.</p>
+        <p className="text-sm text-destructive">Proyecto no encontrado.</p>
         <Button asChild variant="outline">
           <Link href="/projects">
             <ArrowLeft aria-hidden="true" />
-            Back to projects
+            Volver a proyectos
           </Link>
         </Button>
       </div>
@@ -103,7 +103,7 @@ export default function ProjectDetailPage() {
             className="inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-2 hover:underline"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
-            Projects
+            Proyectos
           </Link>
           <div className="flex items-center gap-3">
             <h1 className="font-mono text-2xl font-semibold">{p.code}</h1>
@@ -116,13 +116,13 @@ export default function ProjectDetailPage() {
             variant="destructive"
             disabled={archive.isPending}
             onClick={() => {
-              if (window.confirm(`Archive project ${p.code}?`)) {
+              if (window.confirm(`¿Archivar el proyecto ${p.code}?`)) {
                 archive.mutate({ id });
               }
             }}
           >
             <Archive aria-hidden="true" />
-            {archive.isPending ? "…" : "Archive"}
+            {archive.isPending ? "…" : "Archivar"}
           </Button>
         )}
       </div>
@@ -130,19 +130,21 @@ export default function ProjectDetailPage() {
       {archived ? (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Archived</CardTitle>
+            <CardTitle className="text-base">Archivado</CardTitle>
             <CardDescription>
-              This project is archived and read-only. Engineering records
-              attached in future sprints remain reachable from here.
+              Este proyecto está archivado y es de solo lectura. Sus registros
+              de ingeniería siguen disponibles desde aquí.
             </CardDescription>
           </CardHeader>
         </Card>
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Edit project</CardTitle>
+            <CardTitle className="text-base">Editar proyecto</CardTitle>
             {update.isSuccess && (
-              <CardDescription className="text-success">Saved.</CardDescription>
+              <CardDescription className="text-success">
+                Guardado.
+              </CardDescription>
             )}
           </CardHeader>
           <CardContent>
@@ -156,7 +158,7 @@ export default function ProjectDetailPage() {
                 startDate: toDateInput(p.startDate),
                 endDate: toDateInput(p.endDate),
               }}
-              submitLabel="Save changes"
+              submitLabel="Guardar cambios"
               busy={update.isPending || createClient.isPending}
               errorMessage={
                 update.error?.message ?? createClient.error?.message ?? null
@@ -169,14 +171,14 @@ export default function ProjectDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Inspections</CardTitle>
+          <CardTitle className="text-base">Inspecciones</CardTitle>
           <CardDescription>
-            Site visits for this project — managed in{" "}
+            Visitas de obra de este proyecto, gestionadas en{" "}
             <Link
               href="/projects/inspections"
               className="text-primary underline-offset-2 hover:underline"
             >
-              Inspections
+              Inspecciones
             </Link>
             .
           </CardDescription>
@@ -184,7 +186,7 @@ export default function ProjectDetailPage() {
         <CardContent>
           {p.inspections.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No inspections for this project yet.
+              Aún no hay inspecciones para este proyecto.
             </p>
           ) : (
             <ul className="space-y-2">
@@ -212,14 +214,14 @@ export default function ProjectDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Calculation records</CardTitle>
+          <CardTitle className="text-base">Memorias de cálculo</CardTitle>
           <CardDescription>
-            Memorias de cálculo for this project — managed in{" "}
+            Memorias de cálculo de este proyecto, gestionadas en{" "}
             <Link
               href="/structures"
               className="text-primary underline-offset-2 hover:underline"
             >
-              Structures
+              Estructuras
             </Link>
             .
           </CardDescription>
@@ -227,7 +229,7 @@ export default function ProjectDetailPage() {
         <CardContent>
           {p.calcRecords.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No calculation records for this project yet.
+              Aún no hay memorias de cálculo para este proyecto.
             </p>
           ) : (
             <ul className="space-y-2">
@@ -255,9 +257,9 @@ export default function ProjectDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Geotechnical records</CardTitle>
+          <CardTitle className="text-base">Registros geotécnicos</CardTitle>
           <CardDescription>
-            Estudios geotécnicos for this project — managed in{" "}
+            Estudios geotécnicos de este proyecto, gestionados en{" "}
             <Link
               href="/geo"
               className="text-primary underline-offset-2 hover:underline"
@@ -270,7 +272,7 @@ export default function ProjectDetailPage() {
         <CardContent>
           {p.geoRecords.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No geotechnical records for this project yet.
+              Aún no hay registros geotécnicos para este proyecto.
             </p>
           ) : (
             <ul className="space-y-2">
@@ -298,9 +300,9 @@ export default function ProjectDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">BIM models</CardTitle>
+          <CardTitle className="text-base">Modelos BIM</CardTitle>
           <CardDescription>
-            IFC models for this project — managed in{" "}
+            Modelos IFC de este proyecto, gestionados en{" "}
             <Link
               href="/bim"
               className="text-primary underline-offset-2 hover:underline"
@@ -313,7 +315,7 @@ export default function ProjectDetailPage() {
         <CardContent>
           {p.bimModels.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No BIM models for this project yet.
+              Aún no hay modelos BIM para este proyecto.
             </p>
           ) : (
             <ul className="space-y-2">
@@ -331,7 +333,7 @@ export default function ProjectDetailPage() {
                     </Link>
                     <span className="truncate text-sm">{bimModel.title}</span>
                     <span className="text-xs text-muted-foreground">
-                      {bimModel._count.versions} version
+                      {bimModel._count.versions} versión
                       {bimModel._count.versions === 1 ? "" : "s"}
                     </span>
                   </div>

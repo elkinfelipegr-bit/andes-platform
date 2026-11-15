@@ -9,16 +9,16 @@ import { usePathname } from "next/navigation";
 import { cn } from "@andes/ui";
 
 const tabs = [
-  { label: "Pipeline", href: "/crm/pipeline" },
-  { label: "Clients", href: "/crm" },
-  { label: "Proposals", href: "/crm/proposals" },
+  { label: "Seguimiento", href: "/crm/pipeline" },
+  { label: "Clientes", href: "/crm" },
+  { label: "Propuestas", href: "/crm/proposals" },
 ];
 
 export function CrmNav() {
   const pathname = usePathname();
   return (
     <nav
-      aria-label="CRM sections"
+      aria-label="Secciones del CRM"
       className="flex gap-1 border-b border-border print:hidden"
     >
       {tabs.map((tab) => {

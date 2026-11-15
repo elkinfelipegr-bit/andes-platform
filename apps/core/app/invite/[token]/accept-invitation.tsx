@@ -19,6 +19,7 @@ import {
 
 import { authClient } from "@/lib/auth-client";
 import { trpc } from "@/lib/trpc";
+import { roleLabel } from "@/lib/format";
 
 function Frame({
   title,
@@ -76,19 +77,19 @@ export function AcceptInvitation({
       href="/dashboard"
       className="text-sm text-muted-foreground underline-offset-2 hover:underline"
     >
-      Go to the dashboard
+      Ir al inicio
     </Link>
   );
 
   if (preview.isLoading) {
-    return <Frame title="Checking your invitation…" />;
+    return <Frame title="Verificando tu invitación…" />;
   }
 
   if (preview.error || !preview.data) {
     return (
       <Frame
-        title="Invitation not found"
-        description="This link is not valid. Ask your firm's administrator for a new one."
+        title="Invitación no encontrada"
+        description="Este enlace no es válido. Pídele uno nuevo al administrador de tu firma."
       >
         {dashboardLink}
       </Frame>
@@ -100,14 +101,14 @@ export function AcceptInvitation({
   if (invitation.status !== "PENDING") {
     const reason =
       invitation.status === "EXPIRED"
-        ? "This invitation has expired."
+        ? "Esta invitación venció."
         : invitation.status === "REVOKED"
-          ? "This invitation was revoked."
-          : "This invitation has already been used.";
+          ? "Esta invitación fue revocada."
+          : "Esta invitación ya fue usada.";
     return (
       <Frame
-        title="Invitation unavailable"
-        description={`${reason} Ask your firm's administrator for a new one.`}
+        title="Invitación no disponible"
+        description={`${reason} Pídele una nueva al administrador de tu firma.`}
       >
         {dashboardLink}
       </Frame>
@@ -117,19 +118,19 @@ export function AcceptInvitation({
   if (!invitation.emailMatches) {
     return (
       <Frame
-        title="Wrong account"
+        title="Cuenta equivocada"
         description={
           <>
-            This invitation to <strong>{invitation.tenantName}</strong> was
-            issued to{" "}
-            <span className="font-mono text-xs">{invitation.email}</span>, but
-            you are signed in as{" "}
+            Esta invitación a <strong>{invitation.tenantName}</strong> fue
+            emitida para{" "}
+            <span className="font-mono text-xs">{invitation.email}</span>, pero
+            iniciaste sesión como{" "}
             <span className="font-mono text-xs">{signedInEmail}</span>.
           </>
         }
       >
         <Button className="w-full" onClick={switchAccount}>
-          Sign in with another account
+          Iniciar sesión con otra cuenta
         </Button>
       </Frame>
     );
@@ -137,14 +138,16 @@ export function AcceptInvitation({
 
   return (
     <Frame
-      title={`Join ${invitation.tenantName}`}
+      title={`Unirse a ${invitation.tenantName}`}
       description={
         <>
-          You have been invited as{" "}
-          <strong className="text-foreground">{invitation.roleLabel}</strong>.
-          Accepting links your account{" "}
-          <span className="font-mono text-xs">{signedInEmail}</span> to this
-          firm.
+          Te invitaron como{" "}
+          <strong className="text-foreground">
+            {roleLabel(invitation.roleLabel)}
+          </strong>
+          . Al aceptar, tu cuenta{" "}
+          <span className="font-mono text-xs">{signedInEmail}</span> queda
+          vinculada a esta firma.
         </>
       }
     >
@@ -158,7 +161,7 @@ export function AcceptInvitation({
         disabled={accept.isPending || accept.isSuccess}
         onClick={() => accept.mutate({ token })}
       >
-        {accept.isPending || accept.isSuccess ? "…" : "Accept invitation"}
+        {accept.isPending || accept.isSuccess ? "…" : "Aceptar invitación"}
       </Button>
     </Frame>
   );

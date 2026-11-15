@@ -103,7 +103,7 @@ export const bimModelsRouter = router({
         if (isUniqueViolation(e)) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: `A BIM model with code "${input.code}" already exists.`,
+            message: `Ya existe un modelo BIM con el código "${input.code}".`,
           });
         }
         throw e;
@@ -126,7 +126,7 @@ export const bimModelsRouter = router({
         if (isUniqueViolation(e)) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: `A BIM model with code "${fields.code}" already exists.`,
+            message: `Ya existe un modelo BIM con el código "${fields.code}".`,
           });
         }
         throw e;
@@ -182,7 +182,7 @@ export const bimModelsRouter = router({
         if (isUniqueViolation(e)) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: "Another upload started at the same time — retry.",
+            message: "Otra carga empezó al mismo tiempo: inténtalo de nuevo.",
           });
         }
         throw e;
@@ -212,7 +212,7 @@ export const bimModelsRouter = router({
       if (version.status !== "PENDING") {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "This version was already confirmed.",
+          message: "Esta versión ya fue confirmada.",
         });
       }
       assertKeyInTenant(version.storageKey, ctx.tenantId);
@@ -221,13 +221,15 @@ export const bimModelsRouter = router({
       if (!head) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "The file has not arrived in storage — upload it first.",
+          message:
+            "El archivo no ha llegado al almacenamiento: súbelo primero.",
         });
       }
       if (head.size <= 0 || head.size > MAX_UPLOAD_BYTES) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "The stored file size is outside the accepted range.",
+          message:
+            "El tamaño del archivo almacenado está fuera del rango aceptado.",
         });
       }
 

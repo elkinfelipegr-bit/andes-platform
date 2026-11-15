@@ -64,7 +64,7 @@ async function assertNotLastOwnerAdmin(
     throw new TRPCError({
       code: "CONFLICT",
       message:
-        "This is the tenant's last owner-admin — promote someone else first.",
+        "Es el último propietario-administrador de la firma: promueve primero a otra persona.",
     });
   }
 }
@@ -104,7 +104,7 @@ export const adminRouter = router({
       if (!role) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Role does not belong to this tenant.",
+          message: "El rol no pertenece a esta firma.",
         });
       }
       await assertNotLastOwnerAdmin(
@@ -130,7 +130,7 @@ export const adminRouter = router({
       if (membership.userId === ctx.session.userId) {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "You cannot remove your own membership.",
+          message: "No puedes quitar tu propia membresía.",
         });
       }
       await assertNotLastOwnerAdmin(
@@ -181,7 +181,7 @@ export const adminRouter = router({
       if (!role) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Role does not belong to this tenant.",
+          message: "El rol no pertenece a esta firma.",
         });
       }
       // Already a member? Inviting again would be a no-op at best.
@@ -192,7 +192,7 @@ export const adminRouter = router({
       if (existing) {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "That email is already a member of this tenant.",
+          message: "Ese correo ya es miembro de esta firma.",
         });
       }
       // Re-inviting supersedes the previous pending offer (ratified).
@@ -234,7 +234,7 @@ export const adminRouter = router({
       if (revoked.count === 0) {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "Only pending invitations can be revoked.",
+          message: "Solo se pueden revocar invitaciones pendientes.",
         });
       }
       return { id: input.id };
@@ -293,13 +293,13 @@ export const adminRouter = router({
       if (invitation.email !== ctx.session.email.trim().toLowerCase()) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: `This invitation was issued to ${invitation.email}. Sign in with that address to accept it.`,
+          message: `Esta invitación fue emitida para ${invitation.email}. Inicia sesión con esa dirección para aceptarla.`,
         });
       }
       if (invitation.status !== "PENDING") {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "This invitation is no longer available.",
+          message: "Esta invitación ya no está disponible.",
         });
       }
       if (invitation.expiresAt < new Date()) {
@@ -310,7 +310,7 @@ export const adminRouter = router({
         });
         throw new TRPCError({
           code: "CONFLICT",
-          message: "This invitation has expired — ask for a new one.",
+          message: "Esta invitación venció: pide una nueva.",
         });
       }
 
@@ -329,8 +329,8 @@ export const adminRouter = router({
           code: "CONFLICT",
           message:
             existing.tenantId === invitation.tenantId
-              ? "You already belong to this tenant."
-              : "You already belong to another tenant.",
+              ? "Ya perteneces a esta firma."
+              : "Ya perteneces a otra firma.",
         });
       }
 
@@ -352,7 +352,7 @@ export const adminRouter = router({
         ) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: "You already belong to this tenant.",
+            message: "Ya perteneces a esta firma.",
           });
         }
         throw e;

@@ -21,14 +21,14 @@ import {
 import { trpc } from "@/lib/trpc";
 
 const formSchema = z.object({
-  name: z.string().trim().min(1, "Required").max(200),
+  name: z.string().trim().min(1, "Obligatorio").max(200),
   title: z.string().trim().max(200),
   email: z
     .string()
     .trim()
     .max(200)
     .refine((v) => v === "" || z.string().email().safeParse(v).success, {
-      message: "Invalid email",
+      message: "Correo inválido",
     }),
   phone: z.string().trim().max(200),
 });
@@ -113,18 +113,20 @@ export function ContactDialog({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{contact ? "Edit contact" : "New contact"}</DialogTitle>
+          <DialogTitle>
+            {contact ? "Editar contacto" : "Nuevo contacto"}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="contact-name">Name</Label>
+            <Label htmlFor="contact-name">Nombre</Label>
             <Input id="contact-name" {...form.register("name")} />
             {errors.name && (
               <p className="text-xs text-destructive">{errors.name.message}</p>
             )}
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="contact-title">Title / role</Label>
+            <Label htmlFor="contact-title">Cargo</Label>
             <Input
               id="contact-title"
               placeholder="Interventor, Gerente…"
@@ -133,7 +135,7 @@ export function ContactDialog({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="contact-email">Email</Label>
+              <Label htmlFor="contact-email">Correo</Label>
               <Input id="contact-email" {...form.register("email")} />
               {errors.email && (
                 <p className="text-xs text-destructive">
@@ -142,7 +144,7 @@ export function ContactDialog({
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="contact-phone">Phone</Label>
+              <Label htmlFor="contact-phone">Teléfono</Label>
               <Input id="contact-phone" {...form.register("phone")} />
             </div>
           </div>
@@ -153,7 +155,7 @@ export function ContactDialog({
 
           <div className="flex justify-end">
             <Button type="submit" disabled={busy}>
-              {busy ? "…" : contact ? "Save contact" : "Add contact"}
+              {busy ? "…" : contact ? "Guardar contacto" : "Agregar contacto"}
             </Button>
           </div>
         </form>

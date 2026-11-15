@@ -127,14 +127,14 @@ function OpportunityCard({
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              aria-label={`Move “${o.title}”`}
+              aria-label={`Mover «${o.title}»`}
               className="relative z-10 -mt-1 -mr-1 rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             >
               <MoreHorizontal aria-hidden="true" className="size-4" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Move to</DropdownMenuLabel>
+            <DropdownMenuLabel>Mover a</DropdownMenuLabel>
             {OPEN_STAGES.filter((s) => s !== o.stage).map((s) => (
               <DropdownMenuItem key={s} onSelect={() => onMove(s)}>
                 {STAGE_LABEL[s]}
@@ -142,10 +142,10 @@ function OpportunityCard({
             ))}
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={() => onMove("WON")}>
-              Mark as won
+              Marcar como ganada
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => onMove("LOST")}>
-              Mark as lost…
+              Marcar como perdida…
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -176,8 +176,8 @@ function OpportunityCard({
         <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
           <FileText aria-hidden="true" className="size-3" />
           {o._count.proposals === 1
-            ? "1 proposal"
-            : `${o._count.proposals} proposals`}
+            ? "1 propuesta"
+            : `${o._count.proposals} propuestas`}
         </p>
       )}
     </article>
@@ -271,26 +271,27 @@ export default function PipelinePage() {
       <CrmNav />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Pipeline</h1>
+          <h1 className="text-2xl font-semibold">Seguimiento</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Every prospect, what was last said, and what happens next.
+            Cada prospecto, lo último que se habló y lo que sigue.
           </p>
         </div>
         <NewOpportunityDialog />
       </div>
 
       {list.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading pipeline…</p>
+        <p className="text-sm text-muted-foreground">Cargando seguimiento…</p>
       ) : list.error ? (
         <p role="alert" className="text-sm text-destructive">
           {list.error.message}
         </p>
       ) : all.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-12 text-center">
-          <p className="font-medium">No opportunities yet</p>
+          <p className="font-medium">Aún no hay oportunidades</p>
           <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-            Add the prospects you are talking to and the quotes you are waiting
-            on. Each one gets a next step with a date, so nothing is forgotten.
+            Agrega los prospectos con los que estás hablando y las cotizaciones
+            que esperan respuesta. Cada uno tiene un próximo paso con fecha,
+            para que nada se olvide.
           </p>
           <div className="mt-4 flex justify-center">
             <NewOpportunityDialog />
@@ -299,33 +300,33 @@ export default function PipelinePage() {
       ) : (
         <>
           <section
-            aria-label="Summary"
+            aria-label="Resumen"
             className="grid grid-cols-2 gap-3 lg:grid-cols-4"
           >
             <Tile
-              label="Open opportunities"
+              label="Oportunidades abiertas"
               value={String(open.length)}
-              hint={`${closed.filter((o) => o.stage === "WON").length} won · ${closed.filter((o) => o.stage === "LOST").length} lost`}
+              hint={`${closed.filter((o) => o.stage === "WON").length} ganadas · ${closed.filter((o) => o.stage === "LOST").length} perdidas`}
             />
             <Tile
-              label="Open pipeline value"
+              label="Valor abierto en seguimiento"
               value={moneyTotals(open)}
-              hint="Sum of estimated values"
+              hint="Suma de valores estimados"
             />
             <Tile
-              label="Follow-ups due"
+              label="Seguimientos pendientes"
               value={String(due.length)}
               tone={
                 due.some((o) => o.followUp === "OVERDUE") ? "alert" : undefined
               }
               hint={
                 unplanned.length > 0
-                  ? `${unplanned.length} more without a next step`
-                  : "Overdue or due today"
+                  ? `${unplanned.length} más sin próximo paso`
+                  : "Vencidos o para hoy"
               }
             />
             <Tile
-              label="Quotes awaiting answer"
+              label="Cotizaciones sin respuesta"
               value={String(awaiting.length)}
               hint={
                 awaiting.length > 0
@@ -333,7 +334,7 @@ export default function PipelinePage() {
                       awaitingTotal,
                       awaiting[0]?.currency ?? "COP",
                     )
-                  : "No sent proposals pending"
+                  : "No hay propuestas enviadas pendientes"
               }
             />
           </section>
@@ -341,16 +342,17 @@ export default function PipelinePage() {
           <section className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-xl border border-border bg-card">
               <header className="flex items-baseline justify-between border-b border-border px-4 py-3">
-                <h2 className="font-semibold">Follow up now</h2>
+                <h2 className="font-semibold">Para hacer seguimiento hoy</h2>
                 <span className="text-xs text-muted-foreground">
                   {upcoming.length > 0
-                    ? `${upcoming.length} more in the next 7 days`
+                    ? `${upcoming.length} más en los próximos 7 días`
                     : ""}
                 </span>
               </header>
               {agenda.length === 0 ? (
                 <p className="px-4 py-6 text-sm text-muted-foreground">
-                  Nothing due. Every open opportunity has a next step scheduled.
+                  Nada pendiente. Todas las oportunidades abiertas tienen
+                  próximo paso programado.
                 </p>
               ) : (
                 <ul className="divide-y divide-border">
@@ -362,7 +364,7 @@ export default function PipelinePage() {
                       >
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium">
-                            {o.nextAction ?? "Decide the next step"}
+                            {o.nextAction ?? "Define el próximo paso"}
                           </p>
                           <p className="truncate text-xs text-muted-foreground">
                             {o.client.name} · {o.title}
@@ -384,17 +386,17 @@ export default function PipelinePage() {
 
             <div className="rounded-xl border border-border bg-card">
               <header className="flex items-baseline justify-between border-b border-border px-4 py-3">
-                <h2 className="font-semibold">Quotes awaiting answer</h2>
+                <h2 className="font-semibold">Cotizaciones sin respuesta</h2>
                 <Link
                   href="/crm/proposals"
                   className="text-xs text-primary underline-offset-2 hover:underline"
                 >
-                  All proposals
+                  Todas las propuestas
                 </Link>
               </header>
               {awaiting.length === 0 ? (
                 <p className="px-4 py-6 text-sm text-muted-foreground">
-                  No sent proposals are waiting for a decision.
+                  No hay propuestas enviadas esperando decisión.
                 </p>
               ) : (
                 <ul className="divide-y divide-border">
@@ -425,14 +427,14 @@ export default function PipelinePage() {
                             <p className="truncate text-xs text-muted-foreground">
                               {p.client.name} ·{" "}
                               {waited === null
-                                ? "sent date not recorded"
+                                ? "fecha de envío no registrada"
                                 : waited === 0
-                                  ? "sent today"
-                                  : `sent ${waited} ${waited === 1 ? "day" : "days"} ago`}
+                                  ? "enviada hoy"
+                                  : `enviada hace ${waited} ${waited === 1 ? "día" : "días"}`}
                               {expires !== null &&
                                 (expires < 0
-                                  ? " · validity expired"
-                                  : ` · valid ${relativeDay(toDay(p.validUntil), today).toLowerCase()}`)}
+                                  ? " · vigencia vencida"
+                                  : ` · vigente ${relativeDay(toDay(p.validUntil), today).toLowerCase()}`)}
                             </p>
                           </div>
                           <span className="text-sm font-medium tabular-nums">
@@ -447,9 +449,9 @@ export default function PipelinePage() {
             </div>
           </section>
 
-          <section aria-label="Board" className="space-y-3">
+          <section aria-label="Tablero" className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="font-semibold">Board</h2>
+              <h2 className="font-semibold">Tablero</h2>
               <div className="relative w-full max-w-xs">
                 <Search
                   aria-hidden="true"
@@ -457,8 +459,8 @@ export default function PipelinePage() {
                 />
                 <Input
                   type="search"
-                  aria-label="Search opportunities"
-                  placeholder="Search client, need or next step"
+                  aria-label="Buscar oportunidades"
+                  placeholder="Buscar cliente, necesidad o próximo paso"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   className="pl-8"
@@ -511,7 +513,7 @@ export default function PipelinePage() {
                         ))}
                         {cards.length === 0 && (
                           <p className="px-1.5 py-4 text-xs text-muted-foreground">
-                            {query ? "No matches" : STAGE_HINT[stage]}
+                            {query ? "Sin coincidencias" : STAGE_HINT[stage]}
                           </p>
                         )}
                       </div>
@@ -544,7 +546,8 @@ export default function PipelinePage() {
                   ) : (
                     <CircleX aria-hidden="true" className="size-4" />
                   )}
-                  Drop here to mark as {STAGE_LABEL[stage].toLowerCase()}
+                  Suelta aquí para marcar como{" "}
+                  {STAGE_LABEL[stage].toLowerCase()}
                 </div>
               ))}
             </div>
@@ -563,7 +566,7 @@ export default function PipelinePage() {
                 aria-expanded={showClosed}
                 onClick={() => setShowClosed((v) => !v)}
               >
-                {showClosed ? "Hide" : "Show"} closed ({closed.length})
+                {showClosed ? "Ocultar" : "Mostrar"} cerradas ({closed.length})
               </Button>
               {showClosed && (
                 <ul className="divide-y divide-border rounded-xl border border-border bg-card">
