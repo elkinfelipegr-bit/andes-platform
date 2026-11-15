@@ -132,3 +132,10 @@ export {
 } from "./routers/norms/schemas.js";
 export { analyticsRouter } from "./routers/analytics/index.js";
 export { periodSchema, type Period } from "./routers/analytics/schemas.js";
+export {
+  intakeLead,
+  isValidIntakeKey,
+  leadIntakeSchema,
+  LeadIntakeError,
+  type LeadIntakeInput,
+} from "./intake/lead.js";

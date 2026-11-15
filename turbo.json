@@ -4,7 +4,9 @@
     "DATABASE_URL",
     "APP_DATABASE_URL",
     "BETTER_AUTH_SECRET",
-    "BETTER_AUTH_URL"
+    "BETTER_AUTH_URL",
+    "LEAD_INTAKE_KEY",
+    "LEAD_INTAKE_TENANT_ID"
   ],
   "tasks": {
     "build": {
