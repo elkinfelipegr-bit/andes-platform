@@ -130,3 +130,5 @@ export {
   normsSearchSchema,
   normsRangeSchema,
 } from "./routers/norms/schemas.js";
+export { analyticsRouter } from "./routers/analytics/index.js";
+export { periodSchema, type Period } from "./routers/analytics/schemas.js";
