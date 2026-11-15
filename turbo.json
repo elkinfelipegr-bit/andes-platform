@@ -12,7 +12,9 @@
     "DIGEST_FROM_EMAIL",
     "DIGEST_TO_EMAIL",
     "DIGEST_TIME_ZONE",
-    "RESEND_API_KEY"
+    "RESEND_API_KEY",
+    "VERCEL_URL",
+    "VERCEL_PROJECT_PRODUCTION_URL"
   ],
   "tasks": {
     "build": {

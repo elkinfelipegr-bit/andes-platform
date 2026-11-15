@@ -259,7 +259,10 @@ export interface MailConfig {
 export function mailConfigFromEnv(env: NodeJS.ProcessEnv): MailConfig | null {
   const apiKey = env.RESEND_API_KEY;
   const from = env.DIGEST_FROM_EMAIL;
-  const baseUrl = env.BETTER_AUTH_URL;
+  // Links in the email point at the app. Preview deployments have no
+  // BETTER_AUTH_URL, so fall back to the host Vercel reports.
+  const host = env.VERCEL_PROJECT_PRODUCTION_URL ?? env.VERCEL_URL;
+  const baseUrl = env.BETTER_AUTH_URL ?? (host ? `https://${host}` : undefined);
   return apiKey && from && baseUrl ? { apiKey, from, baseUrl } : null;
 }
 
