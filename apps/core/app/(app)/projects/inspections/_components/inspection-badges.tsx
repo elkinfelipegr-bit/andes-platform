@@ -13,9 +13,9 @@ const statusVariant = {
 } as const;
 
 const statusLabel: Record<InspectionStatus, string> = {
-  SCHEDULED: "Scheduled",
-  COMPLETED: "Completed",
-  CANCELLED: "Cancelled",
+  SCHEDULED: "Programada",
+  COMPLETED: "Completado",
+  CANCELLED: "Cancelada",
 };
 
 export function InspectionStatusBadge({
@@ -34,10 +34,10 @@ const severityVariant = {
 } as const;
 
 const severityLabel: Record<FindingSeverity, string> = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
-  CRITICAL: "Critical",
+  LOW: "Baja",
+  MEDIUM: "Media",
+  HIGH: "Alta",
+  CRITICAL: "Crítica",
 };
 
 export function SeverityBadge({ severity }: { severity: FindingSeverity }) {

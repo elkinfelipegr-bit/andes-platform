@@ -78,11 +78,11 @@ export function PhotoManager({ inspection }: { inspection: InspectionDetail }) {
   async function handleFile(file: File) {
     setError(null);
     if (!PHOTO_CONTENT_TYPES.includes(file.type)) {
-      setError("Only JPEG, PNG, or WebP photos are accepted.");
+      setError("Solo se aceptan fotos JPEG, PNG o WebP.");
       return;
     }
     if (file.size === 0 || file.size > MAX_PHOTO_BYTES) {
-      setError("Photos must be between 1 byte and 15 MB.");
+      setError("Las fotos deben pesar entre 1 byte y 15 MB.");
       return;
     }
     setProgress(0);
@@ -103,7 +103,7 @@ export function PhotoManager({ inspection }: { inspection: InspectionDetail }) {
       await confirmUpload.mutateAsync({ id: request.photoId });
       void utils.inspections.get.invalidate({ id: inspection.id });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "The upload failed.");
+      setError(e instanceof Error ? e.message : "La carga falló.");
     } finally {
       setProgress(null);
       if (inputRef.current) inputRef.current.value = "";
@@ -113,10 +113,10 @@ export function PhotoManager({ inspection }: { inspection: InspectionDetail }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Photos</CardTitle>
+        <CardTitle className="text-base">Fotos</CardTitle>
         <CardDescription>
-          Photographic evidence — attached to a finding or to the visit in
-          general. Freezes with the completed report.
+          Evidencia fotográfica, asociada a un hallazgo o a la visita en
+          general. Queda congelada con el informe completado.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -126,7 +126,7 @@ export function PhotoManager({ inspection }: { inspection: InspectionDetail }) {
               htmlFor="photo-attach"
               className="text-xs font-medium text-muted-foreground"
             >
-              Attach to
+              Asociar a
             </label>
             <Select
               id="photo-attach"
@@ -134,10 +134,10 @@ export function PhotoManager({ inspection }: { inspection: InspectionDetail }) {
               value={attachTo}
               onChange={(e) => setAttachTo(e.target.value)}
             >
-              <option value={GENERAL}>General (whole visit)</option>
+              <option value={GENERAL}>General (toda la visita)</option>
               {inspection.findings.map((finding, index) => (
                 <option key={finding.id} value={finding.id}>
-                  Finding {index + 1} — {finding.description.slice(0, 40)}
+                  Hallazgo {index + 1} — {finding.description.slice(0, 40)}
                 </option>
               ))}
             </Select>
@@ -160,10 +160,10 @@ export function PhotoManager({ inspection }: { inspection: InspectionDetail }) {
           >
             <ImagePlus aria-hidden="true" />
             {progress === null
-              ? "Add photo"
+              ? "Agregar foto"
               : progress < 100
-                ? `Uploading… ${progress}%`
-                : "Confirming…"}
+                ? `Subiendo… ${progress}%`
+                : "Confirmando…"}
           </Button>
         </div>
         {progress !== null && (
@@ -177,7 +177,7 @@ export function PhotoManager({ inspection }: { inspection: InspectionDetail }) {
         {error && <p className="text-sm text-destructive">{error}</p>}
 
         {inspection.photos.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No photos yet.</p>
+          <p className="text-sm text-muted-foreground">Aún no hay fotos.</p>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {inspection.photos.map((photo: Photo) => (
@@ -191,8 +191,8 @@ export function PhotoManager({ inspection }: { inspection: InspectionDetail }) {
                   className="aspect-video w-full rounded object-cover"
                 />
                 <Input
-                  aria-label="Photo caption"
-                  placeholder="Caption…"
+                  aria-label="Pie de foto"
+                  placeholder="Pie de foto…"
                   defaultValue={photo.caption ?? ""}
                   onBlur={(e) => {
                     const caption = e.target.value.trim();
@@ -206,7 +206,7 @@ export function PhotoManager({ inspection }: { inspection: InspectionDetail }) {
                 />
                 <div className="flex items-center gap-1">
                   <Select
-                    aria-label="Photo finding link"
+                    aria-label="Hallazgo asociado a la foto"
                     value={photo.findingId ?? GENERAL}
                     onChange={(e) =>
                       updatePhoto.mutate({
@@ -219,7 +219,7 @@ export function PhotoManager({ inspection }: { inspection: InspectionDetail }) {
                     <option value={GENERAL}>General</option>
                     {inspection.findings.map((finding, index) => (
                       <option key={finding.id} value={finding.id}>
-                        Finding {index + 1}
+                        Hallazgo {index + 1}
                       </option>
                     ))}
                   </Select>
@@ -227,9 +227,9 @@ export function PhotoManager({ inspection }: { inspection: InspectionDetail }) {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    aria-label="Delete photo"
+                    aria-label="Eliminar foto"
                     onClick={() => {
-                      if (window.confirm("Delete this photo?")) {
+                      if (window.confirm("¿Eliminar esta foto?")) {
                         removePhoto.mutate({ id: photo.id });
                       }
                     }}
@@ -261,7 +261,7 @@ export function ReportPhotos({ inspection }: { inspection: InspectionDetail }) {
       (p: Photo) => p.findingId === finding.id,
     );
     if (photos.length > 0) {
-      groups.push({ label: `Finding ${index + 1}`, photos });
+      groups.push({ label: `Hallazgo ${index + 1}`, photos });
     }
   });
   const general = inspection.photos.filter((p: Photo) => !p.findingId);
@@ -270,7 +270,7 @@ export function ReportPhotos({ inspection }: { inspection: InspectionDetail }) {
   return (
     <div className="mt-6">
       <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        Photographic evidence ({inspection.photos.length})
+        Evidencia fotográfica ({inspection.photos.length})
       </p>
       <div className="space-y-4">
         {groups.map((group) => (

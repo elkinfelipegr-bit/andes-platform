@@ -25,7 +25,7 @@ Defines the authenticated shell every Andes product renders inside, and the navi
 
 - **Sidebar** (fixed, `w-60`, desktop-first): Andes wordmark, then one entry per product module, then Administration pinned at the bottom. Active module = `--primary` treatment; inactive real routes = muted; **not-yet-built modules render as disabled stubs** (muted + "Soon" badge) so the product map is visible from day one without dead links.
 - **Topbar**: current page title/breadcrumb slot on the left; on the right the **tenant name + role badge** (the session context RFC-001 makes mandatory — the user must always see which tenant scope they act in) and the user menu (name, email, sign-out) as a `DropdownMenu`.
-- Mobile: the sidebar collapses behind a menu button. Sprint 1 ships the desktop layout and a usable small-screen fallback (topbar + slide-over nav is acceptable to defer if it grows the sprint).
+- Mobile: below the `lg` breakpoint the sidebar collapses behind a menu button in the topbar and opens as a slide-over drawer with a backdrop; it closes on navigation, on Escape and on a backdrop tap. The tenant slug hides on the narrowest screens — the role badge stays, so the scope is still on screen. (Deferred from Sprint 1; shipped with the CRM pipeline work, which is used from a phone.)
 
 ## Module → Route Map
 
@@ -39,12 +39,12 @@ Defines the authenticated shell every Andes product renders inside, and the navi
 | BIM            | Andes BIM        | `/bim`        | **Live** (Sprint 8)  |
 | AI             | Andes AI         | `/ai`         | **Live** (Sprint 9)  |
 | Normas         | Andes Core       | `/normas`     | **Live** (Sprint 11) |
-| Analytics      | Andes Analytics  | `/analytics`  | Stub (disabled)      |
-| Administration | Andes Core       | `/admin`      | Stub (disabled)      |
+| Analytics      | Andes Analytics  | `/analytics`  | **Live** (Sprint 14) |
+| Administration | Andes Core       | `/admin`      | **Live** (Sprint 12) |
 
 Routes are top-level segments (no `/core/...` prefix): products are one platform to the user; the monorepo package split ([ADR-004](../adr/0004-repository-structure.md)) is an implementation boundary, not a URL scheme.
 
-**In-module navigation (Sprint 4 amendment):** functional modules of a product live under that product's segment with tab navigation inside the page — the sidebar stays one-entry-per-product. Cases: Andes CRM's Proposal Generator at `/crm/proposals` (tabs: Clients | Proposals, Sprint 4) and Andes Projects' Inspection Module at `/projects/inspections` (tabs: Projects | Inspections, Sprint 5). The shell (sidebar, topbar) and in-module chrome are `print:hidden` so document views (proposal print view, inspection report) print clean.
+**In-module navigation (Sprint 4 amendment):** functional modules of a product live under that product's segment with tab navigation inside the page — the sidebar stays one-entry-per-product. Cases: Andes CRM's Proposal Generator at `/crm/proposals` (Sprint 4) and its Pipeline at `/crm/pipeline` (Sprint 15 — tabs are now Pipeline | Clients | Proposals; `/crm` itself remains the clients list) and Andes Projects' Inspection Module at `/projects/inspections` (tabs: Projects | Inspections, Sprint 5). The shell (sidebar, topbar) and in-module chrome are `print:hidden` so document views (proposal print view, inspection report) print clean.
 
 ## Access States
 
@@ -55,6 +55,10 @@ Implemented with a Next.js route group `(app)` whose layout owns the shell and t
 3. **Session + membership** → full shell; tenant + role always visible in the topbar.
 
 Role-based visibility (e.g. Administration only for `OWNER_ADMIN`) applies when those pages carry real functionality — stubs stay visible to everyone in Sprint 1.
+
+**Sprint 12 amendment:** Administration now carries real functionality, so the rule above applies — its sidebar entry renders for `OWNER_ADMIN` only, and `/admin` redirects any other role to `/dashboard`. Both are navigation courtesy; the gate is the admin router's `roleProcedure("OWNER_ADMIN")`.
+
+**Invitation landing (`/invite/[token]`, Sprint 12):** the one authenticated page that lives _outside_ the `(app)` shell, because its visitor usually has no account or no membership yet. No session → `/login?next=/invite/<token>`, and the login page returns there after sign-in/sign-up (`next` is honored only for `/invite/<token>` paths — never an arbitrary URL). State 2 above now reads "ask your firm's administrator for an invitation link"; the operator `link-member` script remains only for bootstrapping a tenant's first `OWNER_ADMIN`.
 
 ## References
 

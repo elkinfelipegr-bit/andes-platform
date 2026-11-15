@@ -37,7 +37,7 @@ export const projectCreateSchema = z
     endDate: z.coerce.date().optional(),
   })
   .refine((p) => !p.startDate || !p.endDate || p.startDate <= p.endDate, {
-    message: "endDate must not precede startDate",
+    message: "La fecha de fin no puede ser anterior a la de inicio",
     path: ["endDate"],
   });
 
@@ -53,7 +53,7 @@ export const projectUpdateSchema = z
     endDate: z.coerce.date().nullable().optional(),
   })
   .refine((p) => !p.startDate || !p.endDate || p.startDate <= p.endDate, {
-    message: "endDate must not precede startDate",
+    message: "La fecha de fin no puede ser anterior a la de inicio",
     path: ["endDate"],
   });
 

@@ -43,22 +43,22 @@ import { PhotoManager, ReportPhotos } from "../_components/inspection-photos";
 type InspectionDetail = RouterOutputs["inspections"]["get"];
 
 const SEVERITIES = [
-  ["LOW", "Low"],
-  ["MEDIUM", "Medium"],
-  ["HIGH", "High"],
-  ["CRITICAL", "Critical"],
+  ["LOW", "Baja"],
+  ["MEDIUM", "Media"],
+  ["HIGH", "Alta"],
+  ["CRITICAL", "Crítica"],
 ] as const;
 
 const draftSchema = z.object({
-  code: z.string().trim().min(1, "Required").max(32),
-  title: z.string().trim().min(1, "Required").max(200),
-  inspectorId: z.string().min(1, "Required"),
-  scheduledFor: z.string().min(1, "Required"),
+  code: z.string().trim().min(1, "Obligatorio").max(32),
+  title: z.string().trim().min(1, "Obligatorio").max(200),
+  inspectorId: z.string().min(1, "Obligatorio"),
+  scheduledFor: z.string().min(1, "Obligatorio"),
   notes: z.string().trim().max(5000),
   findings: z
     .array(
       z.object({
-        description: z.string().trim().min(1, "Required").max(1000),
+        description: z.string().trim().min(1, "Obligatorio").max(1000),
         severity: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]),
         location: z.string().trim().max(200),
       }),
@@ -121,15 +121,17 @@ function ScheduledEditor({ inspection }: { inspection: InspectionDetail }) {
     <form onSubmit={form.handleSubmit(submit)} className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Inspection data</CardTitle>
+          <CardTitle className="text-base">Datos de la inspección</CardTitle>
           {update.isSuccess && (
-            <CardDescription className="text-success">Saved.</CardDescription>
+            <CardDescription className="text-success">
+              Guardado.
+            </CardDescription>
           )}
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="i-code">Code</Label>
+              <Label htmlFor="i-code">Código</Label>
               <Input
                 id="i-code"
                 className="font-mono"
@@ -142,7 +144,7 @@ function ScheduledEditor({ inspection }: { inspection: InspectionDetail }) {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="i-date">Scheduled for</Label>
+              <Label htmlFor="i-date">Programada para</Label>
               <Input
                 id="i-date"
                 type="date"
@@ -161,14 +163,14 @@ function ScheduledEditor({ inspection }: { inspection: InspectionDetail }) {
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="i-title">Purpose / title</Label>
+            <Label htmlFor="i-title">Objeto / título</Label>
             <Input id="i-title" {...form.register("title")} />
             {errors.title && (
               <p className="text-xs text-destructive">{errors.title.message}</p>
             )}
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="i-notes">General notes</Label>
+            <Label htmlFor="i-notes">Notas generales</Label>
             <Textarea id="i-notes" rows={3} {...form.register("notes")} />
           </div>
         </CardContent>
@@ -178,9 +180,9 @@ function ScheduledEditor({ inspection }: { inspection: InspectionDetail }) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-base">Findings</CardTitle>
+              <CardTitle className="text-base">Hallazgos</CardTitle>
               <CardDescription>
-                What was observed on site, graded by severity.
+                Lo observado en obra, clasificado por severidad.
               </CardDescription>
             </div>
             <Button
@@ -196,14 +198,14 @@ function ScheduledEditor({ inspection }: { inspection: InspectionDetail }) {
               }
             >
               <Plus aria-hidden="true" />
-              Add finding
+              Agregar hallazgo
             </Button>
           </div>
         </CardHeader>
         <CardContent>
           {findings.fields.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No findings recorded yet.
+              Aún no hay hallazgos registrados.
             </p>
           ) : (
             <div className="space-y-2">
@@ -214,7 +216,7 @@ function ScheduledEditor({ inspection }: { inspection: InspectionDetail }) {
                 >
                   <div>
                     <Input
-                      aria-label={`Finding ${index + 1} description`}
+                      aria-label={`Descripción del hallazgo ${index + 1}`}
                       placeholder="Descripción del hallazgo"
                       {...form.register(`findings.${index}.description`)}
                     />
@@ -225,7 +227,7 @@ function ScheduledEditor({ inspection }: { inspection: InspectionDetail }) {
                     )}
                   </div>
                   <Select
-                    aria-label={`Finding ${index + 1} severity`}
+                    aria-label={`Severidad del hallazgo ${index + 1}`}
                     {...form.register(`findings.${index}.severity`)}
                   >
                     {SEVERITIES.map(([value, label]) => (
@@ -235,7 +237,7 @@ function ScheduledEditor({ inspection }: { inspection: InspectionDetail }) {
                     ))}
                   </Select>
                   <Input
-                    aria-label={`Finding ${index + 1} location`}
+                    aria-label={`Ubicación del hallazgo ${index + 1}`}
                     placeholder="Ubicación (opcional)"
                     {...form.register(`findings.${index}.location`)}
                   />
@@ -243,7 +245,7 @@ function ScheduledEditor({ inspection }: { inspection: InspectionDetail }) {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    aria-label={`Remove finding ${index + 1}`}
+                    aria-label={`Quitar hallazgo ${index + 1}`}
                     onClick={() => findings.remove(index)}
                   >
                     <Trash2 aria-hidden="true" />
@@ -260,7 +262,7 @@ function ScheduledEditor({ inspection }: { inspection: InspectionDetail }) {
       )}
       <div className="flex justify-end">
         <Button type="submit" disabled={update.isPending}>
-          {update.isPending ? "…" : "Save"}
+          {update.isPending ? "…" : "Guardar"}
         </Button>
       </div>
     </form>
@@ -284,9 +286,9 @@ function InspectionReport({ inspection }: { inspection: InspectionDetail }) {
           </p>
         </div>
         <div className="text-right text-sm text-muted-foreground">
-          <p>Scheduled: {formatDate(inspection.scheduledFor)}</p>
+          <p>Programada: {formatDate(inspection.scheduledFor)}</p>
           {inspection.performedAt && (
-            <p>Performed: {formatDate(inspection.performedAt)}</p>
+            <p>Realizada: {formatDate(inspection.performedAt)}</p>
           )}
         </div>
       </div>
@@ -296,7 +298,7 @@ function InspectionReport({ inspection }: { inspection: InspectionDetail }) {
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Project
+            Proyecto
           </p>
           <p className="mt-1 font-medium">
             <span className="font-mono text-xs">{inspection.project.code}</span>{" "}
@@ -314,7 +316,7 @@ function InspectionReport({ inspection }: { inspection: InspectionDetail }) {
       {inspection.notes && (
         <>
           <p className="mt-6 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            General notes
+            Notas generales
           </p>
           <p className="mt-1 whitespace-pre-wrap text-sm">{inspection.notes}</p>
         </>
@@ -322,20 +324,20 @@ function InspectionReport({ inspection }: { inspection: InspectionDetail }) {
 
       <div className="mt-6">
         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Findings ({inspection.findings.length})
+          Hallazgos ({inspection.findings.length})
         </p>
         {inspection.findings.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No findings were recorded.
+            No se registraron hallazgos.
           </p>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-10">#</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Severity</TableHead>
-                <TableHead>Location</TableHead>
+                <TableHead>Descripción</TableHead>
+                <TableHead>Severidad</TableHead>
+                <TableHead>Ubicación</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -377,16 +379,18 @@ export default function InspectionDetailPage() {
   const cancel = trpc.inspections.cancel.useMutation({ onSuccess: invalidate });
 
   if (inspection.isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading inspection…</p>;
+    return (
+      <p className="text-sm text-muted-foreground">Cargando inspección…</p>
+    );
   }
   if (!inspection.data) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-destructive">Inspection not found.</p>
+        <p className="text-sm text-destructive">Inspección no encontrada.</p>
         <Button asChild variant="outline">
           <Link href="/projects/inspections">
             <ArrowLeft aria-hidden="true" />
-            Back to inspections
+            Volver a inspecciones
           </Link>
         </Button>
       </div>
@@ -408,7 +412,7 @@ export default function InspectionDetailPage() {
             className="inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-2 hover:underline"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
-            Inspections
+            Inspecciones
           </Link>
           <div className="flex items-center gap-3">
             <h1 className="font-mono text-2xl font-semibold">{ins.code}</h1>
@@ -429,7 +433,7 @@ export default function InspectionDetailPage() {
           {ins.status !== "SCHEDULED" && (
             <Button variant="outline" onClick={() => window.print()}>
               <Printer aria-hidden="true" />
-              Print
+              Imprimir
             </Button>
           )}
           {ins.status === "SCHEDULED" && (
@@ -439,7 +443,7 @@ export default function InspectionDetailPage() {
                 onClick={() => {
                   if (
                     window.confirm(
-                      `Complete inspection ${ins.code}? The report becomes read-only.`,
+                      `¿Completar la inspección ${ins.code}? El informe quedará de solo lectura.`,
                     )
                   ) {
                     complete.mutate({ id });
@@ -447,19 +451,19 @@ export default function InspectionDetailPage() {
                 }}
               >
                 <Check aria-hidden="true" />
-                {complete.isPending ? "…" : "Complete"}
+                {complete.isPending ? "…" : "Completar"}
               </Button>
               <Button
                 variant="outline"
                 disabled={cancel.isPending}
                 onClick={() => {
-                  if (window.confirm(`Cancel inspection ${ins.code}?`)) {
+                  if (window.confirm(`¿Cancelar la inspección ${ins.code}?`)) {
                     cancel.mutate({ id });
                   }
                 }}
               >
                 <X aria-hidden="true" />
-                Cancel
+                Cancelar
               </Button>
             </>
           )}

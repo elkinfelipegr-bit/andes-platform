@@ -64,8 +64,8 @@ function ChatPane({
       <div className="flex-1 space-y-4 overflow-y-auto pr-1">
         {messages.length === 0 && !busy && (
           <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            Ask about your firm&apos;s projects, proposals, inspections,
-            calculation records, estudios, or BIM models.
+            Pregunta por los proyectos, propuestas, inspecciones, memorias de
+            cálculo, estudios o modelos BIM de tu firma.
           </div>
         )}
         {messages.map((message) => (
@@ -83,7 +83,7 @@ function ChatPane({
                   .filter((part) => part.type.startsWith("tool-"))
                   .map((part, i) => (
                     <Badge key={i} variant="outline" className="text-[10px]">
-                      consulted: {toolLabel(part.type)}
+                      consultó: {toolLabel(part.type)}
                     </Badge>
                   ))}
               </div>
@@ -105,11 +105,13 @@ function ChatPane({
           </div>
         ))}
         {busy && (
-          <p className="text-xs text-muted-foreground">Copilot is thinking…</p>
+          <p className="text-xs text-muted-foreground">
+            El Copiloto está pensando…
+          </p>
         )}
         {error && (
           <p className="text-sm text-destructive">
-            The Copilot could not answer: {error.message}
+            El Copiloto no pudo responder: {error.message}
           </p>
         )}
         <div ref={bottomRef} />
@@ -128,7 +130,7 @@ function ChatPane({
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask the Copilot…"
+          placeholder="Pregúntale al Copiloto…"
           maxLength={4000}
           disabled={busy}
         />
@@ -187,10 +189,10 @@ export default function AiPage() {
   return (
     <div className="mx-auto flex h-[calc(100vh-8rem)] max-w-6xl flex-col space-y-4">
       <div>
-        <h1 className="text-2xl font-semibold">Engineering Copilot</h1>
+        <h1 className="text-2xl font-semibold">Copiloto de ingeniería</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Grounded in your firm&apos;s own records, read-only. The Copilot
-          informs — the responsible engineer reviews and decides.
+          Se basa en los registros de tu propia firma, solo lectura. El Copiloto
+          informa: el ingeniero responsable revisa y decide.
         </p>
       </div>
 
@@ -198,7 +200,7 @@ export default function AiPage() {
         <div className="flex min-h-0 flex-col gap-2">
           <Button variant="outline" onClick={startNewConversation}>
             <MessageSquarePlus aria-hidden="true" />
-            New conversation
+            Nueva conversación
           </Button>
           <div className="min-h-0 flex-1 space-y-1 overflow-y-auto">
             {(conversations.data ?? []).map((conversation) => (
@@ -223,10 +225,10 @@ export default function AiPage() {
                 </button>
                 <button
                   type="button"
-                  aria-label="Delete conversation"
+                  aria-label="Eliminar conversación"
                   className="invisible text-muted-foreground hover:text-destructive group-hover:visible"
                   onClick={() => {
-                    if (window.confirm("Delete this conversation?")) {
+                    if (window.confirm("¿Eliminar esta conversación?")) {
                       deleteConversation.mutate({ id: conversation.id });
                     }
                   }}
@@ -237,7 +239,7 @@ export default function AiPage() {
             ))}
             {conversations.data && conversations.data.length === 0 && (
               <p className="px-2 text-xs text-muted-foreground">
-                No conversations yet.
+                Aún no hay conversaciones.
               </p>
             )}
           </div>
@@ -252,9 +254,9 @@ export default function AiPage() {
                   aria-hidden="true"
                 />
                 <p className="max-w-md text-center text-sm text-muted-foreground">
-                  Start a conversation — for example: &quot;which proposals are
-                  still awaiting a decision?&quot; or &quot;explain the bearing
-                  checks in EG-2026-001&quot;.
+                  Inicia una conversación, por ejemplo: «¿qué propuestas siguen
+                  esperando decisión?» o «explica las verificaciones de
+                  capacidad portante de EG-2026-001».
                 </p>
                 <form
                   className="flex w-full max-w-lg gap-2"
@@ -269,7 +271,7 @@ export default function AiPage() {
                   <Input
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
-                    placeholder="Ask the Copilot…"
+                    placeholder="Pregúntale al Copiloto…"
                     maxLength={4000}
                     autoFocus
                   />
@@ -290,7 +292,7 @@ export default function AiPage() {
               </div>
             ) : pendingFirstMessage === null && selected.isLoading ? (
               <p className="text-sm text-muted-foreground">
-                Loading conversation…
+                Cargando conversación…
               </p>
             ) : (
               <ChatPane

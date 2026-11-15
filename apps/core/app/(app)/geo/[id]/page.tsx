@@ -47,8 +47,8 @@ import { GeoRecordStatusBadge, ShapeBadge } from "../_components/geo-badges";
 type GeoRecordDetail = RouterOutputs["geoRecords"]["get"];
 
 const recordSchema = z.object({
-  code: z.string().trim().min(1, "Required").max(32),
-  title: z.string().trim().min(1, "Required").max(200),
+  code: z.string().trim().min(1, "Obligatorio").max(32),
+  title: z.string().trim().min(1, "Obligatorio").max(200),
   notes: z.string().trim().max(5000),
 });
 
@@ -89,16 +89,16 @@ function RecordEditor({ record }: { record: GeoRecordDetail }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Record data</CardTitle>
+        <CardTitle className="text-base">Datos del registro</CardTitle>
         {update.isSuccess && (
-          <CardDescription className="text-success">Saved.</CardDescription>
+          <CardDescription className="text-success">Guardado.</CardDescription>
         )}
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
           <div className="grid grid-cols-[140px_1fr] gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="geo-code">Code</Label>
+              <Label htmlFor="geo-code">Código</Label>
               <Input
                 id="geo-code"
                 className="font-mono"
@@ -111,7 +111,7 @@ function RecordEditor({ record }: { record: GeoRecordDetail }) {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="geo-title">Title</Label>
+              <Label htmlFor="geo-title">Título</Label>
               <Input id="geo-title" {...form.register("title")} />
               {errors.title && (
                 <p className="text-xs text-destructive">
@@ -121,7 +121,7 @@ function RecordEditor({ record }: { record: GeoRecordDetail }) {
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="geo-notes">Exploration / criteria notes</Label>
+            <Label htmlFor="geo-notes">Notas de exploración / criterios</Label>
             <Textarea id="geo-notes" rows={3} {...form.register("notes")} />
           </div>
 
@@ -130,7 +130,7 @@ function RecordEditor({ record }: { record: GeoRecordDetail }) {
           )}
           <div className="flex justify-end">
             <Button type="submit" disabled={update.isPending}>
-              {update.isPending ? "…" : "Save"}
+              {update.isPending ? "…" : "Guardar"}
             </Button>
           </div>
         </form>
@@ -157,7 +157,8 @@ function ChecksTable({
   if (record.checks.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        No checks yet — a record needs at least one before it can be issued.
+        Aún no hay verificaciones: un registro necesita al menos una para poder
+        emitirse.
       </p>
     );
   }
@@ -166,9 +167,9 @@ function ChecksTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Footing</TableHead>
+          <TableHead>Zapata</TableHead>
           <TableHead className="text-right">B / Df (m)</TableHead>
-          <TableHead>Shape</TableHead>
+          <TableHead>Forma</TableHead>
           <TableHead className="text-right">γ / c / φ</TableHead>
           <TableHead className="text-right">FS</TableHead>
           <TableHead className="text-right">q ult</TableHead>
@@ -208,7 +209,7 @@ function ChecksTable({
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label={`Edit ${check.label}`}
+                        aria-label={`Editar ${check.label}`}
                       >
                         <Pencil aria-hidden="true" />
                       </Button>
@@ -217,10 +218,14 @@ function ChecksTable({
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label={`Remove ${check.label}`}
+                    aria-label={`Quitar a ${check.label}`}
                     disabled={remove.isPending}
                     onClick={() => {
-                      if (window.confirm(`Remove check "${check.label}"?`)) {
+                      if (
+                        window.confirm(
+                          `¿Quitar la verificación "${check.label}"?`,
+                        )
+                      ) {
                         remove.mutate({ id: check.id });
                       }
                     }}
@@ -254,9 +259,9 @@ function GeoMemoriaView({ record }: { record: GeoRecordDetail }) {
         </div>
         <div className="text-right text-sm text-muted-foreground">
           <p>
-            Project: <span className="font-mono">{record.project.code}</span>
+            Proyecto: <span className="font-mono">{record.project.code}</span>
           </p>
-          <p>Issued: {formatDate(record.issuedAt)}</p>
+          <p>Emitido: {formatDate(record.issuedAt)}</p>
         </div>
       </div>
 
@@ -265,7 +270,7 @@ function GeoMemoriaView({ record }: { record: GeoRecordDetail }) {
       {record.notes && (
         <>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Exploration / criteria
+            Exploración / criterios
           </p>
           <p className="mt-1 whitespace-pre-wrap text-sm">{record.notes}</p>
         </>
@@ -273,7 +278,7 @@ function GeoMemoriaView({ record }: { record: GeoRecordDetail }) {
 
       <div className="mt-6">
         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Bearing capacity checks ({record.checks.length})
+          Verificaciones de capacidad portante ({record.checks.length})
         </p>
         <ChecksTable record={record} editable={false} />
       </div>
@@ -301,16 +306,16 @@ export default function GeoRecordDetailPage() {
   });
 
   if (record.isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading record…</p>;
+    return <p className="text-sm text-muted-foreground">Cargando registro…</p>;
   }
   if (!record.data) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-destructive">Record not found.</p>
+        <p className="text-sm text-destructive">Registro no encontrado.</p>
         <Button asChild variant="outline">
           <Link href="/geo">
             <ArrowLeft aria-hidden="true" />
-            Back to records
+            Volver a registros
           </Link>
         </Button>
       </div>
@@ -329,7 +334,7 @@ export default function GeoRecordDetailPage() {
             className="inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-2 hover:underline"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
-            Geotechnical records
+            Registros geotécnicos
           </Link>
           <div className="flex items-center gap-3">
             <h1 className="font-mono text-2xl font-semibold">{r.code}</h1>
@@ -350,7 +355,7 @@ export default function GeoRecordDetailPage() {
           {!draft && (
             <Button variant="outline" onClick={() => window.print()}>
               <Printer aria-hidden="true" />
-              Print
+              Imprimir
             </Button>
           )}
           {draft && (
@@ -359,7 +364,7 @@ export default function GeoRecordDetailPage() {
               onClick={() => {
                 if (
                   window.confirm(
-                    `Issue record ${r.code}? It freezes as evidence — a correction is a new record.`,
+                    `¿Emitir el registro ${r.code}? Queda congelado como evidencia; una corrección es un registro nuevo.`,
                   )
                 ) {
                   issue.mutate({ id });
@@ -367,7 +372,7 @@ export default function GeoRecordDetailPage() {
               }}
             >
               <FileCheck2 aria-hidden="true" />
-              {issue.isPending ? "…" : "Issue"}
+              {issue.isPending ? "…" : "Emitir"}
             </Button>
           )}
         </div>
@@ -387,11 +392,11 @@ export default function GeoRecordDetailPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-base">
-                    Bearing capacity checks
+                    Verificaciones de capacidad portante
                   </CardTitle>
                   <CardDescription>
-                    Computed server-side (Vesic factors) — the engineer reviews
-                    before issuing.
+                    Calculado en el servidor (factores de Vesic); el ingeniero
+                    revisa antes de emitir.
                   </CardDescription>
                 </div>
                 <BearingCheckDialog
@@ -399,7 +404,7 @@ export default function GeoRecordDetailPage() {
                   trigger={
                     <Button variant="outline" size="sm">
                       <Plus aria-hidden="true" />
-                      Add check
+                      Agregar verificación
                     </Button>
                   }
                 />

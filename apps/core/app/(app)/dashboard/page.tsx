@@ -25,6 +25,7 @@ import {
 import { serverCaller } from "@/lib/server-caller";
 
 import { moduleNav } from "../_components/nav-items";
+import { roleLabel } from "@/lib/format";
 
 // Dashboard (sprint-1.md frame + sprint-2.md scope item 3): session
 // identity, tenant, role — and the first real widget, the active-projects
@@ -78,11 +79,11 @@ export default async function DashboardPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">Welcome, {firstName}</h1>
+        <h1 className="text-2xl font-semibold">Bienvenido, {firstName}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {membership
-            ? "Your workspace at a glance."
-            : "Your account is not linked to a tenant yet."}
+            ? "Tu espacio de trabajo de un vistazo."
+            : "Tu cuenta aún no está vinculada a una firma."}
         </p>
       </div>
 
@@ -90,7 +91,7 @@ export default async function DashboardPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           <Card>
             <CardHeader>
-              <CardDescription>Signed in as</CardDescription>
+              <CardDescription>Sesión iniciada como</CardDescription>
               <CardTitle className="text-base">{session.user.name}</CardTitle>
             </CardHeader>
             <CardContent>
@@ -101,7 +102,7 @@ export default async function DashboardPage() {
           </Card>
           <Card>
             <CardHeader>
-              <CardDescription>Tenant</CardDescription>
+              <CardDescription>Firma</CardDescription>
               <CardTitle className="text-base">
                 {membership.tenantSlug}
               </CardTitle>
@@ -114,9 +115,9 @@ export default async function DashboardPage() {
           </Card>
           <Card>
             <CardHeader>
-              <CardDescription>Role</CardDescription>
+              <CardDescription>Rol</CardDescription>
               <CardTitle className="text-base">
-                {membership.roleLabel}
+                {roleLabel(membership.roleLabel)}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -129,15 +130,17 @@ export default async function DashboardPage() {
       ) : (
         <Card className="border-warning/50 bg-warning/5">
           <CardHeader>
-            <CardTitle className="text-base">No tenant membership</CardTitle>
+            <CardTitle className="text-base">
+              Sin membresía en una firma
+            </CardTitle>
             <CardDescription>
-              You are signed in but not a member of any tenant yet. Ask an
-              operator to run:
+              Iniciaste sesión pero aún no eres miembro de ninguna firma. Pídele
+              al administrador de tu firma un enlace de invitación emitido para:
             </CardDescription>
           </CardHeader>
           <CardContent>
             <code className="rounded bg-muted px-2 py-1 font-mono text-xs">
-              pnpm --filter @andes/db link-member {session.user.email}
+              {session.user.email}
             </code>
           </CardContent>
         </Card>
@@ -145,7 +148,7 @@ export default async function DashboardPage() {
 
       <section>
         <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
-          Modules
+          Módulos
         </h2>
         <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {membership && (
@@ -157,12 +160,12 @@ export default async function DashboardPage() {
                       className="size-5 text-primary"
                       aria-hidden="true"
                     />
-                    <CardTitle className="text-sm">Projects</CardTitle>
+                    <CardTitle className="text-sm">Proyectos</CardTitle>
                     <CardDescription>
                       <span className="text-2xl font-semibold text-foreground">
                         {activeProjectCount}
                       </span>{" "}
-                      active
+                      activos
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -179,7 +182,7 @@ export default async function DashboardPage() {
                       <span className="text-2xl font-semibold text-foreground">
                         {activeClientCount}
                       </span>{" "}
-                      clients
+                      clientes
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -191,12 +194,12 @@ export default async function DashboardPage() {
                       className="size-5 text-primary"
                       aria-hidden="true"
                     />
-                    <CardTitle className="text-sm">Proposals</CardTitle>
+                    <CardTitle className="text-sm">Propuestas</CardTitle>
                     <CardDescription>
                       <span className="text-2xl font-semibold text-foreground">
                         {pendingProposalCount}
                       </span>{" "}
-                      awaiting decision
+                      esperando decisión
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -208,12 +211,12 @@ export default async function DashboardPage() {
                       className="size-5 text-primary"
                       aria-hidden="true"
                     />
-                    <CardTitle className="text-sm">Inspections</CardTitle>
+                    <CardTitle className="text-sm">Inspecciones</CardTitle>
                     <CardDescription>
                       <span className="text-2xl font-semibold text-foreground">
                         {scheduledInspectionCount}
                       </span>{" "}
-                      scheduled
+                      programadas
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -225,12 +228,12 @@ export default async function DashboardPage() {
                       className="size-5 text-primary"
                       aria-hidden="true"
                     />
-                    <CardTitle className="text-sm">Structures</CardTitle>
+                    <CardTitle className="text-sm">Estructuras</CardTitle>
                     <CardDescription>
                       <span className="text-2xl font-semibold text-foreground">
                         {draftCalcRecordCount}
                       </span>{" "}
-                      draft records
+                      registros en borrador
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -247,7 +250,7 @@ export default async function DashboardPage() {
                       <span className="text-2xl font-semibold text-foreground">
                         {draftGeoRecordCount}
                       </span>{" "}
-                      draft records
+                      registros en borrador
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -261,7 +264,7 @@ export default async function DashboardPage() {
                       <span className="text-2xl font-semibold text-foreground">
                         {bimModelCount}
                       </span>{" "}
-                      models
+                      modelos
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -273,12 +276,12 @@ export default async function DashboardPage() {
                       className="size-5 text-primary"
                       aria-hidden="true"
                     />
-                    <CardTitle className="text-sm">AI</CardTitle>
+                    <CardTitle className="text-sm">IA</CardTitle>
                     <CardDescription>
                       <span className="text-2xl font-semibold text-foreground">
                         {aiConversationCount}
                       </span>{" "}
-                      conversations
+                      conversaciones
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -296,7 +299,7 @@ export default async function DashboardPage() {
                   />
                   <CardTitle className="text-sm">{item.label}</CardTitle>
                   <CardDescription>
-                    <Badge variant="muted">Soon</Badge>
+                    <Badge variant="muted">Pronto</Badge>
                   </CardDescription>
                 </CardHeader>
               </Card>

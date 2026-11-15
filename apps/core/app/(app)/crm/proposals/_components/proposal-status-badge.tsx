@@ -13,11 +13,11 @@ const variantByStatus = {
 } as const;
 
 const labelByStatus: Record<ProposalStatus, string> = {
-  DRAFT: "Draft",
-  SENT: "Sent",
-  ACCEPTED: "Accepted",
-  REJECTED: "Rejected",
-  EXPIRED: "Expired",
+  DRAFT: "Borrador",
+  SENT: "Enviada",
+  ACCEPTED: "Aceptada",
+  REJECTED: "Rechazada",
+  EXPIRED: "Vencida",
 };
 
 export function ProposalStatusBadge({ status }: { status: ProposalStatus }) {

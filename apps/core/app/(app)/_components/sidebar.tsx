@@ -26,7 +26,7 @@ function NavEntry({
       >
         <item.icon className="size-5" aria-hidden="true" />
         <span className="flex-1">{item.label}</span>
-        {!item.enabled && <Badge variant="muted">Soon</Badge>}
+        {!item.enabled && <Badge variant="muted">Pronto</Badge>}
       </div>
     );
   }
@@ -47,10 +47,19 @@ function NavEntry({
   );
 }
 
-export function Sidebar({ navDisabled = false }: { navDisabled?: boolean }) {
+export function Sidebar({
+  navDisabled = false,
+  showAdmin = false,
+}: {
+  navDisabled?: boolean;
+  // Role-based visibility (docs/design/navigation.md): Administration is
+  // rendered for OWNER_ADMIN only. Hiding is UX — the admin router's
+  // roleProcedure is the actual gate.
+  showAdmin?: boolean;
+}) {
   const pathname = usePathname();
   return (
-    <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-card print:hidden">
+    <aside className="fixed inset-y-0 left-0 z-40 flex w-60 shrink-0 -translate-x-full flex-col overflow-y-auto border-r border-border bg-card transition-transform peer-checked:translate-x-0 max-lg:invisible max-lg:peer-checked:visible lg:static lg:translate-x-0 print:hidden">
       <div className="flex h-14 items-center gap-2 px-5">
         <span className="text-lg font-semibold tracking-tight">Andes</span>
         <span className="text-lg font-light text-muted-foreground">
@@ -58,7 +67,7 @@ export function Sidebar({ navDisabled = false }: { navDisabled?: boolean }) {
         </span>
       </div>
       <Separator />
-      <nav className="flex flex-1 flex-col gap-1 p-3" aria-label="Modules">
+      <nav className="flex flex-1 flex-col gap-1 p-3" aria-label="Módulos">
         {moduleNav.map((item) => (
           <NavEntry
             key={item.href}
@@ -67,14 +76,16 @@ export function Sidebar({ navDisabled = false }: { navDisabled?: boolean }) {
             disabled={navDisabled}
           />
         ))}
-        <div className="mt-auto">
-          <Separator className="my-2" />
-          <NavEntry
-            item={adminNav}
-            active={pathname.startsWith(adminNav.href)}
-            disabled={navDisabled}
-          />
-        </div>
+        {showAdmin && (
+          <div className="mt-auto">
+            <Separator className="my-2" />
+            <NavEntry
+              item={adminNav}
+              active={pathname.startsWith(adminNav.href)}
+              disabled={navDisabled}
+            />
+          </div>
+        )}
       </nav>
     </aside>
   );

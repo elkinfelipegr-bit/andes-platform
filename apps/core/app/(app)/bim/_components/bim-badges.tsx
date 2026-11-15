@@ -4,11 +4,11 @@ export type BimDiscipline =
   "ARCHITECTURE" | "STRUCTURAL" | "MEP" | "SITE" | "OTHER";
 
 const disciplineLabel: Record<BimDiscipline, string> = {
-  ARCHITECTURE: "Architecture",
-  STRUCTURAL: "Structural",
+  ARCHITECTURE: "Arquitectura",
+  STRUCTURAL: "Estructural",
   MEP: "MEP",
-  SITE: "Site",
-  OTHER: "Other",
+  SITE: "Urbanismo",
+  OTHER: "Otra",
 };
 
 export function DisciplineBadge({ discipline }: { discipline: BimDiscipline }) {
@@ -16,9 +16,9 @@ export function DisciplineBadge({ discipline }: { discipline: BimDiscipline }) {
 }
 
 export const DISCIPLINE_OPTIONS: Array<[BimDiscipline, string]> = [
-  ["ARCHITECTURE", "Architecture"],
-  ["STRUCTURAL", "Structural"],
+  ["ARCHITECTURE", "Arquitectura"],
+  ["STRUCTURAL", "Estructural"],
   ["MEP", "MEP"],
-  ["SITE", "Site"],
-  ["OTHER", "Other"],
+  ["SITE", "Urbanismo"],
+  ["OTHER", "Otra"],
 ];

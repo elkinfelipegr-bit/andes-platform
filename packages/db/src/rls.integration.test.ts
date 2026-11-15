@@ -277,6 +277,95 @@ describe.skipIf(!APP_URL)("RLS tenant isolation (integration)", () => {
     ).resolves.toHaveLength(0);
   });
 
+  // ── Sprint 15: opportunity / activity (sprint-15-domain-model.md) ─────
+  it("opportunity + activity isolation: scoped reads, fail-closed, cross-tenant write/update/delete denied, no forUser access", async () => {
+    const opportunityA = await admin.opportunity.create({
+      data: {
+        tenantId: tenantA.id,
+        clientId: clientA.id,
+        title: "Oportunidad A",
+        ownerId: userInA.id,
+        createdById: userInA.id,
+        activities: {
+          create: [
+            {
+              tenantId: tenantA.id,
+              body: "Llamada inicial",
+              createdById: userInA.id,
+            },
+          ],
+        },
+      },
+    });
+
+    const seen = await forTenant(app, tenantA.id).opportunity.findMany();
+    expect(seen.map((o) => o.id)).toContain(opportunityA.id);
+    const activities = await forTenant(
+      app,
+      tenantA.id,
+    ).opportunityActivity.findMany();
+    expect(activities.length).toBeGreaterThan(0);
+    expect(activities.every((a) => a.tenantId === tenantA.id)).toBe(true);
+
+    await expect(app.opportunity.findMany()).resolves.toHaveLength(0);
+    await expect(app.opportunityActivity.findMany()).resolves.toHaveLength(0);
+
+    const asB = forTenant(app, tenantB.id);
+    await expect(asB.opportunity.findMany()).resolves.toHaveLength(0);
+    await expect(asB.opportunityActivity.findMany()).resolves.toHaveLength(0);
+
+    // Insert claiming tenant A from tenant B's context (WITH CHECK).
+    await expect(
+      asB.opportunity.create({
+        data: {
+          tenantId: tenantA.id,
+          clientId: clientA.id,
+          title: "Evil",
+          ownerId: userInA.id,
+          createdById: userInA.id,
+        },
+      }),
+    ).rejects.toThrow();
+    await expect(
+      asB.opportunityActivity.create({
+        data: {
+          tenantId: tenantA.id,
+          opportunityId: opportunityA.id,
+          body: "Evil",
+          createdById: userInA.id,
+        },
+      }),
+    ).rejects.toThrow();
+    // Updates and deletes simply do not reach A's rows.
+    await expect(
+      asB.opportunity.updateMany({
+        where: { id: opportunityA.id },
+        data: { title: "Hijacked" },
+      }),
+    ).resolves.toMatchObject({ count: 0 });
+    await expect(
+      asB.opportunityActivity.deleteMany({
+        where: { opportunityId: opportunityA.id },
+      }),
+    ).resolves.toMatchObject({ count: 0 });
+    await expect(
+      asB.opportunity.deleteMany({ where: { id: opportunityA.id } }),
+    ).resolves.toMatchObject({ count: 0 });
+    const intact = await admin.opportunity.findUnique({
+      where: { id: opportunityA.id },
+      include: { activities: true },
+    });
+    expect(intact?.title).toBe("Oportunidad A");
+    expect(intact?.activities).toHaveLength(1);
+
+    await expect(
+      forUser(app, userInA.id).opportunity.findMany(),
+    ).resolves.toHaveLength(0);
+    await expect(
+      forUser(app, userInA.id).opportunityActivity.findMany(),
+    ).resolves.toHaveLength(0);
+  });
+
   // ── Sprint 5: inspection / finding (sprint-5-domain-model.md) ─────────
 
   it("inspection + finding isolation: scoped reads, fail-closed, cross-tenant write denied, no forUser access", async () => {

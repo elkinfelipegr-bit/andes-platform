@@ -35,17 +35,17 @@ import { trpc } from "@/lib/trpc";
 import { GeoRecordStatusBadge } from "./_components/geo-badges";
 
 const STATUS_FILTERS = [
-  ["ALL", "All statuses"],
-  ["DRAFT", "Draft"],
-  ["ISSUED", "Issued"],
+  ["ALL", "Todos los estados"],
+  ["DRAFT", "Borrador"],
+  ["ISSUED", "Emitido"],
 ] as const;
 
 type StatusFilter = (typeof STATUS_FILTERS)[number][0];
 
 const createFormSchema = z.object({
-  projectId: z.string().min(1, "Pick a project"),
-  code: z.string().trim().min(1, "Required").max(32),
-  title: z.string().trim().min(1, "Required").max(200),
+  projectId: z.string().min(1, "Elige un proyecto"),
+  code: z.string().trim().min(1, "Obligatorio").max(32),
+  title: z.string().trim().min(1, "Obligatorio").max(200),
 });
 
 type CreateFormValues = z.infer<typeof createFormSchema>;
@@ -77,15 +77,15 @@ function NewGeoRecordDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus aria-hidden="true" />
-          New record
+          Nuevo registro
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New geotechnical record</DialogTitle>
+          <DialogTitle>Nuevo registro geotécnico</DialogTitle>
           <DialogDescription>
-            Bearing capacity checks are added on the next screen, while it stays
-            a draft.
+            Las verificaciones de capacidad portante se agregan en la siguiente
+            pantalla, mientras es borrador.
           </DialogDescription>
         </DialogHeader>
         <form
@@ -93,9 +93,9 @@ function NewGeoRecordDialog() {
           className="space-y-4"
         >
           <div className="space-y-1.5">
-            <Label htmlFor="geo-project">Project</Label>
+            <Label htmlFor="geo-project">Proyecto</Label>
             <Select id="geo-project" {...form.register("projectId")}>
-              <option value="">— Pick a project —</option>
+              <option value="">— Elige un proyecto —</option>
               {activeProjects.map((project) => (
                 <option key={project.id} value={project.id}>
                   {project.code} — {project.name}
@@ -110,7 +110,7 @@ function NewGeoRecordDialog() {
           </div>
           <div className="grid grid-cols-[140px_1fr] gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="geo-code">Code</Label>
+              <Label htmlFor="geo-code">Código</Label>
               <Input
                 id="geo-code"
                 placeholder="EG-2026-001"
@@ -124,7 +124,7 @@ function NewGeoRecordDialog() {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="geo-title">Title</Label>
+              <Label htmlFor="geo-title">Título</Label>
               <Input
                 id="geo-title"
                 placeholder="Estudio geotécnico — cimentaciones"
@@ -144,7 +144,7 @@ function NewGeoRecordDialog() {
 
           <div className="flex justify-end">
             <Button type="submit" disabled={create.isPending}>
-              {create.isPending ? "…" : "Create draft"}
+              {create.isPending ? "…" : "Crear borrador"}
             </Button>
           </div>
         </form>
@@ -163,17 +163,17 @@ export default function GeoPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Geotechnical records</h1>
+          <h1 className="text-2xl font-semibold">Registros geotécnicos</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Bearing capacity checks behind each estudio — the platform computes;
-            the engineer reviews, decides, and signs.
+            Verificaciones de capacidad portante detrás de cada estudio: la
+            plataforma calcula; el ingeniero revisa, decide y firma.
           </p>
         </div>
         <NewGeoRecordDialog />
       </div>
 
       <Select
-        aria-label="Filter by status"
+        aria-label="Filtrar por estado"
         className="w-44"
         value={status}
         onChange={(e) => setStatus(e.target.value as StatusFilter)}
@@ -186,16 +186,16 @@ export default function GeoPage() {
       </Select>
 
       {records.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading records…</p>
+        <p className="text-sm text-muted-foreground">Cargando registros…</p>
       ) : records.data && records.data.length > 0 ? (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Code</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Project</TableHead>
-              <TableHead className="text-right">Checks</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Código</TableHead>
+              <TableHead>Título</TableHead>
+              <TableHead>Proyecto</TableHead>
+              <TableHead className="text-right">Verificaciones</TableHead>
+              <TableHead>Estado</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -230,9 +230,8 @@ export default function GeoPage() {
         </Table>
       ) : (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-          No geotechnical records
-          {status !== "ALL" ? " with this status" : " yet"}. Create the first
-          one.
+          No hay registros geotécnicos
+          {status !== "ALL" ? " con este estado" : " todavía"}. Crea el primero.
         </div>
       )}
     </div>

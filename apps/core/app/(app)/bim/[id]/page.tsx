@@ -38,8 +38,8 @@ import { DISCIPLINE_OPTIONS, DisciplineBadge } from "../_components/bim-badges";
 const MAX_UPLOAD_BYTES = 300 * 1024 * 1024;
 
 const metadataSchema = z.object({
-  code: z.string().trim().min(1, "Required").max(32),
-  title: z.string().trim().min(1, "Required").max(200),
+  code: z.string().trim().min(1, "Obligatorio").max(32),
+  title: z.string().trim().min(1, "Obligatorio").max(200),
   discipline: z.enum([
     "ARCHITECTURE",
     "STRUCTURAL",
@@ -76,10 +76,12 @@ function putWithProgress(
       xhr.status >= 200 && xhr.status < 300
         ? resolve()
         : reject(
-            new Error(`Storage rejected the upload (HTTP ${xhr.status}).`),
+            new Error(
+              `El almacenamiento rechazó la carga (HTTP ${xhr.status}).`,
+            ),
           );
     xhr.onerror = () =>
-      reject(new Error("Network error while uploading to storage."));
+      reject(new Error("Error de red al subir al almacenamiento."));
     xhr.send(file);
   });
 }
@@ -95,15 +97,15 @@ function UploadVersion({ modelId }: { modelId: string }) {
   async function handleFile(file: File) {
     setError(null);
     if (!file.name.toLowerCase().endsWith(".ifc")) {
-      setError("Only .ifc files are accepted (RFC-002).");
+      setError("Solo se aceptan archivos .ifc (RFC-002).");
       return;
     }
     if (file.size > MAX_UPLOAD_BYTES) {
-      setError("The file exceeds the 300 MB limit.");
+      setError("El archivo supera el límite de 300 MB.");
       return;
     }
     if (file.size === 0) {
-      setError("The file is empty.");
+      setError("El archivo está vacío.");
       return;
     }
     setProgress(0);
@@ -123,7 +125,7 @@ function UploadVersion({ modelId }: { modelId: string }) {
       void utils.bimModels.get.invalidate({ id: modelId });
       void utils.bimModels.list.invalidate();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "The upload failed.");
+      setError(e instanceof Error ? e.message : "La carga falló.");
     } finally {
       setProgress(null);
       if (inputRef.current) inputRef.current.value = "";
@@ -149,10 +151,10 @@ function UploadVersion({ modelId }: { modelId: string }) {
       >
         <UploadCloud aria-hidden="true" />
         {progress === null
-          ? "Upload new version"
+          ? "Subir nueva versión"
           : progress < 100
-            ? `Uploading… ${progress}%`
-            : "Confirming…"}
+            ? `Subiendo… ${progress}%`
+            : "Confirmando…"}
       </Button>
       {progress !== null && (
         <div className="h-1.5 w-full overflow-hidden rounded bg-muted">
@@ -192,7 +194,7 @@ function DownloadButton({ versionId }: { versionId: string }) {
       onClick={() => void handleDownload()}
     >
       <Download aria-hidden="true" />
-      {busy ? "…" : "Download"}
+      {busy ? "…" : "Descargar"}
     </Button>
   );
 }
@@ -220,16 +222,16 @@ export default function BimModelDetailPage() {
   });
 
   if (model.isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading model…</p>;
+    return <p className="text-sm text-muted-foreground">Cargando modelo…</p>;
   }
   if (!model.data) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-destructive">BIM model not found.</p>
+        <p className="text-sm text-destructive">Modelo BIM no encontrado.</p>
         <Button asChild variant="outline">
           <Link href="/bim">
             <ArrowLeft aria-hidden="true" />
-            Back to BIM
+            Volver a BIM
           </Link>
         </Button>
       </div>
@@ -247,7 +249,7 @@ export default function BimModelDetailPage() {
           className="inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-2 hover:underline"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
-          BIM models
+          Modelos BIM
         </Link>
         <div className="flex items-center gap-3">
           <h1 className="font-mono text-2xl font-semibold">{m.code}</h1>
@@ -266,9 +268,11 @@ export default function BimModelDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Model details</CardTitle>
+          <CardTitle className="text-base">Datos del modelo</CardTitle>
           {update.isSuccess && (
-            <CardDescription className="text-success">Saved.</CardDescription>
+            <CardDescription className="text-success">
+              Guardado.
+            </CardDescription>
           )}
         </CardHeader>
         <CardContent>
@@ -280,7 +284,7 @@ export default function BimModelDetailPage() {
           >
             <div className="grid grid-cols-[140px_1fr_160px] gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="edit-code">Code</Label>
+                <Label htmlFor="edit-code">Código</Label>
                 <Input
                   id="edit-code"
                   className="font-mono"
@@ -293,7 +297,7 @@ export default function BimModelDetailPage() {
                 )}
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="edit-title">Title</Label>
+                <Label htmlFor="edit-title">Título</Label>
                 <Input id="edit-title" {...form.register("title")} />
                 {errors.title && (
                   <p className="text-xs text-destructive">
@@ -302,7 +306,7 @@ export default function BimModelDetailPage() {
                 )}
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="edit-discipline">Discipline</Label>
+                <Label htmlFor="edit-discipline">Disciplina</Label>
                 <Select id="edit-discipline" {...form.register("discipline")}>
                   {DISCIPLINE_OPTIONS.map(([value, label]) => (
                     <option key={value} value={value}>
@@ -321,7 +325,7 @@ export default function BimModelDetailPage() {
                 variant="outline"
                 disabled={update.isPending}
               >
-                {update.isPending ? "…" : "Save changes"}
+                {update.isPending ? "…" : "Guardar cambios"}
               </Button>
             </div>
           </form>
@@ -330,29 +334,29 @@ export default function BimModelDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Versions</CardTitle>
+          <CardTitle className="text-base">Versiones</CardTitle>
           <CardDescription>
-            Every upload is an immutable version — nothing is overwritten or
-            deleted. The model a decision was reviewed against stays
-            retrievable.
+            Cada carga es una versión inmutable: nada se sobrescribe ni se
+            elimina. El modelo contra el que se revisó una decisión siempre se
+            puede recuperar.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <UploadVersion modelId={id} />
           {m.versions.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No versions uploaded yet.
+              Aún no se han subido versiones.
             </p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Version</TableHead>
-                  <TableHead>File</TableHead>
-                  <TableHead className="text-right">Size</TableHead>
-                  <TableHead>Uploaded by</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>Versión</TableHead>
+                  <TableHead>Archivo</TableHead>
+                  <TableHead className="text-right">Tamaño</TableHead>
+                  <TableHead>Subido por</TableHead>
+                  <TableHead>Fecha</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -378,7 +382,7 @@ export default function BimModelDetailPage() {
                         <Button asChild size="sm">
                           <Link href={`/bim/${id}/viewer/${version.id}`}>
                             <Eye aria-hidden="true" />
-                            View
+                            Ver
                           </Link>
                         </Button>
                         <DownloadButton versionId={version.id} />

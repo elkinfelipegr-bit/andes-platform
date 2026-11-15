@@ -1,29 +1,31 @@
 "use client";
 
-// In-module CRM navigation (sprint-4.md scope item 3): proposals are a
-// functional module of Andes CRM, so they live under /crm alongside
-// clients — navigation.md amendment ships with this sprint.
+// In-module CRM navigation (sprint-4.md scope item 3; Pipeline added by
+// sprint-15.md): functional modules of Andes CRM live under /crm as tabs
+// — navigation.md carries both amendments.
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@andes/ui";
 
 const tabs = [
-  { label: "Clients", href: "/crm" },
-  { label: "Proposals", href: "/crm/proposals" },
+  { label: "Seguimiento", href: "/crm/pipeline" },
+  { label: "Clientes", href: "/crm" },
+  { label: "Propuestas", href: "/crm/proposals" },
 ];
 
 export function CrmNav() {
   const pathname = usePathname();
   return (
     <nav
-      aria-label="CRM sections"
+      aria-label="Secciones del CRM"
       className="flex gap-1 border-b border-border print:hidden"
     >
       {tabs.map((tab) => {
         const active =
           tab.href === "/crm"
-            ? pathname === "/crm" || /^\/crm\/(?!proposals)/.test(pathname)
+            ? pathname === "/crm" ||
+              /^\/crm\/(?!proposals|pipeline)/.test(pathname)
             : pathname.startsWith(tab.href);
         return (
           <Link

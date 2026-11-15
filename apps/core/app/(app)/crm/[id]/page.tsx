@@ -5,7 +5,7 @@
 // only (API enforces; UI mirrors), and never touches projects.
 import { Archive, ArrowLeft, Pencil, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import {
   Badge,
@@ -18,12 +18,16 @@ import {
   Separator,
 } from "@andes/ui";
 
+import { formatDate, formatMoney } from "@/lib/format";
 import { trpc } from "@/lib/trpc";
 
 import { StatusBadge } from "../../projects/_components/status-badge";
 import { ClientForm, type ClientFormPayload } from "../_components/client-form";
 import { ContactDialog } from "../_components/contact-dialog";
+import { NewOpportunityDialog } from "../pipeline/_components/opportunity-dialog";
+import { STAGE_LABEL } from "../pipeline/_components/pipeline-meta";
 import { ProposalStatusBadge } from "../proposals/_components/proposal-status-badge";
+import { ConfirmDelete } from "../../_components/confirm-delete";
 
 export default function ClientDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -42,6 +46,15 @@ export default function ClientDetailPage() {
       void utils.clients.list.invalidate();
     },
   });
+  const router = useRouter();
+  const remove = trpc.clients.delete.useMutation({
+    onSuccess: () => {
+      void utils.clients.list.invalidate();
+      void utils.opportunities.list.invalidate();
+      void utils.proposals.list.invalidate();
+      router.push("/crm");
+    },
+  });
   const deleteContact = trpc.contacts.delete.useMutation({
     onSuccess: () => void utils.clients.get.invalidate({ id }),
   });
@@ -49,16 +62,16 @@ export default function ClientDetailPage() {
   const isOwnerAdmin = me.data?.activeMembership?.roleKey === "OWNER_ADMIN";
 
   if (client.isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading client…</p>;
+    return <p className="text-sm text-muted-foreground">Cargando cliente…</p>;
   }
   if (!client.data) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-destructive">Client not found.</p>
+        <p className="text-sm text-destructive">Cliente no encontrado.</p>
         <Button asChild variant="outline">
           <Link href="/crm">
             <ArrowLeft aria-hidden="true" />
-            Back to clients
+            Volver a clientes
           </Link>
         </Button>
       </div>
@@ -77,33 +90,61 @@ export default function ClientDetailPage() {
             className="inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-2 hover:underline"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
-            Clients
+            Clientes
           </Link>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-semibold">{c.name}</h1>
             {archived ? (
-              <Badge variant="outline">Archived</Badge>
+              <Badge variant="outline">Archivado</Badge>
             ) : (
-              <Badge variant="success">Active</Badge>
+              <Badge variant="success">Activo</Badge>
             )}
           </div>
           {c.taxId && (
             <p className="font-mono text-sm text-muted-foreground">{c.taxId}</p>
           )}
         </div>
-        {isOwnerAdmin && !archived && (
-          <Button
-            variant="destructive"
-            disabled={archive.isPending}
-            onClick={() => {
-              if (window.confirm(`Archive client ${c.name}?`)) {
-                archive.mutate({ id });
+        {isOwnerAdmin && (
+          <div className="flex flex-wrap gap-2">
+            {!archived && (
+              <Button
+                variant="outline"
+                disabled={archive.isPending}
+                onClick={() => {
+                  if (window.confirm(`¿Archivar el cliente ${c.name}?`)) {
+                    archive.mutate({ id });
+                  }
+                }}
+              >
+                <Archive aria-hidden="true" />
+                {archive.isPending ? "…" : "Archivar"}
+              </Button>
+            )}
+            <ConfirmDelete
+              what="el cliente"
+              name={c.name}
+              busy={remove.isPending}
+              error={remove.error?.message ?? null}
+              onConfirm={() => remove.mutate({ id })}
+              consequences={
+                <>
+                  <p>Se eliminan junto con el cliente:</p>
+                  <ul className="mt-1 list-disc pl-5">
+                    <li>{c.contacts.length} contacto(s)</li>
+                    <li>
+                      {c.opportunities.length} oportunidad(es) con su historial
+                    </li>
+                    <li>{c.proposals.length} propuesta(s) con sus ítems</li>
+                  </ul>
+                  <p className="mt-2">
+                    Sus {c.projects.length} proyecto(s) se conservan, sin
+                    cliente asignado. Para retirar un cliente real sin perder su
+                    historia, usa Archivar.
+                  </p>
+                </>
               }
-            }}
-          >
-            <Archive aria-hidden="true" />
-            {archive.isPending ? "…" : "Archive"}
-          </Button>
+            />
+          </div>
         )}
       </div>
 
@@ -111,8 +152,8 @@ export default function ClientDetailPage() {
         <Card className="border-warning/50 bg-warning/5">
           <CardHeader>
             <CardDescription>
-              This client is archived: it no longer appears in pickers, but its
-              data, contacts, and projects below remain intact.
+              Este cliente está archivado: ya no aparece en los selectores, pero
+              sus datos, contactos y proyectos siguen intactos.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -120,9 +161,11 @@ export default function ClientDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Client data</CardTitle>
+          <CardTitle className="text-base">Datos del cliente</CardTitle>
           {update.isSuccess && (
-            <CardDescription className="text-success">Saved.</CardDescription>
+            <CardDescription className="text-success">
+              Guardado.
+            </CardDescription>
           )}
         </CardHeader>
         <CardContent>
@@ -137,7 +180,7 @@ export default function ClientDetailPage() {
               email: c.email ?? "",
               notes: c.notes ?? "",
             }}
-            submitLabel="Save changes"
+            submitLabel="Guardar cambios"
             busy={update.isPending}
             errorMessage={update.error?.message ?? null}
             onSubmit={(payload: ClientFormPayload) =>
@@ -151,15 +194,15 @@ export default function ClientDetailPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-base">Contacts</CardTitle>
-              <CardDescription>Your counterparts at {c.name}.</CardDescription>
+              <CardTitle className="text-base">Contactos</CardTitle>
+              <CardDescription>Tus interlocutores en {c.name}.</CardDescription>
             </div>
             <ContactDialog
               clientId={id}
               trigger={
                 <Button variant="outline" size="sm">
                   <Plus aria-hidden="true" />
-                  Add contact
+                  Agregar contacto
                 </Button>
               }
             />
@@ -167,7 +210,9 @@ export default function ClientDetailPage() {
         </CardHeader>
         <CardContent>
           {c.contacts.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No contacts yet.</p>
+            <p className="text-sm text-muted-foreground">
+              Aún no hay contactos.
+            </p>
           ) : (
             <ul className="space-y-1">
               {c.contacts.map((contact, i) => (
@@ -197,7 +242,7 @@ export default function ClientDetailPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            aria-label={`Edit ${contact.name}`}
+                            aria-label={`Editar ${contact.name}`}
                           >
                             <Pencil aria-hidden="true" />
                           </Button>
@@ -206,11 +251,13 @@ export default function ClientDetailPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label={`Delete ${contact.name}`}
+                        aria-label={`Eliminar ${contact.name}`}
                         disabled={deleteContact.isPending}
                         onClick={() => {
                           if (
-                            window.confirm(`Delete contact ${contact.name}?`)
+                            window.confirm(
+                              `¿Eliminar el contacto ${contact.name}?`,
+                            )
                           ) {
                             deleteContact.mutate({ id: contact.id });
                           }
@@ -229,14 +276,78 @@ export default function ClientDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Projects</CardTitle>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <CardTitle className="text-base">Oportunidades</CardTitle>
+              <CardDescription>
+                La historia comercial con {c.name}: lo que está en curso y lo
+                que se ganó o se perdió.
+              </CardDescription>
+            </div>
+            {!archived && <NewOpportunityDialog clientId={c.id} />}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {c.opportunities.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Aún no hay oportunidades con este cliente.
+            </p>
+          ) : (
+            <ul className="divide-y divide-border">
+              {c.opportunities.map((o) => (
+                <li key={o.id} className="py-2">
+                  <Link
+                    href={`/crm/pipeline/${o.id}`}
+                    className="group flex items-center justify-between gap-4"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium group-hover:text-primary">
+                        {o.title}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {o.closedAt
+                          ? `Cerrada ${formatDate(o.closedAt)}`
+                          : o.nextAction
+                            ? `Próximo paso: ${o.nextAction}${o.nextActionAt ? ` · ${formatDate(o.nextActionAt)}` : ""}`
+                            : "Sin próximo paso"}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-3">
+                      <span className="text-sm tabular-nums">
+                        {o.estimatedValue !== null
+                          ? formatMoney(o.estimatedValue, o.currency)
+                          : ""}
+                      </span>
+                      <Badge
+                        variant={
+                          o.stage === "WON"
+                            ? "success"
+                            : o.stage === "LOST"
+                              ? "outline"
+                              : "secondary"
+                        }
+                      >
+                        {STAGE_LABEL[o.stage]}
+                      </Badge>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Proyectos</CardTitle>
           <CardDescription>
-            Engineering work for this client — managed in{" "}
+            Trabajo de ingeniería para este cliente, gestionado en{" "}
             <Link
               href="/projects"
               className="text-primary underline-offset-2 hover:underline"
             >
-              Projects
+              Proyectos
             </Link>
             .
           </CardDescription>
@@ -244,7 +355,7 @@ export default function ClientDetailPage() {
         <CardContent>
           {c.projects.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No projects for this client yet.
+              Aún no hay proyectos para este cliente.
             </p>
           ) : (
             <ul className="space-y-2">
@@ -272,14 +383,14 @@ export default function ClientDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Proposals</CardTitle>
+          <CardTitle className="text-base">Propuestas</CardTitle>
           <CardDescription>
-            Commercial offers to {c.name} — managed in{" "}
+            Ofertas comerciales para {c.name} , gestionadas en{" "}
             <Link
               href="/crm/proposals"
               className="text-primary underline-offset-2 hover:underline"
             >
-              Proposals
+              Propuestas
             </Link>
             .
           </CardDescription>
@@ -287,7 +398,7 @@ export default function ClientDetailPage() {
         <CardContent>
           {c.proposals.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No proposals for this client yet.
+              Aún no hay propuestas para este cliente.
             </p>
           ) : (
             <ul className="space-y-2">

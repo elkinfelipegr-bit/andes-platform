@@ -28,6 +28,8 @@ export const proposalItemInputSchema = z.object({
 export const proposalCreateSchema = z.object({
   clientId: z.string().min(1),
   contactId: z.string().min(1).optional(),
+  // Sprint 15: the opportunity this quote is prepared for (same client).
+  opportunityId: z.string().min(1).optional(),
   code: z.string().trim().min(1).max(32),
   title: z.string().trim().min(1).max(200),
   scope: z.string().trim().max(5000).optional(),

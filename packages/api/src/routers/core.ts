@@ -5,7 +5,9 @@ import {
   router,
   tenantProcedure,
 } from "../trpc.js";
+import { analyticsRouter } from "./analytics/index.js";
 import { clientsRouter, contactsRouter } from "./crm/index.js";
+import { opportunitiesRouter } from "./crm/opportunities.js";
 import { proposalsRouter } from "./crm/proposals.js";
 import { projectsRouter } from "./projects/index.js";
 import { inspectionsRouter } from "./projects/inspections.js";
@@ -60,6 +62,8 @@ export const appRouter = router({
   clients: clientsRouter,
   contacts: contactsRouter,
   proposals: proposalsRouter,
+  opportunities: opportunitiesRouter,
+  analytics: analyticsRouter,
   inspections: inspectionsRouter,
   calcRecords: calcRecordsRouter,
   geoRecords: geoRecordsRouter,

@@ -32,6 +32,23 @@ export {
   proposalItemInputSchema,
 } from "./routers/crm/proposal-schemas.js";
 export { proposalTotal } from "./routers/crm/proposal-total.js";
+export { opportunitiesRouter } from "./routers/crm/opportunities.js";
+export {
+  OPPORTUNITY_STAGES,
+  OPEN_STAGES,
+  ACTIVITY_TYPES,
+  opportunityStageSchema,
+  activityTypeSchema,
+  opportunityCreateSchema,
+  opportunityUpdateSchema,
+  opportunitySetStageSchema,
+  activityLogSchema,
+} from "./routers/crm/opportunity-schemas.js";
+export {
+  FOLLOW_UP_STATES,
+  followUpState,
+  type FollowUpState,
+} from "./routers/crm/follow-up.js";
 export { inspectionsRouter } from "./routers/projects/inspections.js";
 export {
   INSPECTION_STATUSES,
@@ -113,3 +130,34 @@ export {
   normsSearchSchema,
   normsRangeSchema,
 } from "./routers/norms/schemas.js";
+export { analyticsRouter } from "./routers/analytics/index.js";
+export { periodSchema, type Period } from "./routers/analytics/schemas.js";
+export {
+  intakeLead,
+  isValidIntakeKey,
+  leadIntakeSchema,
+  LeadIntakeError,
+  type LeadIntakeInput,
+} from "./intake/lead.js";
+export {
+  buildFollowUpDigests,
+  renderDigest,
+  isValidCronSecret,
+  type MemberDigest,
+} from "./reminders/digest.js";
+export {
+  buildFirmReport,
+  renderFirmReport,
+  reportHasContent,
+  reportRecipients,
+  mailConfigFromEnv,
+  sendMail,
+  type FirmReport,
+} from "./reminders/report.js";
+export {
+  STAGE_PROBABILITY,
+  COLD_AFTER_DAYS,
+  QUOTE_CHASE_AFTER_DAYS,
+  RISKS,
+  type Risk,
+} from "./routers/crm/health.js";

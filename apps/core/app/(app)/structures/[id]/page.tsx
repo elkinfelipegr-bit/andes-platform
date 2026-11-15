@@ -49,9 +49,9 @@ import {
 type CalcRecordDetail = RouterOutputs["calcRecords"]["get"];
 
 const criteriaSchema = z.object({
-  code: z.string().trim().min(1, "Required").max(32),
-  title: z.string().trim().min(1, "Required").max(200),
-  designCode: z.string().trim().min(1, "Required").max(50),
+  code: z.string().trim().min(1, "Obligatorio").max(32),
+  title: z.string().trim().min(1, "Obligatorio").max(200),
+  designCode: z.string().trim().min(1, "Obligatorio").max(50),
   fc: z.string().refine((v) => Number(v) >= 17 && Number(v) <= 100, {
     message: "17–100 MPa",
   }),
@@ -110,11 +110,12 @@ function CriteriaEditor({ record }: { record: CalcRecordDetail }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Design criteria</CardTitle>
+        <CardTitle className="text-base">Criterios de diseño</CardTitle>
         <CardDescription>
-          Changing f&apos;c or fy recomputes every check in this record.
+          Cambiar f&apos;c o fy recalcula todas las verificaciones de este
+          registro.
           {update.isSuccess && (
-            <span className="ml-2 text-success">Saved.</span>
+            <span className="ml-2 text-success">Guardado.</span>
           )}
         </CardDescription>
       </CardHeader>
@@ -122,7 +123,7 @@ function CriteriaEditor({ record }: { record: CalcRecordDetail }) {
         <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
           <div className="grid grid-cols-4 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="cr-code">Code</Label>
+              <Label htmlFor="cr-code">Código</Label>
               <Input
                 id="cr-code"
                 className="font-mono"
@@ -135,7 +136,7 @@ function CriteriaEditor({ record }: { record: CalcRecordDetail }) {
               )}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="cr-designcode">Design code</Label>
+              <Label htmlFor="cr-designcode">Norma de diseño</Label>
               <Input id="cr-designcode" {...form.register("designCode")} />
             </div>
             <div className="space-y-1.5">
@@ -166,14 +167,14 @@ function CriteriaEditor({ record }: { record: CalcRecordDetail }) {
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="cr-title">Title</Label>
+            <Label htmlFor="cr-title">Título</Label>
             <Input id="cr-title" {...form.register("title")} />
             {errors.title && (
               <p className="text-xs text-destructive">{errors.title.message}</p>
             )}
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="cr-notes">Criteria notes</Label>
+            <Label htmlFor="cr-notes">Notas de criterios</Label>
             <Textarea id="cr-notes" rows={3} {...form.register("notes")} />
           </div>
 
@@ -182,7 +183,7 @@ function CriteriaEditor({ record }: { record: CalcRecordDetail }) {
           )}
           <div className="flex justify-end">
             <Button type="submit" disabled={update.isPending}>
-              {update.isPending ? "…" : "Save criteria"}
+              {update.isPending ? "…" : "Guardar criterios"}
             </Button>
           </div>
         </form>
@@ -209,7 +210,8 @@ function ChecksTable({
   if (record.checks.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        No checks yet — a record needs at least one before it can be issued.
+        Aún no hay verificaciones: un registro necesita al menos una para poder
+        emitirse.
       </p>
     );
   }
@@ -218,13 +220,13 @@ function ChecksTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Element</TableHead>
+          <TableHead>Elemento</TableHead>
           <TableHead className="text-right">b×h (mm)</TableHead>
           <TableHead className="text-right">Mu (kN·m)</TableHead>
           <TableHead className="text-right">d (mm)</TableHead>
           <TableHead className="text-right">ρ req.</TableHead>
           <TableHead className="text-right">As req.</TableHead>
-          <TableHead>Verdict</TableHead>
+          <TableHead>Veredicto</TableHead>
           {editable && <TableHead className="w-20" />}
         </TableRow>
       </TableHeader>
@@ -260,7 +262,7 @@ function ChecksTable({
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label={`Edit ${check.label}`}
+                        aria-label={`Editar ${check.label}`}
                       >
                         <Pencil aria-hidden="true" />
                       </Button>
@@ -269,10 +271,14 @@ function ChecksTable({
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label={`Remove ${check.label}`}
+                    aria-label={`Quitar a ${check.label}`}
                     disabled={remove.isPending}
                     onClick={() => {
-                      if (window.confirm(`Remove check "${check.label}"?`)) {
+                      if (
+                        window.confirm(
+                          `¿Quitar la verificación "${check.label}"?`,
+                        )
+                      ) {
                         remove.mutate({ id: check.id });
                       }
                     }}
@@ -305,8 +311,8 @@ function MemoriaView({ record }: { record: CalcRecordDetail }) {
           </p>
         </div>
         <div className="text-right text-sm text-muted-foreground">
-          <p>Design code: {record.designCode}</p>
-          <p>Issued: {formatDate(record.issuedAt)}</p>
+          <p>Norma de diseño: {record.designCode}</p>
+          <p>Emitido: {formatDate(record.issuedAt)}</p>
         </div>
       </div>
 
@@ -315,7 +321,7 @@ function MemoriaView({ record }: { record: CalcRecordDetail }) {
       <div className="grid grid-cols-3 gap-4 text-sm">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Project
+            Proyecto
           </p>
           <p className="mt-1 font-medium">
             <span className="font-mono text-xs">{record.project.code}</span> —{" "}
@@ -324,13 +330,13 @@ function MemoriaView({ record }: { record: CalcRecordDetail }) {
         </div>
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Concrete f&apos;c
+            Concreto f&apos;c
           </p>
           <p className="mt-1 font-mono font-medium">{record.fc} MPa</p>
         </div>
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Steel fy
+            Acero fy
           </p>
           <p className="mt-1 font-mono font-medium">{record.fy} MPa</p>
         </div>
@@ -339,7 +345,7 @@ function MemoriaView({ record }: { record: CalcRecordDetail }) {
       {record.notes && (
         <>
           <p className="mt-6 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Criteria
+            Criterios
           </p>
           <p className="mt-1 whitespace-pre-wrap text-sm">{record.notes}</p>
         </>
@@ -347,7 +353,7 @@ function MemoriaView({ record }: { record: CalcRecordDetail }) {
 
       <div className="mt-6">
         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Flexural design checks ({record.checks.length})
+          Verificaciones de diseño a flexión ({record.checks.length})
         </p>
         <ChecksTable record={record} editable={false} />
       </div>
@@ -374,16 +380,16 @@ export default function CalcRecordDetailPage() {
   });
 
   if (record.isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading record…</p>;
+    return <p className="text-sm text-muted-foreground">Cargando registro…</p>;
   }
   if (!record.data) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-destructive">Record not found.</p>
+        <p className="text-sm text-destructive">Registro no encontrado.</p>
         <Button asChild variant="outline">
           <Link href="/structures">
             <ArrowLeft aria-hidden="true" />
-            Back to records
+            Volver a registros
           </Link>
         </Button>
       </div>
@@ -402,7 +408,7 @@ export default function CalcRecordDetailPage() {
             className="inline-flex items-center gap-1 text-sm text-muted-foreground underline-offset-2 hover:underline"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
-            Calculation records
+            Memorias de cálculo
           </Link>
           <div className="flex items-center gap-3">
             <h1 className="font-mono text-2xl font-semibold">{r.code}</h1>
@@ -423,7 +429,7 @@ export default function CalcRecordDetailPage() {
           {!draft && (
             <Button variant="outline" onClick={() => window.print()}>
               <Printer aria-hidden="true" />
-              Print
+              Imprimir
             </Button>
           )}
           {draft && (
@@ -432,7 +438,7 @@ export default function CalcRecordDetailPage() {
               onClick={() => {
                 if (
                   window.confirm(
-                    `Issue record ${r.code}? It freezes as evidence — a correction is a new record.`,
+                    `¿Emitir el registro ${r.code}? Queda congelado como evidencia; una corrección es un registro nuevo.`,
                   )
                 ) {
                   issue.mutate({ id });
@@ -440,7 +446,7 @@ export default function CalcRecordDetailPage() {
               }}
             >
               <FileCheck2 aria-hidden="true" />
-              {issue.isPending ? "…" : "Issue"}
+              {issue.isPending ? "…" : "Emitir"}
             </Button>
           )}
         </div>
@@ -459,10 +465,12 @@ export default function CalcRecordDetailPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-base">Design checks</CardTitle>
+                  <CardTitle className="text-base">
+                    Verificaciones de diseño
+                  </CardTitle>
                   <CardDescription>
-                    Computed server-side per NSR-10 C.10 — the engineer reviews
-                    before issuing.
+                    Calculado en el servidor según NSR-10 C.10; el ingeniero
+                    revisa antes de emitir.
                   </CardDescription>
                 </div>
                 <CheckDialog
@@ -470,7 +478,7 @@ export default function CalcRecordDetailPage() {
                   trigger={
                     <Button variant="outline" size="sm">
                       <Plus aria-hidden="true" />
-                      Add check
+                      Agregar verificación
                     </Button>
                   }
                 />

@@ -12,8 +12,8 @@ const statusVariant = {
 } as const;
 
 const statusLabel: Record<CalcRecordStatus, string> = {
-  DRAFT: "Draft",
-  ISSUED: "Issued",
+  DRAFT: "Borrador",
+  ISSUED: "Emitido",
 };
 
 export function CalcRecordStatusBadge({
@@ -32,8 +32,8 @@ const verdictVariant = {
 
 const verdictLabel: Record<CheckVerdict, string> = {
   OK: "OK",
-  USE_MIN: "Min. steel",
-  INCREASE_SECTION: "Increase section",
+  USE_MIN: "Acero mín.",
+  INCREASE_SECTION: "Aumentar sección",
 };
 
 export function VerdictBadge({ verdict }: { verdict: CheckVerdict }) {

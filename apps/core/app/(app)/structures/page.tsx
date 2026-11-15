@@ -34,17 +34,17 @@ import { trpc } from "@/lib/trpc";
 import { CalcRecordStatusBadge } from "./_components/structures-badges";
 
 const STATUS_FILTERS = [
-  ["ALL", "All statuses"],
-  ["DRAFT", "Draft"],
-  ["ISSUED", "Issued"],
+  ["ALL", "Todos los estados"],
+  ["DRAFT", "Borrador"],
+  ["ISSUED", "Emitido"],
 ] as const;
 
 type StatusFilter = (typeof STATUS_FILTERS)[number][0];
 
 const createFormSchema = z.object({
-  projectId: z.string().min(1, "Pick a project"),
-  code: z.string().trim().min(1, "Required").max(32),
-  title: z.string().trim().min(1, "Required").max(200),
+  projectId: z.string().min(1, "Elige un proyecto"),
+  code: z.string().trim().min(1, "Obligatorio").max(32),
+  title: z.string().trim().min(1, "Obligatorio").max(200),
   fc: z.string().refine((v) => Number(v) >= 17 && Number(v) <= 100, {
     message: "17–100 MPa",
   }),
@@ -92,22 +92,22 @@ function NewRecordDialog() {
       <DialogTrigger asChild>
         <Button>
           <Plus aria-hidden="true" />
-          New record
+          Nuevo registro
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New calculation record</DialogTitle>
+          <DialogTitle>Nueva memoria de cálculo</DialogTitle>
           <DialogDescription>
-            Design criteria first — checks are added on the next screen, while
-            it stays a draft.
+            Primero los criterios de diseño; las verificaciones se agregan en la
+            siguiente pantalla, mientras es borrador.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="cr-project">Project</Label>
+            <Label htmlFor="cr-project">Proyecto</Label>
             <Select id="cr-project" {...form.register("projectId")}>
-              <option value="">— Pick a project —</option>
+              <option value="">— Elige un proyecto —</option>
               {activeProjects.map((project) => (
                 <option key={project.id} value={project.id}>
                   {project.code} — {project.name}
@@ -122,7 +122,7 @@ function NewRecordDialog() {
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="cr-code">Code</Label>
+              <Label htmlFor="cr-code">Código</Label>
               <Input
                 id="cr-code"
                 placeholder="MC-2026-001"
@@ -163,7 +163,7 @@ function NewRecordDialog() {
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="cr-title">Title</Label>
+            <Label htmlFor="cr-title">Título</Label>
             <Input
               id="cr-title"
               placeholder="Memoria de cálculo — vigas nivel 2"
@@ -180,7 +180,7 @@ function NewRecordDialog() {
 
           <div className="flex justify-end">
             <Button type="submit" disabled={create.isPending}>
-              {create.isPending ? "…" : "Create draft"}
+              {create.isPending ? "…" : "Crear borrador"}
             </Button>
           </div>
         </form>
@@ -199,17 +199,17 @@ export default function StructuresPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Calculation records</h1>
+          <h1 className="text-2xl font-semibold">Memorias de cálculo</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Memorias de cálculo — the platform computes; the engineer reviews,
-            decides, and signs.
+            Memorias de cálculo: la plataforma calcula; el ingeniero revisa,
+            decide y firma.
           </p>
         </div>
         <NewRecordDialog />
       </div>
 
       <Select
-        aria-label="Filter by status"
+        aria-label="Filtrar por estado"
         className="w-44"
         value={status}
         onChange={(e) => setStatus(e.target.value as StatusFilter)}
@@ -222,17 +222,17 @@ export default function StructuresPage() {
       </Select>
 
       {records.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading records…</p>
+        <p className="text-sm text-muted-foreground">Cargando registros…</p>
       ) : records.data && records.data.length > 0 ? (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Code</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Project</TableHead>
+              <TableHead>Código</TableHead>
+              <TableHead>Título</TableHead>
+              <TableHead>Proyecto</TableHead>
               <TableHead className="text-right">f&apos;c / fy</TableHead>
-              <TableHead className="text-right">Checks</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Verificaciones</TableHead>
+              <TableHead>Estado</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -270,9 +270,8 @@ export default function StructuresPage() {
         </Table>
       ) : (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-          No calculation records
-          {status !== "ALL" ? " with this status" : " yet"}. Create the first
-          one.
+          No hay memorias de cálculo
+          {status !== "ALL" ? " con este estado" : " todavía"}. Crea el primero.
         </div>
       )}
     </div>

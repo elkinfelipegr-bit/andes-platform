@@ -1,5 +1,7 @@
 // Module → route map from docs/design/navigation.md. The eight products
 // stay visible as disabled stubs until their sprint ships them.
+// Administration is live since Sprint 12 and shown to OWNER_ADMIN only
+// (the sidebar decides visibility; the API enforces the role).
 import {
   BookOpen,
   Boxes,
@@ -23,24 +25,24 @@ export interface NavItem {
 
 export const moduleNav: NavItem[] = [
   {
-    label: "Dashboard",
+    label: "Inicio",
     href: "/dashboard",
     icon: LayoutDashboard,
     enabled: true,
   },
-  { label: "Projects", href: "/projects", icon: FolderKanban, enabled: true },
+  { label: "Proyectos", href: "/projects", icon: FolderKanban, enabled: true },
   { label: "CRM", href: "/crm", icon: Handshake, enabled: true },
-  { label: "Structures", href: "/structures", icon: Building2, enabled: true },
+  { label: "Estructuras", href: "/structures", icon: Building2, enabled: true },
   { label: "Geo", href: "/geo", icon: Mountain, enabled: true },
   { label: "BIM", href: "/bim", icon: Boxes, enabled: true },
-  { label: "AI", href: "/ai", icon: Sparkles, enabled: true },
+  { label: "IA", href: "/ai", icon: Sparkles, enabled: true },
   { label: "Normas", href: "/normas", icon: BookOpen, enabled: true },
-  { label: "Analytics", href: "/analytics", icon: ChartColumn, enabled: false },
+  { label: "Analítica", href: "/analytics", icon: ChartColumn, enabled: true },
 ];
 
 export const adminNav: NavItem = {
-  label: "Administration",
+  label: "Administración",
   href: "/admin",
   icon: Settings,
-  enabled: false,
+  enabled: true,
 };

@@ -19,10 +19,12 @@ export function putWithProgress(
       xhr.status >= 200 && xhr.status < 300
         ? resolve()
         : reject(
-            new Error(`Storage rejected the upload (HTTP ${xhr.status}).`),
+            new Error(
+              `El almacenamiento rechazó la carga (HTTP ${xhr.status}).`,
+            ),
           );
     xhr.onerror = () =>
-      reject(new Error("Network error while uploading to storage."));
+      reject(new Error("Error de red al subir al almacenamiento."));
     xhr.send(file);
   });
 }

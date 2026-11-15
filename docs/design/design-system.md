@@ -59,6 +59,14 @@ Exact values live in `packages/ui/src/styles/theme.css` — that file and this t
 - Sprint 3 additions (CRM module): `Textarea`.
 - Icons: **lucide-react** (shadcn's companion set), sized `size-4` inline / `size-5` nav.
 
+## Interface Language
+
+**The interface is written in Spanish (es-CO).** The platform's users are Colombian engineering firms; the documents it produces (proposals, inspection reports, calculation and geotechnical records) go to their clients. This covers every visible string in `apps/core` and `packages/ui`, the error messages the API returns to the interface, and date and number formatting (`es-CO`).
+
+It does not change [project-principles.md](../foundation/project-principles.md)'s Language Decision: documentation, code, identifiers, comments and commit messages stay in English. The Copilot's system prompt and tool descriptions also stay in English — they are read by the model, not by people; it answers in the user's language.
+
+Strings live inline, in Spanish, with no translation layer. A second interface language would be a decision of its own (a library, a catalogue and a per-tenant setting) and is deliberately not anticipated here. Decided under the CTO's instruction of 2026-11-15 to build the interface in Spanish.
+
 ## Accessibility Baseline
 
 Semantic HTML first; Radix primitives for anything with keyboard/focus behavior; visible focus ring (`--ring`) on all interactive elements; WCAG AA contrast for text tokens; every icon-only control carries an accessible name.
