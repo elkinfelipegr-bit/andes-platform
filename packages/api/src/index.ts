@@ -130,3 +130,10 @@ export {
   normsSearchSchema,
   normsRangeSchema,
 } from "./routers/norms/schemas.js";
+export {
+  intakeLead,
+  isValidIntakeKey,
+  leadIntakeSchema,
+  LeadIntakeError,
+  type LeadIntakeInput,
+} from "./intake/lead.js";
