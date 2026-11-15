@@ -156,12 +156,12 @@ function escapeHtml(value: string) {
 export function renderDigest(digest: MemberDigest, baseUrl: string) {
   const link = (path: string) => `${baseUrl.replace(/\/$/, "")}${path}`;
   const late = (d: number) =>
-    d === 0 ? "today" : d === 1 ? "1 day late" : `${d} days late`;
+    d === 0 ? "hoy" : d === 1 ? "1 día de atraso" : `${d} días de atraso`;
   const count = digest.due.length;
   const subject =
     count > 0
-      ? `${count} follow-up${count === 1 ? "" : "s"} due today`
-      : "Your pipeline needs a next step";
+      ? `${count} seguimiento${count === 1 ? "" : "s"} para hoy`
+      : "Tienes oportunidades sin próximo paso";
 
   const sections: {
     heading: string;
@@ -169,19 +169,19 @@ export function renderDigest(digest: MemberDigest, baseUrl: string) {
   }[] = [];
   if (digest.due.length > 0) {
     sections.push({
-      heading: "Due",
+      heading: "Pendientes",
       rows: digest.due.map((i) => ({
-        text: `${i.nextAction ?? "Follow up"} — ${i.client} · ${i.title} (${late(i.daysLate)})`,
+        text: `${i.nextAction ?? "Hacer seguimiento"} — ${i.client} · ${i.title} (${late(i.daysLate)})`,
         href: link(`/crm/pipeline/${i.opportunityId}`),
       })),
     });
   }
   if (digest.quotes.length > 0) {
     sections.push({
-      heading: "Quotes awaiting an answer",
+      heading: "Cotizaciones sin respuesta",
       rows: digest.quotes.map((q) => ({
         text: `${q.code} ${q.title} — ${q.client}${
-          q.daysWaiting === null ? "" : ` (sent ${q.daysWaiting} d ago)`
+          q.daysWaiting === null ? "" : ` (enviada hace ${q.daysWaiting} d)`
         }`,
         href: link(`/crm/proposals/${q.proposalId}`),
       })),
@@ -189,7 +189,7 @@ export function renderDigest(digest: MemberDigest, baseUrl: string) {
   }
   if (digest.unplanned.length > 0) {
     sections.push({
-      heading: "Without a next step",
+      heading: "Sin próximo paso",
       rows: digest.unplanned.map((u) => ({
         text: `${u.client} · ${u.title}`,
         href: link(`/crm/pipeline/${u.opportunityId}`),
@@ -198,18 +198,18 @@ export function renderDigest(digest: MemberDigest, baseUrl: string) {
   }
 
   const text = [
-    `Hello ${digest.name},`,
+    `Hola, ${digest.name}:`,
     "",
     ...sections.flatMap((s) => [
       `${s.heading}:`,
       ...s.rows.map((r) => `- ${r.text}\n  ${r.href}`),
       "",
     ]),
-    `Pipeline: ${link("/crm/pipeline")}`,
+    `Seguimiento: ${link("/crm/pipeline")}`,
   ].join("\n");
 
   const html = [
-    `<p>Hello ${escapeHtml(digest.name)},</p>`,
+    `<p>Hola, ${escapeHtml(digest.name)}:</p>`,
     ...sections.map(
       (s) =>
         `<h3 style="margin:16px 0 4px">${escapeHtml(s.heading)}</h3><ul style="margin:0;padding-left:18px">${s.rows
@@ -219,7 +219,7 @@ export function renderDigest(digest: MemberDigest, baseUrl: string) {
           )
           .join("")}</ul>`,
     ),
-    `<p><a href="${escapeHtml(link("/crm/pipeline"))}">Open the pipeline</a></p>`,
+    `<p><a href="${escapeHtml(link("/crm/pipeline"))}">Abrir el seguimiento</a></p>`,
   ].join("");
 
   return { subject, text, html };

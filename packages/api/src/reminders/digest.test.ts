@@ -49,13 +49,13 @@ describe("renderDigest", () => {
   const r = renderDigest(digest, "https://app.example.com/");
 
   it("puts the count in the subject and links every row to the app", () => {
-    expect(r.subject).toBe("2 follow-ups due today");
+    expect(r.subject).toBe("2 seguimientos para hoy");
     expect(r.text).toContain("https://app.example.com/crm/pipeline/o1");
     expect(r.text).toContain("https://app.example.com/crm/proposals/p1");
     expect(r.text).not.toContain(".com//crm");
-    expect(r.text).toContain("(2 days late)");
-    expect(r.text).toContain("Follow up — Beta · Casa (today)");
-    expect(r.text).toContain("(sent 5 d ago)");
+    expect(r.text).toContain("(2 días de atraso)");
+    expect(r.text).toContain("Hacer seguimiento — Beta · Casa (hoy)");
+    expect(r.text).toContain("(enviada hace 5 d)");
     expect(r.text).toContain("COT-2 Viejo — Beta\n");
   });
 
@@ -68,8 +68,8 @@ describe("renderDigest", () => {
 
   it("uses a different subject when nothing is due", () => {
     const quiet = renderDigest({ ...digest, due: [], quotes: [] }, "https://x");
-    expect(quiet.subject).toBe("Your pipeline needs a next step");
-    expect(quiet.text).not.toContain("Due:");
+    expect(quiet.subject).toBe("Tienes oportunidades sin próximo paso");
+    expect(quiet.text).not.toContain("Pendientes:");
   });
 });
 

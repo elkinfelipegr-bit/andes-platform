@@ -44,7 +44,7 @@ Vercel Cron on the free plan runs at most daily and with loose timing (within th
 
 ## Examples
 
-Monday 07:00: Ana receives "2 follow-ups due today" — one three days late, one for today — each linking to its opportunity. Luis receives the proposal he sent four days ago and an opportunity with no next step. A member with nothing pending receives nothing.
+Monday 07:00: Ana receives "2 seguimientos para hoy" (the email is written in Spanish, the interface language) — one three days late, one for today — each linking to its opportunity. Luis receives the proposal he sent four days ago and an opportunity with no next step. A member with nothing pending receives nothing.
 
 ## Exceptions
 
