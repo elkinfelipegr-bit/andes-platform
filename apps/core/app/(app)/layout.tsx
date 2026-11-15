@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { auth } from "@andes/auth";
 
+import { NavBackdrop, NavToggleState } from "./_components/nav-toggle";
 import { Sidebar } from "./_components/sidebar";
 import { Topbar } from "./_components/topbar";
 import { AppProviders } from "./providers";
@@ -19,7 +20,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
+      <NavToggleState />
       <Sidebar navDisabled={!membership} />
+      <NavBackdrop />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
           user={{ name: session.user.name, email: session.user.email }}
@@ -32,7 +35,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
               : null
           }
         />
-        <main className="flex-1 p-8 print:p-0">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 print:p-0">
           <AppProviders>{children}</AppProviders>
         </main>
       </div>

@@ -50,7 +50,7 @@ function NavEntry({
 export function Sidebar({ navDisabled = false }: { navDisabled?: boolean }) {
   const pathname = usePathname();
   return (
-    <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-card print:hidden">
+    <aside className="fixed inset-y-0 left-0 z-40 flex w-60 shrink-0 -translate-x-full flex-col overflow-y-auto border-r border-border bg-card transition-transform peer-checked:translate-x-0 max-lg:invisible max-lg:peer-checked:visible lg:static lg:translate-x-0 print:hidden">
       <div className="flex h-14 items-center gap-2 px-5">
         <span className="text-lg font-semibold tracking-tight">Andes</span>
         <span className="text-lg font-light text-muted-foreground">

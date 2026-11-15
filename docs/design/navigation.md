@@ -25,7 +25,7 @@ Defines the authenticated shell every Andes product renders inside, and the navi
 
 - **Sidebar** (fixed, `w-60`, desktop-first): Andes wordmark, then one entry per product module, then Administration pinned at the bottom. Active module = `--primary` treatment; inactive real routes = muted; **not-yet-built modules render as disabled stubs** (muted + "Soon" badge) so the product map is visible from day one without dead links.
 - **Topbar**: current page title/breadcrumb slot on the left; on the right the **tenant name + role badge** (the session context RFC-001 makes mandatory — the user must always see which tenant scope they act in) and the user menu (name, email, sign-out) as a `DropdownMenu`.
-- Mobile: the sidebar collapses behind a menu button. Sprint 1 ships the desktop layout and a usable small-screen fallback (topbar + slide-over nav is acceptable to defer if it grows the sprint).
+- Mobile: below the `lg` breakpoint the sidebar collapses behind a menu button in the topbar and opens as a slide-over drawer with a backdrop; it closes on navigation, on Escape and on a backdrop tap. The tenant slug hides on the narrowest screens — the role badge stays, so the scope is still on screen. (Deferred from Sprint 1; shipped with the CRM pipeline work, which is used from a phone.)
 
 ## Module → Route Map
 

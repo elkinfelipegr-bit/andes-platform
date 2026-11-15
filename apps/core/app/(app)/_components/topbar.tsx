@@ -17,6 +17,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 
 import { adminNav, moduleNav } from "./nav-items";
+import { NavMenuButton } from "./nav-toggle";
 
 export interface TopbarProps {
   user: { name: string; email: string };
@@ -33,12 +34,17 @@ export function Topbar({ user, membership }: TopbarProps) {
   );
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6 print:hidden">
-      <h1 className="text-sm font-medium">{current?.label ?? "Andes Core"}</h1>
+    <header className="flex h-14 items-center justify-between gap-2 border-b border-border bg-card px-4 lg:px-6 print:hidden">
+      <div className="flex min-w-0 items-center gap-1">
+        <NavMenuButton />
+        <h1 className="truncate text-sm font-medium">
+          {current?.label ?? "Andes Core"}
+        </h1>
+      </div>
       <div className="flex items-center gap-3">
         {membership ? (
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs text-muted-foreground">
+            <span className="hidden font-mono text-xs text-muted-foreground sm:inline">
               {membership.tenantSlug}
             </span>
             <Badge variant="secondary">{membership.roleLabel}</Badge>
