@@ -43,6 +43,7 @@ export async function GET(req: Request) {
     return Response.json({ status: "unconfigured", sent: 0 });
   }
 
+  const override = process.env.DIGEST_TO_EMAIL || undefined;
   const today = todayIn(process.env.DIGEST_TIME_ZONE ?? "America/Bogota");
   let sent = 0;
   let failed = 0;
@@ -56,7 +57,15 @@ export async function GET(req: Request) {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ from, to: [digest.email], subject, text, html }),
+        body: JSON.stringify({
+          from,
+          // DIGEST_TO_EMAIL routes every digest to one shared inbox (ADR-012,
+          // Exceptions) — the member's name then goes in the subject.
+          to: [override ?? digest.email],
+          subject: override ? `${digest.name}: ${subject}` : subject,
+          text,
+          html,
+        }),
       });
       if (res.ok) sent += 1;
       else {

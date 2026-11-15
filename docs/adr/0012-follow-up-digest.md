@@ -48,7 +48,9 @@ Monday 07:00: Ana receives "2 seguimientos para hoy" (the email is written in Sp
 
 ## Exceptions
 
-None. Per-member opt-out, other schedules and other email types are follow-ups, not exceptions.
+**One shared inbox.** When `DIGEST_TO_EMAIL` is set, every member's digest is sent to that single address instead of the member's own, with the member's name in the subject. This is how Tenant #1 runs today (CTO instruction of 2026-11-15: everything goes to the firm's inbox), and it is also what makes the digest deliverable before a sending domain is verified in Resend — the sandbox sender only delivers to the Resend account's own address. Unset it to send to each member once the domain is verified.
+
+Per-member opt-out, other schedules and other email types are follow-ups, not exceptions.
 
 ## References
 
